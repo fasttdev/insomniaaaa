@@ -12,9 +12,13 @@
     --blue-50:  #f0f8ff;
     --blue-100: #e0f2fe;
     --blue-200: #bae6fd;
+    --blue-300: #7dd3fc;
     --blue-400: #38bdf8;
     --blue-500: #0ea5e9;
     --blue-600: #0284c7;
+    --blue-700: #0369a1;
+    --blue-800: #075985;
+    --blue-900: #0c4a6e;
     --ink:      #0b1220;
     --ink-2:    #334155;
     --muted:    #64748b;
@@ -78,10 +82,10 @@
     width: 100%;
     max-width: 760px;
     margin: 0 auto;
-    padding: 36px 24px 56px;
+    padding: 32px 24px 56px;
   }
 
-  .intro { text-align: center; margin-bottom: 20px; }
+  .intro { text-align: center; margin-bottom: 8px; }
 
   .badge {
     display: inline-block;
@@ -102,7 +106,7 @@
   }
   h1 em {
     font-style: normal;
-    background: linear-gradient(90deg, var(--blue-500), var(--blue-400));
+    background: linear-gradient(90deg, var(--blue-500), var(--blue-300));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -116,14 +120,13 @@
     margin: 0 auto;
   }
 
-  /* ================= SCENE ================= */
+  /* ========== SCENE ========== */
   .scene {
     position: relative;
     width: 100%;
-    height: 560px;
-    margin-top: 10px;
-    perspective: 1400px;
-    perspective-origin: 50% 30%;
+    height: 620px;
+    margin-top: 8px;
+    overflow: visible;
   }
 
   .svg-strap {
@@ -134,127 +137,156 @@
     overflow: visible;
     pointer-events: none;
     z-index: 1;
-    filter: drop-shadow(0 6px 10px rgba(2, 50, 80, 0.18));
   }
 
-  /* titik gantung */
+  /* anchor titik gantung */
   .anchor {
     position: absolute;
-    top: 6px;
+    top: 4px;
     left: 50%;
     transform: translateX(-50%);
-    width: 26px;
-    height: 26px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     background:
-      radial-gradient(circle at 35% 30%, #ffffff 0%, #cbd5e1 55%, #64748b 100%);
+      radial-gradient(circle at 35% 30%, #ffffff 0%, #e2e8f0 30%, #94a3b8 70%, #475569 100%);
     box-shadow:
-      0 4px 10px rgba(2, 50, 80, .35),
-      inset 0 -2px 3px rgba(0, 0, 0, .25),
-      inset 0 2px 3px rgba(255, 255, 255, .9);
+      0 6px 14px rgba(2, 50, 80, .35),
+      inset 0 -3px 4px rgba(0, 0, 0, .35),
+      inset 0 3px 4px rgba(255, 255, 255, .95);
     z-index: 3;
   }
   .anchor::after {
     content: "";
     position: absolute;
-    inset: 8px;
+    inset: 9px;
     border-radius: 50%;
-    background: radial-gradient(circle at 40% 40%, #f8fafc, #cbd5e1);
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .2);
+    background: radial-gradient(circle at 40% 40%, #cbd5e1, #475569);
+    box-shadow:
+      inset 0 2px 3px rgba(0, 0, 0, .4),
+      0 1px 0 rgba(255, 255, 255, .6);
   }
 
-  /* ================= KARTU ID ================= */
+  /* ========== KARTU ID (versi baru) ========== */
   .idcard {
     position: absolute;
     top: 0; left: 0;
-    width: 280px;
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    box-shadow: 0 26px 50px -22px rgba(2, 132, 199, .42);
-    padding: 16px 16px 18px;
+    width: 282px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow:
+      0 30px 60px -28px rgba(2, 132, 199, .45),
+      0 4px 12px -4px rgba(2, 132, 199, .15);
+    padding: 0 0 16px;
     z-index: 2;
-    transform-origin: 50% 0%;
+    transform-origin: 50% 21px;
     cursor: grab;
     touch-action: none;
     user-select: none;
     -webkit-user-select: none;
     will-change: transform;
     backface-visibility: hidden;
+    overflow: hidden;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(14,165,233,.07) 1px, transparent 0);
+    background-size: 12px 12px;
   }
   .idcard:active { cursor: grabbing; }
 
-  .idcard::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 5px;
-    background: linear-gradient(90deg, var(--blue-400), var(--blue-600));
-    border-radius: 16px 16px 0 0;
+  /* accent bar atas */
+  .idcard__bar {
+    height: 6px;
+    background: linear-gradient(90deg, var(--blue-400), var(--blue-600), var(--blue-400));
   }
 
-  /* lubang tempat strap masuk */
+  /* slot/lubang lanyard */
   .idcard__hole {
-    width: 40px;
-    height: 8px;
-    margin: 8px auto 14px;
+    width: 52px;
+    height: 10px;
+    margin: 9px auto 12px;
     border-radius: 99px;
-    background: linear-gradient(180deg, #cbd5e1, #94a3b8);
+    background:
+      linear-gradient(180deg, #64748b 0%, #334155 45%, #1e293b 100%);
     box-shadow:
-      inset 0 2px 3px rgba(0, 0, 0, .35),
-      inset 0 -1px 1px rgba(255, 255, 255, .6),
+      inset 0 2px 3px rgba(0, 0, 0, .55),
+      inset 0 -1px 1px rgba(255, 255, 255, .25),
       0 1px 0 rgba(255, 255, 255, .8);
     position: relative;
   }
   .idcard__hole::after {
     content: "";
     position: absolute;
-    inset: 1px 3px;
+    inset: 2px 3px;
     border-radius: 99px;
-    background: #475569;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .5);
+    background: #0b1220;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .8);
   }
 
-  .idcard__top {
+  /* header ID */
+  .idcard__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 0 16px;
     margin-bottom: 12px;
   }
   .idcard__brand {
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 800;
-    letter-spacing: .16em;
+    letter-spacing: .18em;
     color: var(--muted);
   }
   .idcard__status {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-size: 10px;
+    gap: 5px;
+    font-size: 9px;
     font-weight: 800;
-    letter-spacing: .08em;
-    color: var(--blue-600);
+    letter-spacing: .1em;
+    color: var(--blue-700);
     background: var(--blue-50);
     border: 1px solid var(--blue-100);
-    padding: 3px 9px;
+    padding: 3px 8px;
     border-radius: 99px;
   }
   .idcard__status i {
-    width: 6px; height: 6px;
+    width: 5px; height: 5px;
     border-radius: 50%;
     background: var(--blue-500);
   }
 
-  .idcard__photo {
-    width: 106px;
+  /* foto + ring */
+  .idcard__photo-wrap {
+    width: 108px;
     height: 132px;
     margin: 0 auto 12px;
-    border-radius: 12px;
+    position: relative;
+  }
+  .idcard__photo-wrap::before {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--blue-300), var(--blue-500), var(--blue-300));
+    z-index: 0;
+  }
+  .idcard__photo-wrap::after {
+    content: "";
+    position: absolute;
+    inset: -7px;
+    border-radius: 20px;
+    border: 1px dashed var(--blue-200);
+    z-index: 0;
+  }
+  .idcard__photo {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 14px;
     overflow: hidden;
-    border: 1px solid var(--line);
     background: var(--blue-50);
-    box-shadow: 0 10px 22px -12px rgba(2, 132, 199, .55);
+    z-index: 1;
+    box-shadow: 0 8px 18px -8px rgba(2, 132, 199, .5);
   }
   .idcard__photo img {
     width: 100%;
@@ -265,35 +297,53 @@
     -webkit-user-drag: none;
   }
 
+  /* nama + role */
   .idcard__name {
     text-align: center;
-    font-size: 18px;
+    font-size: 19px;
     font-weight: 800;
     letter-spacing: -.5px;
+    padding: 0 16px;
+    background: linear-gradient(90deg, var(--ink) 0%, var(--blue-700) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   .idcard__role {
     text-align: center;
-    font-size: 11px;
-    font-weight: 600;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .06em;
     color: var(--blue-600);
-    margin-top: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
     margin-bottom: 14px;
   }
 
+  /* divider */
+  .idcard__divider {
+    height: 1px;
+    margin: 0 16px 12px;
+    background:
+      linear-gradient(90deg, transparent, var(--line) 20%, var(--line) 80%, transparent);
+  }
+
+  /* baris info */
   .idcard__rows {
     list-style: none;
-    border-top: 1px dashed var(--line);
-    padding-top: 10px;
+    padding: 0 16px;
   }
   .idcard__rows li {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 5px 0;
+    gap: 10px;
+    padding: 5.5px 0;
     font-size: 11.5px;
   }
-  .idcard__rows li + li { border-top: 1px solid #f1f7fd; }
+  .idcard__rows li + li {
+    border-top: 1px solid #f1f7fd;
+  }
   .idcard__rows dt {
     color: var(--muted);
     font-weight: 600;
@@ -304,10 +354,46 @@
     font-weight: 700;
     text-align: right;
   }
-  .idcard__rows dd b { color: var(--blue-600); }
+  .idcard__rows dd b {
+    color: var(--blue-600);
+  }
+
+  /* footer barcode */
+  .idcard__footer {
+    padding: 14px 16px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .idcard__code {
+    font-family: Consolas, monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    color: var(--muted);
+  }
+  .idcard__barcode {
+    height: 22px;
+    width: 100px;
+    background:
+      repeating-linear-gradient(
+        90deg,
+        var(--ink) 0px, var(--ink) 2px,
+        transparent 2px, transparent 4px,
+        var(--ink) 4px, var(--ink) 5px,
+        transparent 5px, transparent 7px,
+        var(--ink) 7px, var(--ink) 10px,
+        transparent 10px, transparent 12px,
+        var(--ink) 12px, var(--ink) 13px,
+        transparent 13px, transparent 16px
+      );
+    border-radius: 2px;
+    opacity: .85;
+  }
 
   /* hint */
-  .hint-wrap { text-align: center; margin-top: 12px; }
+  .hint-wrap { text-align: center; margin-top: 14px; }
   .hint {
     display: inline-flex;
     align-items: center;
@@ -372,7 +458,7 @@
     color: var(--ink-2);
   }
 
-  /* FOOTER */
+  /* footer */
   footer {
     background: #fff;
     border-top: 1px solid var(--line);
@@ -409,15 +495,15 @@
   }
 
   @media (max-width: 640px) {
-    main { padding: 24px 16px 44px; }
-    .scene { height: 520px; }
+    main { padding: 22px 16px 44px; }
+    .scene { height: 560px; }
     .about { grid-template-columns: 1fr; }
     .btn { width: 100%; justify-content: center; }
   }
-  @media (max-width: 380px) {
-    .idcard { width: 260px; padding: 14px; }
-    .idcard__photo { width: 92px; height: 116px; }
-    .idcard__name { font-size: 16px; }
+  @media (max-width: 400px) {
+    .idcard { width: 252px; }
+    .idcard__photo-wrap { width: 96px; height: 118px; }
+    .idcard__name { font-size: 17px; }
     .idcard__rows li { font-size: 11px; }
   }
 </style>
@@ -438,391 +524,11 @@
     <h1>Halo, saya<br><em>Insomnia Dev.</em></h1>
     <p class="desc">
       Nama asli <strong>Yudha</strong>. Tinggal di Dlingo, Bantul, Yogyakarta.
-      Sehari-hari ngoding web, IoT, dan Arduino — sudah <strong>65+ project</strong>
-      yang saya bangun sampai selesai.
+      Sehari-hari ngoding web, IoT, dan Arduino — sudah <strong>65+ project</strong>.
     </p>
   </section>
 
-  <!-- SCENE: lanyard + kartu -->
+  <!-- SCENE -->
   <section class="scene" id="scene">
 
-    <svg class="svg-strap" id="svgStrap" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="strapStripes" patternUnits="userSpaceOnUse"
-                 width="14" height="14" patternTransform="rotate(-45)">
-          <rect width="14" height="14" fill="transparent"/>
-          <rect width="4" height="14" fill="rgba(255,255,255,0.28)"/>
-        </pattern>
-        <pattern id="strapStripesInner" patternUnits="userSpaceOnUse"
-                 width="14" height="14" patternTransform="rotate(-45)">
-          <rect width="14" height="14" fill="transparent"/>
-          <rect width="1.5" height="14" fill="rgba(2, 40, 70, 0.15)"/>
-        </pattern>
-      </defs>
-
-      <path id="strapBase" fill="none"
-            stroke="#0ea5e9" stroke-width="26"
-            stroke-linecap="round" stroke-linejoin="round"/>
-      <path id="strapStripe" fill="none"
-            stroke="url(#strapStripes)" stroke-width="26"
-            stroke-linecap="round" stroke-linejoin="round"/>
-      <path id="strapInner" fill="none"
-            stroke="url(#strapStripesInner)" stroke-width="26"
-            stroke-linecap="round" stroke-linejoin="round"/>
-      <path id="strapHighlight" fill="none"
-            stroke="rgba(255,255,255,0.35)" stroke-width="6"
-            stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-
-    <div class="anchor" id="anchor"></div>
-
-    <div class="idcard" id="card">
-      <div class="idcard__hole" aria-hidden="true"></div>
-
-      <div class="idcard__top">
-        <span class="idcard__brand">ID CARD</span>
-        <span class="idcard__status"><i></i> AKTIF</span>
-      </div>
-
-      <div class="idcard__photo">
-        <img src="saya.jpg" alt="Foto Yudha — Insomnia Dev">
-      </div>
-
-      <div class="idcard__name">Insomnia Dev</div>
-      <div class="idcard__role">Web &amp; IoT Developer</div>
-
-      <ul class="idcard__rows">
-        <li><dt>Nama Asli</dt><dd>Yudha</dd></li>
-        <li><dt>Domisili</dt><dd>Dlingo, Bantul</dd></li>
-        <li><dt>Pendidikan</dt><dd>SMPN 2 Dlingo</dd></li>
-        <li><dt>Lahir</dt><dd>22 Agustus 2011</dd></li>
-        <li><dt>Project</dt><dd><b>65+</b></dd></li>
-      </ul>
-    </div>
-
-  </section>
-
-  <div class="hint-wrap">
-    <div class="hint">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-           stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M18 11V6a2 2 0 0 0-4 0v5"/>
-        <path d="M14 10V4a2 2 0 0 0-4 0v6"/>
-        <path d="M10 10.5V6a2 2 0 0 0-4 0v8"/>
-        <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
-      </svg>
-      Geser kartunya ke mana saja
-    </div>
-  </div>
-
-  <div class="chips">
-    <span>HTML</span><span>CSS</span><span>C++</span>
-    <span>Arduino .ino</span><span>Internet of Things</span>
-  </div>
-
-  <section class="about">
-    <article class="about__card">
-      <h3>Fokus</h3>
-      <p>Website, perangkat Internet of Things, dan mikrokontroler berbasis Arduino.</p>
-    </article>
-    <article class="about__card">
-      <h3>Alat</h3>
-      <p>HTML, CSS, JavaScript, C++, dan sketch Arduino <code>.ino</code> untuk perangkat.</p>
-    </article>
-    <article class="about__card">
-      <h3>Lokasi</h3>
-      <p>Dlingo, Bantul, Yogyakarta. Terbuka untuk kolaborasi dan belajar bareng.</p>
-    </article>
-  </section>
-</main>
-
-<footer>
-  <a class="btn" href="beranda.html">Ke Menu &rarr;</a>
-  <small>&copy; <span id="y">2025</span> Insomnia Dev. Semua hak dilindungi.</small>
-</footer>
-
-<script>
-(function () {
-  "use strict";
-
-  document.getElementById("y").textContent = new Date().getFullYear();
-
-  /* ================= ELEMEN ================= */
-  var scene = document.getElementById("scene");
-  var anchorEl = document.getElementById("anchor");
-  var card = document.getElementById("card");
-
-  var pathBase = document.getElementById("strapBase");
-  var pathStripe = document.getElementById("strapStripe");
-  var pathInner = document.getElementById("strapInner");
-  var pathHL = document.getElementById("strapHighlight");
-
-  if (!scene || !card || !pathBase) return;
-
-  /* ================= PARAMETER FISIKA ================= */
-  var SEGS = 10;             // jumlah segmen rantai
-  var L = 240;               // total panjang strap (px)
-  var ITER = 10;             // iterasi constraint
-  var G = 2400;              // gravitasi (px/s^2)
-  var DAMP = 0.985;          // redaman per frame
-  var SEG_LEN = L / SEGS;
-
-  var anchorX = 0, anchorY = 0;
-  var chain = [];
-  var lastTime = 0;
-  var raf = null;
-
-  /* ================= STATE DRAG ================= */
-  var dragging = false;
-  var pointerId = null;
-  var cursorVel = { x: 0, y: 0 };
-  var lastPointerPos = { x: 0, y: 0, t: 0 };
-
-  /* ================= INIT ================= */
-  function measureAnchor() {
-    var sRect = scene.getBoundingClientRect();
-    var aRect = anchorEl.getBoundingClientRect();
-    anchorX = aRect.left + aRect.width / 2 - sRect.left;
-    anchorY = aRect.top + aRect.height / 2 - sRect.top;
-  }
-
-  function buildChain() {
-    chain = [];
-    for (var i = 0; i <= SEGS; i++) {
-      var y = anchorY + i * SEG_LEN;
-      chain.push({
-        x: anchorX, y: y, z: 0,
-        px: anchorX, py: y, pz: 0
-      });
-    }
-  }
-
-  function applyInitialSwing() {
-    var last = chain[SEGS];
-    // velocity = pos - prevPos; beri dorongan awal
-    last.px = last.x + 3.0;
-    last.py = last.y + 0.6;
-    last.pz = last.z + 2.0;
-  }
-
-  function init() {
-    measureAnchor();
-    SEG_LEN = L / SEGS;
-    buildChain();
-    applyInitialSwing();
-    lastTime = performance.now();
-    if (!raf) raf = requestAnimationFrame(tick);
-  }
-
-  /* ================= INTEGRASI (VERLET) ================= */
-  function integrate(dt) {
-    var dt2 = dt * dt;
-    var damp = Math.pow(DAMP, dt * 60);
-
-    for (var i = 1; i <= SEGS; i++) {
-      var s = chain[i];
-      var vx = (s.x - s.px) * damp;
-      var vy = (s.y - s.py) * damp;
-      var vz = (s.z - s.pz) * damp;
-      s.px = s.x;
-      s.py = s.y;
-      s.pz = s.z;
-      s.x += vx;
-      s.y += vy + G * dt2;
-      s.z += vz;
-    }
-  }
-
-  /* ================= CONSTRAINT ================= */
-  function solveConstraints() {
-    // anchor terkunci
-    chain[0].x = anchorX;
-    chain[0].y = anchorY;
-    chain[0].z = 0;
-
-    for (var iter = 0; iter < ITER; iter++) {
-      for (var i = 0; i < SEGS; i++) {
-        var a = chain[i];
-        var b = chain[i + 1];
-        var dx = b.x - a.x;
-        var dy = b.y - a.y;
-        var dz = b.z - a.z;
-        var dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 1e-6;
-        var diff = (dist - SEG_LEN) / dist;
-
-        if (i === 0) {
-          // anchor fixed → geser b saja
-          b.x -= dx * diff;
-          b.y -= dy * diff;
-          b.z -= dz * diff;
-        } else {
-          var half = diff * 0.5;
-          a.x += dx * half;
-          a.y += dy * half;
-          a.z += dz * half;
-          b.x -= dx * half;
-          b.y -= dy * half;
-          b.z -= dz * half;
-        }
-      }
-    }
-  }
-
-  /* ================= RENDER ================= */
-  function catmullRom(points) {
-    if (points.length < 2) return "";
-    var d = "M " + points[0].x.toFixed(2) + " " + points[0].y.toFixed(2);
-    for (var i = 0; i < points.length - 1; i++) {
-      var p0 = points[Math.max(0, i - 1)];
-      var p1 = points[i];
-      var p2 = points[i + 1];
-      var p3 = points[Math.min(points.length - 1, i + 2)];
-
-      var cp1x = p1.x + (p2.x - p0.x) / 6;
-      var cp1y = p1.y + (p2.y - p0.y) / 6;
-      var cp2x = p2.x - (p3.x - p1.x) / 6;
-      var cp2y = p2.y - (p3.y - p1.y) / 6;
-
-      d += " C " + cp1x.toFixed(2) + " " + cp1y.toFixed(2) +
-           ", " + cp2x.toFixed(2) + " " + cp2y.toFixed(2) +
-           ", " + p2.x.toFixed(2) + " " + p2.y.toFixed(2);
-    }
-    return d;
-  }
-
-  function render() {
-    var d = catmullRom(chain);
-    pathBase.setAttribute("d", d);
-    pathStripe.setAttribute("d", d);
-    pathInner.setAttribute("d", d);
-    pathHL.setAttribute("d", d);
-
-    var last = chain[SEGS];
-    var prev = chain[SEGS - 1];
-
-    var dx = last.x - prev.x;
-    var dy = last.y - prev.y;
-    var dz = last.z - prev.z;
-
-    // rotasi Z: kemiringan kartu di layar (kiri/kanan/atas)
-    var angleZ = Math.atan2(dx, dy) * 180 / Math.PI;
-
-    // rotasi X: kemiringan kartu karena gerak depan-belakang
-    var angleX = Math.atan2(dz, dy) * 180 / Math.PI * 0.7;
-
-    // skala kedalaman
-    var scale = 1 + last.z * 0.0007;
-    if (scale < 0.85) scale = 0.85;
-    if (scale > 1.15) scale = 1.15;
-
-    card.style.transform =
-      "translate(-50%, 0) translate(" + last.x.toFixed(2) + "px, " + last.y.toFixed(2) + "px) " +
-      "rotateZ(" + angleZ.toFixed(2) + "deg) " +
-      "rotateX(" + angleX.toFixed(2) + "deg) " +
-      "scale(" + scale.toFixed(3) + ")";
-  }
-
-  /* ================= LOOP ================= */
-  function tick(now) {
-    var dt = Math.min((now - lastTime) / 1000, 0.033);
-    lastTime = now;
-
-    integrate(dt);
-
-    if (dragging) {
-      // paksa ujung rantai ke posisi kursor (dibatasi jari-jari L)
-      var sRect = scene.getBoundingClientRect();
-      var cx = lastPointerPos.x - sRect.left;
-      var cy = lastPointerPos.y - sRect.top;
-
-      var dx = cx - anchorX;
-      var dy = cy - anchorY;
-      var dist = Math.sqrt(dx * dx + dy * dy) || 1e-6;
-      var scale = L / dist;
-
-      var last = chain[SEGS];
-      last.px = last.x;
-      last.py = last.y;
-      last.pz = last.z;
-
-      last.x = anchorX + dx * scale;
-      last.y = anchorY + dy * scale;
-      last.z = 0;
-
-      // beri dorongan 3D kecil berdasarkan kecepatan kursor
-      var kv = Math.sqrt(cursorVel.x * cursorVel.x + cursorVel.y * cursorVel.y);
-      if (kv > 50) {
-        last.pz += Math.min(6, kv * 0.012) * Math.sign(cursorVel.x || 1);
-      }
-    }
-
-    solveConstraints();
-    render();
-
-    raf = requestAnimationFrame(tick);
-  }
-
-  /* ================= INTERAKSI DRAG ================= */
-  function onPointerDown(e) {
-    dragging = true;
-    pointerId = e.pointerId;
-    lastPointerPos = { x: e.clientX, y: e.clientY, t: performance.now() };
-    cursorVel = { x: 0, y: 0 };
-    try { card.setPointerCapture(pointerId); } catch (err) {}
-    e.preventDefault();
-  }
-
-  function onPointerMove(e) {
-    if (!dragging || e.pointerId !== pointerId) return;
-
-    var now = performance.now();
-    var dt = (now - lastPointerPos.t) / 1000;
-    if (dt > 0.005) {
-      cursorVel.x = (e.clientX - lastPointerPos.x) / dt;
-      cursorVel.y = (e.clientY - lastPointerPos.y) / dt;
-    }
-    lastPointerPos = { x: e.clientX, y: e.clientY, t: now };
-  }
-
-  function onPointerUp(e) {
-    if (e.pointerId !== pointerId) return;
-    dragging = false;
-
-    // konversi kecepatan kursor jadi kecepatan ujung rantai
-    var last = chain[SEGS];
-    var frameDt = 1 / 60;
-    last.px = last.x - cursorVel.x * frameDt;
-    last.py = last.y - cursorVel.y * frameDt;
-    last.pz = last.z;
-
-    try { card.releasePointerCapture(pointerId); } catch (err) {}
-    pointerId = null;
-  }
-
-  card.addEventListener("pointerdown", onPointerDown);
-  card.addEventListener("pointermove", onPointerMove);
-  card.addEventListener("pointerup", onPointerUp);
-  card.addEventListener("pointercancel", onPointerUp);
-  card.addEventListener("lostpointercapture", function () {
-    dragging = false;
-    pointerId = null;
-  });
-
-  /* ================= RESIZE ================= */
-  var resizeTimer = null;
-  window.addEventListener("resize", function () {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(function () {
-      measureAnchor();
-      SEG_LEN = L / SEGS;
-      buildChain();
-    }, 150);
-  });
-
-  /* ================= MULAI ================= */
-  init();
-})();
-</script>
-
-</body>
-</html>
+    <svg class="svg-strap" id="svgStrap" xmlns="http://www.w3
