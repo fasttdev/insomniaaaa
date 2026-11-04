@@ -36,7 +36,6 @@
     overflow-x: hidden;
   }
 
-  /* HEADER */
   header {
     display: flex;
     align-items: center;
@@ -74,7 +73,6 @@
   }
   .back:hover { color: var(--blue-600); border-color: var(--blue-200); }
 
-  /* MAIN */
   main {
     flex: 1;
     width: 100%;
@@ -83,7 +81,7 @@
     padding: 28px 24px 56px;
   }
 
-  .intro { text-align: center; margin-bottom: 0; }
+  .intro { text-align: center; }
 
   .badge {
     display: inline-block;
@@ -118,7 +116,6 @@
     margin: 0 auto;
   }
 
-  /* ========== SCENE ========== */
   .scene {
     position: relative;
     width: 100%;
@@ -137,7 +134,6 @@
     z-index: 1;
   }
 
-  /* anchor titik gantung */
   .anchor {
     position: absolute;
     top: 4px;
@@ -165,7 +161,6 @@
       0 1px 0 rgba(255, 255, 255, .6);
   }
 
-  /* ========== KARTU ID ========== */
   .idcard {
     position: absolute;
     top: 0; left: 0;
@@ -370,7 +365,6 @@
     opacity: .85;
   }
 
-  /* hint */
   .hint-wrap { text-align: center; margin-top: 6px; }
   .hint {
     display: inline-flex;
@@ -505,7 +499,6 @@
   </section>
 
   <section class="scene" id="scene">
-
     <svg class="svg-strap" id="svgStrap" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="strapGrad" x1="0" y1="0" x2="1" y2="0">
@@ -613,7 +606,6 @@
 
   document.getElementById("y").textContent = new Date().getFullYear();
 
-  /* ============ ELEMEN ============ */
   var scene      = document.getElementById("scene");
   var anchorEl   = document.getElementById("anchor");
   var card       = document.getElementById("card");
@@ -624,34 +616,33 @@
   if (!scene || !card || !pathBase) return;
 
   /* ============ KONSTANTA ============ */
-  var SEGS         = 10;
-  var ITER         = 14;
-  var G            = 2400;
-  var DAMP         = 0.985;
-  var PERSP        = 700;
-  var HOLE_OFFSET  = 20;   // jarak lubang dari atas kartu (harus = transform-origin)
+  var SEGS        = 10;
+  var ITER        = 14;
+  var G           = 2400;
+  var DAMP        = 0.985;
+  var PERSP       = 700;
+  var HOLE_OFFSET = 20;
 
-  var L = 175;             // panjang strap total (px) — dihitung ulang saat init
+  var L = 175;
   var SEG_LEN = L / SEGS;
-
   var anchorX = 0, anchorY = 0;
   var chain = [];
 
-  /* ============ STATE DRAG ============ */
-  var dragging = false;
-  var pointerId = null;
+  /* ============ DRAG STATE ============ */
+  var dragging   = false;
+  var pointerId  = null;
+  var grabStartX = 0, grabStartY = 0;   // cursor saat pointerdown
+  var grabHoleX  = 0, grabHoleY  = 0;   // hole saat pointerdown
+  var dragTarget = { x: 0, y: 0, z: 0 };
+
   var cursorVel = { x: 0, y: 0 };
   var lastPointer = { x: 0, y: 0, t: 0 };
 
-  var grabStartX = 0, grabStartY = 0;   // posisi kursor saat grab (screen)
-  var grabHoleX = 0,  grabHoleY = 0;    // posisi hole saat grab (scene)
-
   var lastTime = 0;
   var raf = null;
-
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ============ UTIL ============ */
+  /* ============ INIT ============ */
   function computeL() {
     var w = window.innerWidth;
     if (w < 400) return 145;
@@ -675,20 +666,18 @@
     }
   }
 
-  function initialSwing() {
-    if (reduceMotion) return;
-    var last = chain[SEGS];
-    last.px = last.x - 1.4;   // dorong ke kanan pelan
-    last.py = last.y - 0.2;
-    last.pz = last.z + 0.8;   // dorong ke depan pelan
-  }
-
   function init() {
     L = computeL();
     SEG_LEN = L / SEGS;
     measureAnchor();
     buildChain();
-    initialSwing();
+    if (!reduceMotion) {
+      // dorongan awal kecil biar hidup
+      var last = chain[SEGS];
+      last.px = last.x - 1.4;
+      last.py = last.y - 0.2;
+      last.pz = last.z + 0.8;
+    }
     lastTime = performance.now();
     if (!raf) raf = requestAnimationFrame(tick);
   }
@@ -697,15 +686,12 @@
   function integrate(dt) {
     var dt2 = dt * dt;
     var damp = Math.pow(DAMP, dt * 60);
-
     for (var i = 1; i <= SEGS; i++) {
       var s = chain[i];
       var vx = (s.x - s.px) * damp;
       var vy = (s.y - s.py) * damp;
       var vz = (s.z - s.pz) * damp;
-      s.px = s.x;
-      s.py = s.y;
-      s.pz = s.z;
+      s.px = s.x; s.py = s.y; s.pz = s.z;
       s.x += vx;
       s.y += vy + G * dt2;
       s.z += vz;
@@ -740,7 +726,7 @@
     }
   }
 
-  /* ============ PROYEKSI PERSPEKTIF ============ */
+  /* ============ PROJECT ============ */
   function project(p) {
     var s = PERSP / (PERSP + p.z);
     if (s < 0.5) s = 0.5;
@@ -784,14 +770,15 @@
     pathStitch.setAttribute("d", d);
 
     var last = projected[SEGS];
-    var ref  = projected[Math.max(0, SEGS - 3)];
 
-    var dx = last.x - ref.x;
-    var dy = last.y - ref.y;
-    var angleZ = Math.atan2(dx, dy) * 180 / Math.PI;
+    // Sudut Z dari rantai ASLI (bukan proyeksi) → tidak terbalik
+    var rax = chain[SEGS].x - anchorX;
+    var ray = chain[SEGS].y - anchorY;
+    var angleZ = Math.atan2(rax, ray) * 180 / Math.PI;
+    if (angleZ >  80) angleZ =  80;
+    if (angleZ < -80) angleZ = -80;
 
-    // TILT X: z negatif = ke arah kamera → bawah kartu menghadap kita
-    // rotateX(+) memutar bawah ke arah viewer, jadi kita pakai -z
+    // Rotasi X: z negatif = maju ke viewer → bawah kartu menghadap kita
     var zRaw = chain[SEGS].z;
     var angleX = -zRaw / L * 30;
     if (angleX >  22) angleX =  22;
@@ -805,7 +792,7 @@
       "scale(" + last.s.toFixed(3) + ")";
   }
 
-  /* ============ LOOP ============ */
+  /* ============ TICK ============ */
   function tick(now) {
     var dt = Math.min((now - lastTime) / 1000, 0.033);
     lastTime = now;
@@ -814,14 +801,27 @@
       integrate(dt);
     }
     solveConstraints();
-    render();
 
+    // Kalau dragging, paksa ujung SETELAH solve — supaya constraint
+    // tidak bisa menariknya balik
+    if (dragging) {
+      var last = chain[SEGS];
+      last.x = dragTarget.x;
+      last.y = dragTarget.y;
+      last.z = dragTarget.z;
+      last.px = last.x;
+      last.py = last.y;
+      last.pz = last.z;
+    }
+
+    render();
     raf = requestAnimationFrame(tick);
   }
 
   /* ============ DRAG ============ */
   function onPointerDown(e) {
     if (reduceMotion) return;
+    if (e.button !== undefined && e.button !== 0) return;
 
     dragging = true;
     pointerId = e.pointerId;
@@ -831,15 +831,24 @@
     grabHoleX  = chain[SEGS].x;
     grabHoleY  = chain[SEGS].y;
 
+    dragTarget.x = grabHoleX;
+    dragTarget.y = grabHoleY;
+    dragTarget.z = chain[SEGS].z;
+
     lastPointer = { x: e.clientX, y: e.clientY, t: performance.now() };
     cursorVel = { x: 0, y: 0 };
 
-    // bekukan seluruh rantai biar tidak "liar" saat mulai drag
+    // freeze chain supaya tidak ada momentum lama
     for (var i = 1; i <= SEGS; i++) {
       chain[i].px = chain[i].x;
       chain[i].py = chain[i].y;
       chain[i].pz = chain[i].z;
     }
+
+    // listener di window: tetap menerima event walau kursor keluar kartu
+    window.addEventListener("pointermove", onPointerMove, { passive: false });
+    window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener("pointercancel", onPointerUp);
 
     try { card.setPointerCapture(pointerId); } catch (err) {}
     e.preventDefault();
@@ -848,49 +857,46 @@
   function onPointerMove(e) {
     if (!dragging || e.pointerId !== pointerId) return;
 
-    // kecepatan kursor (untuk dilepas)
+    // Delta kursor (screen px = scene px, karena scene hanya di-translate)
+    var dx = e.clientX - grabStartX;
+    var dy = e.clientY - grabStartY;
+
+    var tx = grabHoleX + dx;
+    var ty = grabHoleY + dy;
+
+    // clamp ke radius L (strap tetap taut) — HANYA kalau melebihi
+    var adx = tx - anchorX;
+    var ady = ty - anchorY;
+    var dist = Math.sqrt(adx * adx + ady * ady);
+    if (dist > L) {
+      tx = anchorX + (adx / dist) * L;
+      ty = anchorY + (ady / dist) * L;
+    }
+
+    // cegah kartu lewat atas anchor (strap tidak bisa lipat ke atas)
+    if (ty < anchorY + 50) ty = anchorY + 50;
+
+    // hitung velocity kursor untuk dilepas nanti
     var now = performance.now();
-    var dt = (now - lastPointer.t) / 1000;
-    if (dt > 0.008) {
-      cursorVel.x = (e.clientX - lastPointer.x) / dt;
-      cursorVel.y = (e.clientY - lastPointer.y) / dt;
+    var pdt = (now - lastPointer.t) / 1000;
+    if (pdt > 0.008) {
+      cursorVel.x = (e.clientX - lastPointer.x) / pdt;
+      cursorVel.y = (e.clientY - lastPointer.y) / pdt;
       if (Math.abs(cursorVel.x) > 6000) cursorVel.x = Math.sign(cursorVel.x) * 6000;
       if (Math.abs(cursorVel.y) > 6000) cursorVel.y = Math.sign(cursorVel.y) * 6000;
     }
     lastPointer = { x: e.clientX, y: e.clientY, t: now };
 
-    // target = posisi hole saat grab + delta kursor (dalam scene coords)
-    var targetX = grabHoleX + (e.clientX - grabStartX);
-    var targetY = grabHoleY + (e.clientY - grabStartY);
-
-    // clamp: strap harus tetap taut → hole selalu di radius L dari anchor
-    var adx = targetX - anchorX;
-    var ady = targetY - anchorY;
-    var dist = Math.sqrt(adx * adx + ady * ady);
-
-    // jaga-jaga kalau kursor persis di anchor
-    if (dist < 12) { adx = 0; ady = 1; dist = 1; }
-
-    var scale = L / dist;
-    targetX = anchorX + adx * scale;
-    targetY = anchorY + ady * scale;
-
-    // cegah kartu lewat atas anchor (strap lipat)
-    if (targetY < anchorY + 8) targetY = anchorY + 8;
-
-    // dorongan z tipis kalau drag-nya kencang ke samping
-    var kv = Math.abs(e.clientX - lastPointer.x) + Math.abs(e.clientY - lastPointer.y);
+    // sedikitz saat drag cepat → kartu terasa "diangkat"
     var targetZ = 0;
-    if (cursorVel.x > 400) targetZ = -Math.min(60, cursorVel.x * 0.06);
-    if (cursorVel.x < -400) targetZ =  Math.min(60, -cursorVel.x * 0.06);
+    var spd = Math.abs(cursorVel.x);
+    if (spd > 800) targetZ = -Math.min(40, (spd - 800) * 0.05);
 
-    var last = chain[SEGS];
-    last.px = last.x;  // velocity = target - px
-    last.py = last.y;
-    last.pz = last.z;
-    last.x = targetX;
-    last.y = targetY;
-    last.z = targetZ;
+    dragTarget.x = tx;
+    dragTarget.y = ty;
+    dragTarget.z = targetZ;
+
+    e.preventDefault();
   }
 
   function onPointerUp(e) {
@@ -899,8 +905,8 @@
 
     var speed = Math.sqrt(cursorVel.x * cursorVel.x + cursorVel.y * cursorVel.y);
 
-    if (speed < 40) {
-      // gerakan kecil → hentikan saja biar tidak goyang aneh
+    if (speed < 60) {
+      // hentikan saja — tidak ada momentum
       var last = chain[SEGS];
       last.px = last.x;
       last.py = last.y;
@@ -911,20 +917,18 @@
       var last = chain[SEGS];
       last.px = last.x - cursorVel.x * dt;
       last.py = last.y - cursorVel.y * dt;
+      last.pz = last.z;
     }
+
+    window.removeEventListener("pointermove", onPointerMove);
+    window.removeEventListener("pointerup", onPointerUp);
+    window.removeEventListener("pointercancel", onPointerUp);
 
     try { card.releasePointerCapture(pointerId); } catch (err) {}
     pointerId = null;
   }
 
   card.addEventListener("pointerdown", onPointerDown);
-  card.addEventListener("pointermove", onPointerMove);
-  card.addEventListener("pointerup", onPointerUp);
-  card.addEventListener("pointercancel", onPointerUp);
-  card.addEventListener("lostpointercapture", function () {
-    dragging = false;
-    pointerId = null;
-  });
 
   /* ============ RESIZE ============ */
   var resizeTimer = null;
@@ -935,11 +939,9 @@
       SEG_LEN = L / SEGS;
       measureAnchor();
       buildChain();
-      if (!reduceMotion) initialSwing();
     }, 200);
   });
 
-  /* ============ MULAI ============ */
   init();
 })();
 </script>
