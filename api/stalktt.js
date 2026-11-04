@@ -1,6 +1,6 @@
 /*
   Insomnia Dev — TikTok Stalker (core)
-  Source: tikip.us via VamxAPI backend (Vamz Spectre)
+  Source: tikip.us via VamxAPI backend
   Export: handler(req, res)  → Express & Vercel compatible
 */
 
@@ -133,7 +133,7 @@ async function fetchProfile(username) {
 }
 
 /* =========================================================
-   NORMALISASI — shape seragam untuk frontend
+   HELPER
    ========================================================= */
 function fixOverflow(n) {
   var v = Number(n);
@@ -155,57 +155,101 @@ function flagEmoji(code) {
   }
 }
 
+function asStr(v) {
+  if (v == null) return "";
+  if (typeof v === "string") return v;
+  if (typeof v === "object" && v.code) return String(v.code);
+  return String(v);
+}
+
+/* =========================================================
+   NORMALISASI — sesuai shape RAW dari backend worker:
+   {
+     user: { uniqueId, nickname, signature, avatarLarger, ... },
+     stats: { followerCount, followingCount, heartCount, ... },
+     region: "ID", region_name: "Indonesia",
+     current_region, current_region_name,
+     registered_region, registered_region_name,
+     locked_region, locked_region_name
+   }
+   ========================================================= */
 function normalize(raw) {
   if (!raw || typeof raw !== "object") return null;
 
-  var user = raw.user || {};
+  var user  = raw.user  || {};
   var stats = raw.stats || {};
-  var region = raw.region || {};
-  var avatar = raw.avatar || {};
 
-  var curr = region.current_region || {};
-  var reg  = region.registered_region || {};
-  var lock = region.locked_region || {};
+  /* Region — top-level string (fallback ke user.current_region) */
+  var regionCode = asStr(raw.region || user.current_region || "");
+  var regionName = asStr(raw.region_name || user.current_region_name || "");
+
+  var currentCode = asStr(raw.current_region || user.current_region || "");
+  var currentName = asStr(raw.current_region_name || user.current_region_name || "");
+
+  var regCode = asStr(raw.registered_region || user.registered_region || "");
+  var regName = asStr(raw.registered_region_name || user.registered_region_name || "");
+
+  var lockCode = asStr(raw.locked_region || user.locked_region || "");
+  var lockName = asStr(raw.locked_region_name || user.locked_region_name || "");
+
+  /* Bio link — bisa null, string, atau object */
+  var bioLink = "";
+  if (user.bioLink) {
+    if (typeof user.bioLink === "string") bioLink = user.bioLink;
+    else if (user.bioLink.link) bioLink = String(user.bioLink.link);
+  }
+
+  /* createdAt dari createTime (Unix seconds) */
+  var createdAt = "";
+  if (user.createTime) {
+    try {
+      createdAt = new Date(Number(user.createTime) * 1000).toISOString();
+    } catch (e) {}
+  }
+
+  /* Avatar priority */
+  var avatar = user.avatarLarger || user.avatarMedium || user.avatarThumb || "";
 
   return {
-    id: user.id || "",
-    secUid: user.sec_uid || "",
-    username: user.username || "",
-    nickname: user.nickname || "",
-    bio: user.bio || "",
-    bioLink: user.bio_link || "",
-    profileUrl: user.profile_url || (user.username ? "https://www.tiktok.com/@" + user.username : ""),
+    id: asStr(user.id),
+    secUid: asStr(user.secUid),
+    username: asStr(user.uniqueId),
+    nickname: asStr(user.nickname),
+    bio: asStr(user.signature),
+    bioLink: bioLink,
+    profileUrl: user.uniqueId
+      ? "https://www.tiktok.com/@" + encodeURIComponent(user.uniqueId)
+      : "",
 
     verified: !!user.verified,
-    privateAccount: !!user.private,
+    privateAccount: !!user.privateAccount,
+    language: asStr(user.language),
+    createdAt: createdAt,
+    createdTimestamp: user.createTime || null,
 
-    language: user.language || "",
-    createdAt: user.created_at || "",
-    createdTimestamp: user.created_timestamp || null,
+    avatar: avatar,
 
-    avatar: avatar.hd || avatar.medium || avatar.thumb || "",
+    regionCode: regionCode,
+    regionCountry: regionName,
+    regionFlag: flagEmoji(regionCode),
 
-    regionCode: region.code || "",
-    regionCountry: region.country || "",
-    regionFlag: region.flag || flagEmoji(region.code),
+    currentRegionCode: currentCode,
+    currentRegionCountry: currentName,
+    currentRegionFlag: flagEmoji(currentCode),
 
-    currentRegionCode: curr.code || "",
-    currentRegionCountry: curr.country || "",
-    currentRegionFlag: curr.flag || flagEmoji(curr.code),
+    registeredRegionCode: regCode,
+    registeredRegionCountry: regName,
+    registeredRegionFlag: flagEmoji(regCode),
 
-    registeredRegionCode: reg.code || "",
-    registeredRegionCountry: reg.country || "",
-    registeredRegionFlag: reg.flag || flagEmoji(reg.code),
+    lockedRegionCode: lockCode,
+    lockedRegionCountry: lockName,
+    lockedRegionFlag: flagEmoji(lockCode),
 
-    lockedRegionCode: lock.code || "",
-    lockedRegionCountry: lock.country || "",
-    lockedRegionFlag: lock.flag || flagEmoji(lock.code),
-
-    followers: fixOverflow(stats.followers),
-    following: fixOverflow(stats.following),
-    likes: fixOverflow(stats.likes),
-    videos: fixOverflow(stats.videos),
-    friends: fixOverflow(stats.friends),
+    followers: fixOverflow(stats.followerCount),
+    following: fixOverflow(stats.followingCount),
+    likes: fixOverflow(stats.heartCount),
+    videos: fixOverflow(stats.videoCount),
+    friends: fixOverflow(stats.friendCount),
   };
 }
 
@@ -272,7 +316,6 @@ async function handler(req, res) {
       ok: true,
       username: username,
       profile: profile,
-      raw: rawData,
     });
   } catch (err) {
     console.error("[STALK ERR] @" + username + ": " + err.message);
