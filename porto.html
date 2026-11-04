@@ -531,4 +531,427 @@
   <!-- SCENE -->
   <section class="scene" id="scene">
 
-    <svg class="svg-strap" id="svgStrap" xmlns="http://www.w3
+    <svg class="svg-strap" id="svgStrap" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="strapGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="#075985"/>
+          <stop offset="18%"  stop-color="#0369a1"/>
+          <stop offset="42%"  stop-color="#38bdf8"/>
+          <stop offset="58%"  stop-color="#38bdf8"/>
+          <stop offset="82%"  stop-color="#0369a1"/>
+          <stop offset="100%" stop-color="#075985"/>
+        </linearGradient>
+      </defs>
+
+      <path id="strapShadow" fill="none" stroke="#0c4a6e" stroke-width="30"
+            stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+      <path id="strapBase" fill="none" stroke="url(#strapGrad)" stroke-width="26"
+            stroke-linecap="round" stroke-linejoin="round"/>
+      <path id="strapWeave" fill="none" stroke="#0b1220" stroke-width="26"
+            stroke-linecap="butt" stroke-linejoin="round"
+            stroke-dasharray="1 4" opacity="0.08"/>
+      <path id="strapStitch" fill="none" stroke="#ffffff" stroke-width="1.4"
+            stroke-linecap="round" stroke-linejoin="round"
+            stroke-dasharray="4 5" opacity="0.55"/>
+    </svg>
+
+    <div class="anchor" id="anchor" aria-hidden="true"></div>
+
+    <div class="idcard" id="card">
+      <div class="idcard__bar"></div>
+      <div class="idcard__hole"></div>
+
+      <div class="idcard__header">
+        <span class="idcard__brand">INSOMNIA DEV</span>
+        <span class="idcard__status"><i></i> AKTIF</span>
+      </div>
+
+      <div class="idcard__photo-wrap">
+        <div class="idcard__photo">
+          <img src="saya.jpg" alt="Foto Yudha — Insomnia Dev">
+        </div>
+      </div>
+
+      <div class="idcard__name">Insomnia Dev</div>
+      <div class="idcard__role">Web &amp; IoT Developer</div>
+
+      <div class="idcard__divider"></div>
+
+      <ul class="idcard__rows">
+        <li><dt>Nama</dt><dd>Yudha</dd></li>
+        <li><dt>Domisili</dt><dd>Dlingo, Bantul</dd></li>
+        <li><dt>Sekolah</dt><dd>SMPN 2 Dlingo</dd></li>
+        <li><dt>Lahir</dt><dd>22 Agu 2011</dd></li>
+        <li><dt>Project</dt><dd><b>65+</b></dd></li>
+      </ul>
+
+      <div class="idcard__footer">
+        <span class="idcard__code">ID · 1108 · 22</span>
+        <div class="idcard__barcode"></div>
+      </div>
+    </div>
+
+  </section>
+
+  <div class="hint-wrap">
+    <div class="hint">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 11V6a2 2 0 0 0-4 0v5"/>
+        <path d="M14 10V4a2 2 0 0 0-4 0v6"/>
+        <path d="M10 10.5V6a2 2 0 0 0-4 0v8"/>
+        <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
+      </svg>
+      Geser kartunya
+    </div>
+  </div>
+
+  <div class="chips">
+    <span>HTML</span><span>CSS</span><span>C++</span>
+    <span>Arduino .ino</span><span>Internet of Things</span>
+  </div>
+
+  <section class="about">
+    <article class="about__card">
+      <h3>Fokus</h3>
+      <p>Website, perangkat Internet of Things, dan mikrokontroler berbasis Arduino.</p>
+    </article>
+    <article class="about__card">
+      <h3>Alat</h3>
+      <p>HTML, CSS, JavaScript, C++, dan sketch Arduino <code>.ino</code>.</p>
+    </article>
+    <article class="about__card">
+      <h3>Lokasi</h3>
+      <p>Dlingo, Bantul, Yogyakarta. Terbuka untuk kolaborasi.</p>
+    </article>
+  </section>
+</main>
+
+<footer>
+  <a class="btn" href="beranda.html">Ke Menu &rarr;</a>
+  <small>&copy; <span id="y">2025</span> Insomnia Dev. Semua hak dilindungi.</small>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  document.getElementById("y").textContent = new Date().getFullYear();
+
+  /* ============ ELEMEN ============ */
+  var scene       = document.getElementById("scene");
+  var anchorEl    = document.getElementById("anchor");
+  var card        = document.getElementById("card");
+  var pathShadow  = document.getElementById("strapShadow");
+  var pathBase    = document.getElementById("strapBase");
+  var pathWeave   = document.getElementById("strapWeave");
+  var pathStitch  = document.getElementById("strapStitch");
+  if (!scene || !card || !pathBase) return;
+
+  /* ============ KONSTANTA ============ */
+  var SEGS    = 10;
+  var ITER    = 12;
+  var G       = 2600;
+  var DAMP    = 0.985;
+  var PERSP   = 600;
+  var HOLE_OFFSET = 21;  // jarak lubang kartu dari atas (px) — sesuai CSS
+
+  var L = 240;
+  var SEG_LEN = L / SEGS;
+  var anchorX = 0, anchorY = 0;
+  var chain = [];
+
+  /* ============ STATE DRAG ============ */
+  var dragging = false;
+  var pointerId = null;
+  var cursorVel = { x: 0, y: 0 };
+  var lastPointer = { x: 0, y: 0, t: 0 };
+  var lastPointerPos = { x: 0, y: 0 };  // di-update pointermove
+
+  var lastTime = 0;
+  var raf = null;
+
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ============ INIT ============ */
+  function computeL() {
+    return window.innerWidth < 500 ? 190 : 240;
+  }
+
+  function measureAnchor() {
+    var sRect = scene.getBoundingClientRect();
+    var aRect = anchorEl.getBoundingClientRect();
+    anchorX = aRect.left + aRect.width / 2 - sRect.left;
+    anchorY = aRect.top + aRect.height / 2 - sRect.top;
+  }
+
+  function buildChain() {
+    chain = [];
+    for (var i = 0; i <= SEGS; i++) {
+      var y = anchorY + i * SEG_LEN;
+      chain.push({ x: anchorX, y: y, z: 0, px: anchorX, py: y, pz: 0 });
+    }
+  }
+
+  function initialSwing() {
+    var last = chain[SEGS];
+    last.px = last.x - 2.2;   // velocity ke kanan
+    last.py = last.y - 0.3;
+    last.pz = last.z + 1.2;   // velocity ke arah kamera
+  }
+
+  function init() {
+    L = computeL();
+    SEG_LEN = L / SEGS;
+    measureAnchor();
+    buildChain();
+    if (!reduceMotion) initialSwing();
+    lastTime = performance.now();
+    if (!raf) raf = requestAnimationFrame(tick);
+  }
+
+  /* ============ FISIKA ============ */
+  function integrate(dt) {
+    var dt2 = dt * dt;
+    var damp = Math.pow(DAMP, dt * 60);
+
+    for (var i = 1; i <= SEGS; i++) {
+      var s = chain[i];
+      var vx = (s.x - s.px) * damp;
+      var vy = (s.y - s.py) * damp;
+      var vz = (s.z - s.pz) * damp;
+      s.px = s.x;
+      s.py = s.y;
+      s.pz = s.z;
+      s.x += vx;
+      s.y += vy + G * dt2;
+      s.z += vz;
+    }
+  }
+
+  function solveConstraints() {
+    chain[0].x = anchorX;
+    chain[0].y = anchorY;
+    chain[0].z = 0;
+
+    for (var iter = 0; iter < ITER; iter++) {
+      for (var i = 0; i < SEGS; i++) {
+        var a = chain[i];
+        var b = chain[i + 1];
+        var dx = b.x - a.x;
+        var dy = b.y - a.y;
+        var dz = b.z - a.z;
+        var dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 1e-6;
+        var diff = (dist - SEG_LEN) / dist;
+
+        if (i === 0) {
+          b.x -= dx * diff;
+          b.y -= dy * diff;
+          b.z -= dz * diff;
+        } else {
+          var half = diff * 0.5;
+          a.x += dx * half;  a.y += dy * half;  a.z += dz * half;
+          b.x -= dx * half;  b.y -= dy * half;  b.z -= dz * half;
+        }
+      }
+    }
+  }
+
+  /* ============ PROJECTION (perspective) ============ */
+  function project(p) {
+    var s = PERSP / (PERSP + p.z);
+    if (s < 0.4) s = 0.4;
+    if (s > 2.5) s = 2.5;
+    return {
+      x: anchorX + (p.x - anchorX) * s,
+      y: anchorY + (p.y - anchorY) * s,
+      s: s
+    };
+  }
+
+  /* ============ RENDER ============ */
+  function catmullRom(pts) {
+    if (pts.length < 2) return "";
+    var d = "M " + pts[0].x.toFixed(2) + " " + pts[0].y.toFixed(2);
+    for (var i = 0; i < pts.length - 1; i++) {
+      var p0 = pts[Math.max(0, i - 1)];
+      var p1 = pts[i];
+      var p2 = pts[i + 1];
+      var p3 = pts[Math.min(pts.length - 1, i + 2)];
+      var cp1x = p1.x + (p2.x - p0.x) / 6;
+      var cp1y = p1.y + (p2.y - p0.y) / 6;
+      var cp2x = p2.x - (p3.x - p1.x) / 6;
+      var cp2y = p2.y - (p3.y - p1.y) / 6;
+      d += " C " +
+        cp1x.toFixed(2) + " " + cp1y.toFixed(2) + ", " +
+        cp2x.toFixed(2) + " " + cp2y.toFixed(2) + ", " +
+        p2.x.toFixed(2) + " " + p2.y.toFixed(2);
+    }
+    return d;
+  }
+
+  function render() {
+    // project semua chain point
+    var projected = [];
+    for (var i = 0; i <= SEGS; i++) projected.push(project(chain[i]));
+
+    var d = catmullRom(projected);
+    pathShadow.setAttribute("d", d);
+    pathBase.setAttribute("d", d);
+    pathWeave.setAttribute("d", d);
+    pathStitch.setAttribute("d", d);
+
+    var last = projected[SEGS];
+    var prev = projected[SEGS - 1];
+
+    // rotasi Z dari arah strap di layar
+    var dx = last.x - prev.x;
+    var dy = last.y - prev.y;
+    var angleZ = Math.atan2(dx, dy) * 180 / Math.PI;
+
+    // rotasi X dari z-offset (kalau z < 0, kartu lebih dekat → top tilt ke kita)
+    var zAt = chain[SEGS].z;
+    var angleX = (zAt / L) * 28;
+    if (angleX > 20)  angleX = 20;
+    if (angleX < -20) angleX = -20;
+
+    // transform kartu: hole di (last.x, last.y)
+    card.style.transform =
+      "translate(-50%, -" + HOLE_OFFSET + "px) " +
+      "translate(" + last.x.toFixed(2) + "px, " + last.y.toFixed(2) + "px) " +
+      "rotateZ(" + angleZ.toFixed(2) + "deg) " +
+      "rotateX(" + angleX.toFixed(2) + "deg) " +
+      "scale(" + last.s.toFixed(3) + ")";
+  }
+
+  /* ============ LOOP ============ */
+  function tick(now) {
+    var dt = Math.min((now - lastTime) / 1000, 0.033);
+    lastTime = now;
+
+    if (dragging) {
+      var sRect = scene.getBoundingClientRect();
+      var tx = lastPointerPos.x - sRect.left;
+      var ty = lastPointerPos.y - sRect.top;
+
+      var dx = tx - anchorX;
+      var dy = ty - anchorY;
+      var dist = Math.sqrt(dx * dx + dy * dy) || 1e-6;
+
+      // proyeksikan ke radius L (strap selalu taut)
+      tx = anchorX + dx * L / dist;
+      ty = anchorY + dy * L / dist;
+
+      // batasi sudut supaya tidak pernah melewati atas anchor
+      var angle = Math.atan2(tx - anchorX, ty - anchorY);
+      var maxAngle = Math.PI * 0.52; // ~94° dari vertikal
+      if (angle > maxAngle)  angle = maxAngle;
+      if (angle < -maxAngle) angle = -maxAngle;
+
+      tx = anchorX + Math.sin(angle) * L;
+      ty = anchorY + Math.cos(angle) * L;
+
+      var last = chain[SEGS];
+      last.px = last.x;   // reset velocity
+      last.py = last.y;
+      last.pz = last.z;
+      last.x = tx;
+      last.y = ty;
+      last.z = 0;
+    } else {
+      integrate(dt);
+    }
+
+    solveConstraints();
+    render();
+    raf = requestAnimationFrame(tick);
+  }
+
+  /* ============ DRAG ============ */
+  function onPointerDown(e) {
+    dragging = true;
+    pointerId = e.pointerId;
+    lastPointer = { x: e.clientX, y: e.clientY, t: performance.now() };
+    lastPointerPos = { x: e.clientX, y: e.clientY };
+    cursorVel = { x: 0, y: 0 };
+
+    // rapikan z saat grab biar tidak jitter
+    for (var i = 1; i <= SEGS; i++) {
+      chain[i].z = 0;
+      chain[i].pz = 0;
+    }
+
+    try { card.setPointerCapture(pointerId); } catch (err) {}
+    e.preventDefault();
+  }
+
+  function onPointerMove(e) {
+    if (!dragging || e.pointerId !== pointerId) return;
+
+    var now = performance.now();
+    var dt = (now - lastPointer.t) / 1000;
+
+    if (dt > 0.008) {
+      cursorVel.x = (e.clientX - lastPointer.x) / dt;
+      cursorVel.y = (e.clientY - lastPointer.y) / dt;
+      if (Math.abs(cursorVel.x) > 6000) cursorVel.x = Math.sign(cursorVel.x) * 6000;
+      if (Math.abs(cursorVel.y) > 6000) cursorVel.y = Math.sign(cursorVel.y) * 6000;
+    }
+
+    lastPointer = { x: e.clientX, y: e.clientY, t: now };
+    lastPointerPos = { x: e.clientX, y: e.clientY };
+  }
+
+  function onPointerUp(e) {
+    if (e.pointerId !== pointerId) return;
+    dragging = false;
+
+    var speed = Math.sqrt(cursorVel.x * cursorVel.x + cursorVel.y * cursorVel.y);
+    if (speed < 40) {
+      cursorVel.x = 0;
+      cursorVel.y = 0;
+    }
+
+    var last = chain[SEGS];
+    var frameDt = 1 / 60;
+    last.px = last.x - cursorVel.x * frameDt;
+    last.py = last.y - cursorVel.y * frameDt;
+
+    // dorongan forward kecil kalau ayunannya kencang
+    if (speed > 200) {
+      last.pz = last.z + Math.min(2.5, speed * 0.004);
+    }
+
+    try { card.releasePointerCapture(pointerId); } catch (err) {}
+    pointerId = null;
+  }
+
+  card.addEventListener("pointerdown", onPointerDown);
+  card.addEventListener("pointermove", onPointerMove);
+  card.addEventListener("pointerup", onPointerUp);
+  card.addEventListener("pointercancel", onPointerUp);
+  card.addEventListener("lostpointercapture", function () {
+    dragging = false;
+    pointerId = null;
+  });
+
+  /* ============ RESIZE ============ */
+  var resizeTimer = null;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      L = computeL();
+      SEG_LEN = L / SEGS;
+      measureAnchor();
+      buildChain();
+      if (!reduceMotion) initialSwing();
+    }, 200);
+  });
+
+  /* ============ MULAI ============ */
+  init();
+})();
+</script>
+
+</body>
+</html>
