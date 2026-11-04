@@ -155,7 +155,7 @@
       if (months < 0) months = 0;
       var years = Math.floor(months / 12);
       var remMonths = months % 12;
-      if (years === 0 && remMonths === 0) return "Baru";
+      if (years === 0 && remMonths === 0) return "Baru dibuat";
       var parts = [];
       if (years > 0) parts.push(years + " Tahun");
       if (remMonths > 0) parts.push(remMonths + " Bulan");
@@ -193,9 +193,8 @@
       el.innerHTML = "";
     }
 
-    function renderProfile(data) {
-      var p = (data && data.profile) ? data.profile : {};
-      var raw = (data && data.raw) ? data.raw : data;
+    function renderProfile(p) {
+      if (!p) return;
 
       var avatar     = p.avatar || "";
       var name       = p.nickname || p.username || "Tanpa nama";
@@ -206,17 +205,21 @@
       var priv       = !!p.privateAccount;
       var profileUrl = p.profileUrl || (uname ? "https://www.tiktok.com/@" + uname : "");
 
-      var regionCode  = p.regionCode || "";
-      var regionName  = p.regionCountry || "";
-      var regionFlag  = p.regionFlag || "";
+      var regionCode = p.regionCode || "";
+      var regionName = p.regionCountry || "";
+      var regionFlag = p.regionFlag || "";
 
-      var currentCode = p.currentRegionCode || "";
-      var currentName = p.currentRegionCountry || "";
-      var currentFlag = p.currentRegionFlag || "";
+      var currCode   = p.currentRegionCode || "";
+      var currName   = p.currentRegionCountry || "";
+      var currFlag   = p.currentRegionFlag || "";
 
-      var regCode     = p.registeredRegionCode || "";
-      var regName     = p.registeredRegionCountry || "";
-      var regFlag     = p.registeredRegionFlag || "";
+      var regCode    = p.registeredRegionCode || "";
+      var regName    = p.registeredRegionCountry || "";
+      var regFlag    = p.registeredRegionFlag || "";
+
+      var lockCode   = p.lockedRegionCode || "";
+      var lockName   = p.lockedRegionCountry || "";
+      var lockFlag   = p.lockedRegionFlag || "";
 
       var age = computeAge(p.createdAt);
 
@@ -281,15 +284,19 @@
       html += '</div>';
 
       /* ============ REGION ============ */
-      if (regionCode || currentCode) {
-        var displayFlag = regionFlag || currentFlag || "";
-        var displayName = regionName || currentName || regionCode || currentCode || "";
+      if (regionCode || currCode) {
+        var displayFlag = regionFlag || currFlag || "";
+        var displayName = regionName || currName || regionCode || currCode || "";
+
         var subs = [];
-        if (currentName || currentCode) {
-          subs.push("Current: " + escapeHtml((currentFlag ? currentFlag + " " : "") + (currentName || currentCode)));
+        if (currName || currCode) {
+          subs.push("Sekarang: " + escapeHtml((currFlag ? currFlag + " " : "") + (currName || currCode)));
         }
         if (regName || regCode) {
-          subs.push("Registered: " + escapeHtml((regFlag ? regFlag + " " : "") + (regName || regCode)));
+          subs.push("Terdaftar: " + escapeHtml((regFlag ? regFlag + " " : "") + (regName || regCode)));
+        }
+        if (lockName || lockCode) {
+          subs.push("Terkunci: " + escapeHtml((lockFlag ? lockFlag + " " : "") + (lockName || lockCode)));
         }
 
         html += '<div class="profile__region">';
@@ -313,9 +320,9 @@
         html += '<span class="profile__tag">Umur akun: <b>' + escapeHtml(age) + '</b></span>';
       }
       if (p.language) {
-        html += '<span class="profile__tag">Bahasa: <b>' + escapeHtml(p.language) + '</b></span>';
+        html += '<span class="profile__tag">Bahasa: <b>' + escapeHtml(p.language.toUpperCase()) + '</b></span>';
       }
-      if (p.friends) {
+      if (p.friends > 0) {
         html += '<span class="profile__tag">Teman: <b>' + fmtNum(p.friends) + '</b></span>';
       }
       if (priv) {
@@ -328,14 +335,6 @@
                 '" target="_blank" rel="noopener noreferrer">Buka di TikTok &rarr;</a>';
       }
       html += '</div>';
-
-      /* ============ RAW ============ */
-      var rawStr = JSON.stringify(raw, null, 2);
-      if (rawStr.length > 50000) rawStr = rawStr.slice(0, 50000) + "\n\n... (dipotong)";
-      html += '<details class="profile__raw">' +
-              '<summary>Lihat respons mentah</summary>' +
-              '<pre>' + escapeHtml(rawStr) + '</pre>' +
-              '</details>';
 
       resultEl.innerHTML = html;
       resultEl.hidden = false;
@@ -391,7 +390,7 @@
         if (!json.ok) throw new Error(json.error || "Gagal mengambil profil.");
 
         hideStatus();
-        renderProfile(json);
+        renderProfile(json.profile);
       } catch (err) {
         if (err.name === "AbortError") {
           showStatus("Waktu habis. Sumber tidak merespons.", "error");
