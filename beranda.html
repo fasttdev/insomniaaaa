@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sedang Maintenance — Insomnia Dev</title>
+<title>Beranda — Insomnia Dev</title>
 <link rel="icon" href="logo.jpg" type="image/jpeg">
 <style>
   /* =========================================================
@@ -17,6 +17,9 @@
     --blue-900:#0c4a6e;
     --ink:#0b1220;--ink-2:#334155;--muted:#64748b;--line:#e3eef8;
     --panel:#ffffff;
+    --ok:#047857;--ok-bg:#ecfdf5;--ok-line:#d1fae5;
+    --warn:#b45309;--warn-bg:#fffbeb;--warn-line:#fef3c7;
+    --err:#b91c1c;--err-bg:#fef2f2;--err-line:#fee2e2;
     --shadow-soft:0 20px 40px -20px rgba(2,132,199,.30);
     --shadow-card:0 30px 60px -34px rgba(2,132,199,.45);
     --ease:cubic-bezier(.22,.61,.36,1);
@@ -39,6 +42,7 @@
   img{max-width:100%;display:block}
   a{color:inherit;text-decoration:none}
   button{font-family:inherit;cursor:pointer}
+  input{font-family:inherit}
 
   ::selection{background:var(--blue-200);color:var(--blue-900)}
   :focus-visible{outline:2px solid var(--blue-500);outline-offset:3px;border-radius:6px}
@@ -87,8 +91,7 @@
     position:absolute;inset:0;
     display:flex;align-items:center;justify-content:center;gap:11px;
     color:#fff;font-size:17px;font-weight:800;letter-spacing:-.3px;
-    opacity:0;
-    transition:opacity .3s ease .2s;
+    opacity:0;transition:opacity .3s ease .2s;
     pointer-events:none;
   }
   .xfer__brand img{
@@ -97,7 +100,6 @@
     box-shadow:0 4px 12px rgba(0,0,0,.3);
   }
   .xfer__brand em{font-style:normal;color:#bae6fd}
-
   body.is-loading .xfer__brand,
   body.is-leaving .xfer__brand{opacity:1}
 
@@ -105,14 +107,12 @@
      2. LATAR BELAKANG
      ========================================================= */
   .bg{
-    position:fixed;inset:0;z-index:0;
-    pointer-events:none;overflow:hidden;
+    position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
     background:
       radial-gradient(760px 460px at 82% -6%,var(--blue-100) 0%,transparent 62%),
       radial-gradient(680px 420px at -4% 104%,var(--blue-50) 0%,transparent 62%),
       #fbfdff;
   }
-
   .bg__grid{
     position:absolute;inset:0;
     background-image:
@@ -122,7 +122,6 @@
     -webkit-mask-image:radial-gradient(circle at 50% 42%,#000 0%,transparent 68%);
     mask-image:radial-gradient(circle at 50% 42%,#000 0%,transparent 68%);
   }
-
   .bg__orb{
     position:absolute;border-radius:50%;
     filter:blur(50px);opacity:.55;
@@ -143,24 +142,6 @@
     50%{transform:translate3d(-28px,34px,0) scale(1.09)}
   }
 
-  .ring{
-    position:absolute;color:var(--blue-200);
-    opacity:.55;will-change:transform;
-  }
-  .ring--1{
-    width:260px;height:260px;top:12%;right:9%;
-    animation:spin 44s linear infinite;
-  }
-  .ring--2{
-    width:150px;height:150px;bottom:14%;left:7%;
-    color:var(--blue-100);
-    animation:spin 32s linear infinite reverse;
-  }
-  @keyframes spin{
-    from{transform:rotate(0deg)}
-    to{transform:rotate(360deg)}
-  }
-
   /* =========================================================
      3. REVEAL
      ========================================================= */
@@ -172,76 +153,83 @@
   body.is-ready .reveal{opacity:1;transform:translateY(0)}
 
   /* =========================================================
-     4. HEADER
+     4. NAV / TOOLBAR
      ========================================================= */
-  .topbar{
-    position:relative;z-index:3;
+  .nav{
+    position:sticky;top:0;z-index:50;
     display:flex;align-items:center;justify-content:space-between;
-    gap:16px;padding:16px 28px;
-    background:#fff;
-    border-bottom:1px solid var(--line);
+    gap:16px;padding:14px 28px;
+    background:#fff;border-bottom:1px solid var(--line);
   }
-  .brand{display:flex;align-items:center;gap:10px}
-  .brand img{
-    width:42px;height:42px;border-radius:10px;object-fit:cover;
-    border:1px solid var(--line);
+  .nav__brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .nav__brand img{
+    width:38px;height:38px;border-radius:10px;
+    object-fit:cover;border:1px solid var(--line);
   }
-  .brand b{font-size:16px;font-weight:800;letter-spacing:-.3px}
-  .brand b em{font-style:normal;color:var(--blue-500)}
+  .nav__brand b{font-size:15.5px;font-weight:800;letter-spacing:-.3px}
+  .nav__brand b em{font-style:normal;color:var(--blue-500)}
 
-  .topbar__status{
-    display:inline-flex;align-items:center;gap:8px;
-    font-size:12px;font-weight:700;color:var(--blue-700);
-    background:var(--blue-50);border:1px solid var(--blue-100);
-    padding:7px 14px;border-radius:99px;
-    white-space:nowrap;
+  .nav__links{
+    display:flex;align-items:center;gap:4px;
+    overflow-x:auto;overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding:2px;
+    max-width:100%;
   }
-  .pulse-dot{
-    width:7px;height:7px;border-radius:50%;
-    background:var(--blue-500);flex-shrink:0;
+  .nav__links::-webkit-scrollbar{display:none}
+
+  .nav__link{
+    display:inline-flex;align-items:center;
+    padding:9px 16px;border-radius:99px;
+    font-size:13.5px;font-weight:700;
+    color:var(--ink-2);
+    white-space:nowrap;
+    transition:color .15s,background .15s;
+  }
+  .nav__link:hover{color:var(--blue-600);background:var(--blue-50)}
+  .nav__link.is-active{
+    color:#fff;
+    background:linear-gradient(135deg,var(--blue-400),var(--blue-600));
+    box-shadow:0 8px 18px -10px rgba(2,132,199,.7);
+  }
+
+  /* =========================================================
+     5. LAYOUT
+     ========================================================= */
+  .page{
+    position:relative;z-index:2;
+    flex:1;width:100%;max-width:1080px;
+    margin:0 auto;padding:52px 28px 56px;
+    display:flex;flex-direction:column;gap:52px;
+  }
+
+  /* =========================================================
+     6. HERO
+     ========================================================= */
+  .hero{text-align:center;max-width:720px;margin:0 auto}
+  .hero__badge{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:11.5px;font-weight:800;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--blue-700);
+    background:var(--blue-100);
+    padding:7px 15px;border-radius:99px;margin-bottom:18px;
+  }
+  .hero__badge i{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--blue-500);
     animation:pulse 1.8s ease-in-out infinite;
   }
   @keyframes pulse{
     0%,100%{box-shadow:0 0 0 0 rgba(14,165,233,.55)}
     50%{box-shadow:0 0 0 6px rgba(14,165,233,0)}
   }
-
-  /* =========================================================
-     5. LAYOUT
-     ========================================================= */
-  .stage{
-    position:relative;z-index:2;
-    flex:1;width:100%;max-width:1080px;
-    margin:0 auto;padding:56px 28px 48px;
-    display:grid;
-    grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
-    gap:48px;align-items:start;
-  }
-
-  /* =========================================================
-     6. HERO
-     ========================================================= */
-  .hero{min-width:0}
-
-  .badge{
-    display:inline-flex;align-items:center;gap:8px;
-    font-size:12px;font-weight:800;letter-spacing:.04em;
-    text-transform:uppercase;color:var(--blue-700);
-    background:var(--blue-100);
-    padding:7px 15px;border-radius:99px;margin-bottom:20px;
-  }
-  .badge i{
-    width:6px;height:6px;border-radius:50%;
-    background:var(--blue-500);
-    animation:pulse 1.8s ease-in-out infinite;
-  }
-
-  .title{
-    font-size:clamp(34px,5.4vw,56px);
-    line-height:1.04;letter-spacing:-1.6px;
+  .hero__title{
+    font-size:clamp(34px,5.5vw,56px);
+    line-height:1.05;letter-spacing:-1.5px;
     margin-bottom:18px;
   }
-  .title em{
+  .hero__title em{
     font-style:normal;
     background:linear-gradient(90deg,var(--blue-500),var(--blue-300),var(--blue-500));
     background-size:220% 100%;
@@ -252,186 +240,359 @@
     0%,100%{background-position:0% 50%}
     50%{background-position:100% 50%}
   }
-
-  .desc{
-    font-size:15.5px;line-height:1.78;
-    color:var(--ink-2);max-width:46ch;margin-bottom:30px;
+  .hero__desc{
+    font-size:15.5px;line-height:1.75;
+    color:var(--ink-2);max-width:52ch;margin:0 auto;
   }
-  .desc strong{color:var(--ink);font-weight:700}
-
-  /* ---------- Progress ---------- */
-  .progress{
-    background:var(--panel);border:1px solid var(--line);
-    border-radius:14px;padding:18px 20px;
-    box-shadow:var(--shadow-soft);margin-bottom:18px;
-  }
-  .progress__head{
-    display:flex;align-items:baseline;justify-content:space-between;
-    gap:12px;margin-bottom:11px;
-  }
-  .progress__head span{
-    font-size:11px;font-weight:800;letter-spacing:.1em;
-    text-transform:uppercase;color:var(--muted);
-  }
-  .progress__head b{
-    font-size:15px;font-weight:800;color:var(--blue-600);
-    letter-spacing:-.3px;font-variant-numeric:tabular-nums;
-  }
-  .progress__track{
-    position:relative;height:9px;
-    border-radius:99px;background:var(--blue-50);
-    border:1px solid var(--blue-100);overflow:hidden;
-  }
-  .progress__bar{
-    display:block;height:100%;width:0;
-    border-radius:99px;
-    background:linear-gradient(90deg,var(--blue-400),var(--blue-600));
-    transition:width 1.6s var(--ease-out);
-    position:relative;overflow:hidden;
-  }
-  .progress__bar::after{
-    content:"";position:absolute;inset:0;
-    background:linear-gradient(90deg,transparent,rgba(255,255,255,.68),transparent);
-    transform:translateX(-100%);
-    animation:barShine 2.4s ease-in-out infinite;
-  }
-  @keyframes barShine{
-    0%{transform:translateX(-100%)}
-    60%{transform:translateX(100%)}
-    100%{transform:translateX(100%)}
-  }
-  .progress__foot{
-    margin-top:11px;font-size:12.5px;
-    color:var(--muted);line-height:1.55;
-    display:flex;align-items:center;gap:7px;
-  }
-  .progress__foot svg{color:var(--blue-500);flex-shrink:0}
-
-  /* ---------- Countdown ---------- */
-  .countdown{
-    display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
-    gap:10px;margin-bottom:26px;
-  }
-  .countdown__cell{
-    background:var(--panel);border:1px solid var(--line);
-    border-radius:14px;padding:13px 8px 11px;
-    text-align:center;
-    box-shadow:0 10px 22px -18px rgba(2,132,199,.55);
-    overflow:hidden;
-  }
-  .countdown__num{
-    display:block;
-    font-size:clamp(21px,4vw,28px);
-    font-weight:800;letter-spacing:-1px;color:var(--ink);
-    line-height:1.1;font-variant-numeric:tabular-nums;
-    transition:transform .22s var(--ease),color .22s var(--ease);
-  }
-  .countdown__num.is-tick{transform:translateY(-3px);color:var(--blue-600)}
-  .countdown__label{
-    display:block;margin-top:5px;
-    font-size:10px;font-weight:800;letter-spacing:.1em;
-    text-transform:uppercase;color:var(--muted);
-  }
-
-  /* ---------- Actions ---------- */
-  .actions{display:flex;flex-wrap:wrap;gap:12px}
-
-  .btn{
-    display:inline-flex;align-items:center;justify-content:center;gap:9px;
-    font-size:15px;font-weight:700;
-    padding:14px 30px;border-radius:99px;border:1px solid transparent;
-    transition:
-      background .18s var(--ease),
-      border-color .18s var(--ease),
-      color .18s var(--ease),
-      transform .18s var(--ease),
-      box-shadow .18s var(--ease);
-  }
-  .btn:active{transform:translateY(1px) scale(.99)}
-  .btn--primary{
-    color:#fff;
-    background:linear-gradient(135deg,var(--blue-400),var(--blue-600));
-    box-shadow:0 10px 24px -10px rgba(2,132,199,.62);
-  }
-  .btn--primary:hover{
-    background:var(--blue-600);transform:translateY(-2px);
-    box-shadow:0 16px 30px -12px rgba(2,132,199,.68);
-  }
-  .btn--ghost{
-    color:var(--ink-2);background:#fff;border-color:var(--line);
-  }
-  .btn--ghost:hover{
-    color:var(--blue-600);border-color:var(--blue-200);
-    transform:translateY(-2px);
-  }
-  .btn svg{flex-shrink:0}
-  .btn.is-spinning svg{animation:spin .9s linear infinite}
 
   /* =========================================================
-     7. PANEL STATUS
+     7. DOWNLOADER
      ========================================================= */
-  .panel{
-    background:var(--panel);border:1px solid var(--line);
-    border-radius:18px;box-shadow:var(--shadow-card);
-    overflow:hidden;position:relative;
+  .dl{
+    position:relative;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:22px;
+    padding:32px;
+    box-shadow:var(--shadow-card);
+    overflow:hidden;
   }
-  .panel::before{
+  .dl::before{
     content:"";position:absolute;top:0;left:0;right:0;height:5px;
     background:linear-gradient(90deg,var(--blue-400),var(--blue-600),var(--blue-400));
     background-size:200% 100%;
     animation:shimmer 5.5s ease-in-out infinite;
   }
-  .panel__head{
-    display:flex;align-items:center;gap:9px;
-    padding:20px 20px 14px;
-    font-size:11.5px;font-weight:800;
+
+  .dl__head{
+    display:flex;align-items:center;gap:14px;
+    margin-bottom:24px;
+  }
+  .dl__mark{
+    display:flex;align-items:center;justify-content:center;
+    width:48px;height:48px;border-radius:14px;
+    background:linear-gradient(135deg,var(--blue-400),var(--blue-600));
+    color:#fff;flex-shrink:0;
+    box-shadow:0 10px 22px -10px rgba(2,132,199,.7);
+  }
+  .dl__kicker{
+    font-size:11px;font-weight:800;
     letter-spacing:.12em;text-transform:uppercase;
+    color:var(--blue-600);margin-bottom:2px;
+  }
+  .dl__title{
+    font-size:22px;font-weight:800;
+    letter-spacing:-.5px;color:var(--ink);
+  }
+  .dl__title em{
+    font-style:normal;color:var(--blue-600);
+  }
+
+  /* Form */
+  .dl__form{
+    display:flex;gap:10px;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+  }
+  .dl__field{
+    position:relative;
+    flex:1 1 320px;min-width:0;
+    display:flex;align-items:center;
+    background:#fff;
+    border:1.5px solid var(--line);
+    border-radius:14px;
+    transition:border-color .18s,box-shadow .18s;
+  }
+  .dl__field:focus-within{
+    border-color:var(--blue-400);
+    box-shadow:0 0 0 4px rgba(56,189,248,.15);
+  }
+  .dl__field-icon{
+    position:absolute;left:14px;
+    color:var(--muted);pointer-events:none;
+    transition:color .18s;
+  }
+  .dl__field:focus-within .dl__field-icon{color:var(--blue-500)}
+  .dl__input{
+    flex:1;min-width:0;
+    padding:14px 88px 14px 42px;
+    font-size:14.5px;color:var(--ink);
+    background:transparent;border:none;outline:none;
+    border-radius:14px;
+  }
+  .dl__input::placeholder{color:var(--muted);opacity:.85}
+  .dl__input:disabled{opacity:.6;cursor:not-allowed}
+
+  .dl__paste{
+    position:absolute;right:8px;
+    font-size:11.5px;font-weight:800;letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--blue-600);
+    background:var(--blue-50);
+    border:1px solid var(--blue-100);
+    padding:7px 13px;border-radius:9px;
+    transition:background .15s,color .15s,border-color .15s;
+  }
+  .dl__paste:hover{background:var(--blue-100);border-color:var(--blue-200)}
+  .dl__paste:active{transform:scale(.96)}
+
+  .dl__submit{
+    display:inline-flex;align-items:center;justify-content:center;
+    gap:9px;flex-shrink:0;
+    font-size:15px;font-weight:800;
+    color:#fff;
+    background:linear-gradient(135deg,var(--blue-400),var(--blue-600));
+    padding:14px 32px;border:none;border-radius:14px;
+    box-shadow:0 10px 24px -10px rgba(2,132,199,.65);
+    transition:background .18s,transform .15s,box-shadow .18s,opacity .15s;
+  }
+  .dl__submit:hover:not(:disabled){
+    transform:translateY(-1px);
+    box-shadow:0 16px 30px -12px rgba(2,132,199,.75);
+  }
+  .dl__submit:active:not(:disabled){transform:translateY(0) scale(.98)}
+  .dl__submit:disabled{opacity:.7;cursor:not-allowed}
+
+  .dl__submit-spinner{
+    width:16px;height:16px;
+    border:2px solid rgba(255,255,255,.35);
+    border-top-color:#fff;
+    border-radius:50%;
+    animation:spin .75s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* Platform chips */
+  .dl__platforms{
+    display:flex;flex-wrap:wrap;gap:7px;
+    margin-top:4px;
+  }
+  .dl__platforms span{
+    font-size:11.5px;font-weight:700;
     color:var(--muted);
+    background:#fff;
+    border:1px solid var(--line);
+    padding:5px 12px;border-radius:99px;
+    transition:all .18s var(--ease);
   }
-  .panel__head i{
-    width:7px;height:7px;border-radius:50%;
-    background:var(--blue-500);
-    animation:pulse 1.8s ease-in-out infinite;
+  .dl__platforms span.is-detected{
+    color:var(--blue-700);
+    background:var(--blue-100);
+    border-color:var(--blue-200);
+    box-shadow:0 4px 10px -4px rgba(2,132,199,.4);
   }
 
-  .status-list{list-style:none;padding:0 20px}
-  .status-list li{
-    display:flex;align-items:center;justify-content:space-between;
-    gap:12px;padding:12px 0;font-size:13.5px;
-    color:var(--ink-2);border-top:1px solid #f1f7fd;
+  /* Status */
+  .dl__status{
+    display:flex;align-items:flex-start;gap:9px;
+    margin-top:20px;
+    padding:13px 16px;
+    font-size:13.5px;line-height:1.55;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:var(--blue-50);
+    color:var(--ink-2);
   }
-  .status-list li:first-child{border-top:none}
-  .status-list li span:first-child{
-    display:flex;align-items:center;gap:9px;font-weight:600;
+  .dl__status svg{flex-shrink:0;margin-top:1px}
+  .dl__status.is-loading{
+    color:var(--blue-700);
+    background:var(--blue-50);
+    border-color:var(--blue-100);
   }
-  .status-list svg{color:var(--blue-400);flex-shrink:0}
+  .dl__status.is-loading svg{animation:spin .9s linear infinite}
+  .dl__status.is-error{
+    color:var(--err);
+    background:var(--err-bg);
+    border-color:var(--err-line);
+  }
+  .dl__status.is-success{
+    color:var(--ok);
+    background:var(--ok-bg);
+    border-color:var(--ok-line);
+  }
 
-  .tag{
-    font-size:10px;font-weight:800;letter-spacing:.08em;
-    text-transform:uppercase;padding:4px 10px;
-    border-radius:99px;white-space:nowrap;flex-shrink:0;
+  /* Result */
+  .dl__result{
+    margin-top:20px;
+    border-radius:16px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    background:#fff;
+    animation:revealResult .45s var(--ease-out) both;
   }
-  .tag--ok{color:#047857;background:#ecfdf5;border:1px solid #d1fae5}
-  .tag--warn{color:#b45309;background:#fffbeb;border:1px solid #fef3c7}
-  .tag--off{color:var(--blue-700);background:var(--blue-50);border:1px solid var(--blue-100)}
+  @keyframes revealResult{
+    from{opacity:0;transform:translateY(8px)}
+    to{opacity:1;transform:translateY(0)}
+  }
 
-  .panel__foot{
-    margin-top:8px;padding:15px 20px 20px;
-    border-top:1px solid var(--line);
+  .result__head{
+    display:flex;gap:16px;align-items:center;
+    padding:16px;
     background:linear-gradient(180deg,#ffffff,var(--blue-50));
-    font-size:12px;line-height:1.65;color:var(--muted);
+    border-bottom:1px solid var(--line);
   }
-  .panel__clock{
+  .result__thumb{
+    width:78px;height:78px;flex-shrink:0;
+    border-radius:10px;overflow:hidden;
+    background:var(--blue-100);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 14px -6px rgba(2,132,199,.4);
+  }
+  .result__thumb img{width:100%;height:100%;object-fit:cover}
+  .result__info{flex:1;min-width:0}
+  .result__title{
+    font-size:14.5px;font-weight:800;color:var(--ink);
+    line-height:1.4;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+    overflow:hidden;
+    margin-bottom:3px;
+  }
+  .result__meta{
+    font-size:11.5px;font-weight:700;
+    color:var(--muted);
+    text-transform:uppercase;letter-spacing:.06em;
+  }
+
+  .result__list{
+    display:flex;flex-direction:column;gap:1px;
+    background:var(--line);
+  }
+  .result__item{
     display:flex;align-items:center;justify-content:space-between;
-    gap:10px;font-weight:700;color:var(--ink-2);margin-bottom:4px;
+    gap:10px;padding:13px 16px;
+    background:#fff;
+    color:var(--ink);
+    text-decoration:none;
+    transition:background .15s;
   }
-  .panel__clock b{
-    font-variant-numeric:tabular-nums;
-    color:var(--blue-600);font-weight:800;letter-spacing:.02em;
+  .result__item:hover{background:var(--blue-50)}
+  .result__item-label{
+    font-size:13.5px;font-weight:700;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .result__item-icon{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:32px;height:32px;flex-shrink:0;
+    border-radius:9px;
+    color:var(--blue-600);
+    background:var(--blue-50);
+    transition:background .15s,color .15s;
+  }
+  .result__item:hover .result__item-icon{
+    background:var(--blue-100);color:var(--blue-700);
+  }
+
+  .result__empty{
+    padding:20px 16px;
+    font-size:13px;color:var(--muted);
+    text-align:center;background:#fff;
+  }
+
+  .result__raw{
+    border-top:1px solid var(--line);
+    background:var(--blue-50);
+  }
+  .result__raw summary{
+    padding:11px 16px;
+    font-size:11.5px;font-weight:800;
+    color:var(--muted);letter-spacing:.06em;
+    text-transform:uppercase;
+    cursor:pointer;
+    user-select:none;
+  }
+  .result__raw summary:hover{color:var(--blue-600)}
+  .result__raw pre{
+    max-height:260px;overflow:auto;
+    margin:0 16px 14px;
+    padding:12px 14px;
+    background:#0b1220;color:#bae6fd;
+    border-radius:10px;
+    font-family:Consolas,"Courier New",monospace;
+    font-size:11.5px;line-height:1.55;
+    white-space:pre-wrap;word-break:break-word;
   }
 
   /* =========================================================
-     8. FOOTER
+     8. SHORTCUTS
+     ========================================================= */
+  .shortcuts{max-width:1000px;width:100%;margin:0 auto}
+  .shortcuts__head{text-align:center;margin-bottom:22px}
+  .shortcuts__title{
+    font-size:20px;font-weight:800;
+    letter-spacing:-.4px;color:var(--ink);
+    margin-bottom:6px;
+  }
+  .shortcuts__desc{
+    font-size:13.5px;color:var(--muted);line-height:1.6;
+  }
+  .shortcuts__grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:14px;
+  }
+  .shortcuts__card{
+    display:flex;flex-direction:column;align-items:flex-start;
+    gap:12px;
+    padding:22px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:16px;
+    text-decoration:none;
+    color:inherit;
+    position:relative;
+    transition:border-color .18s,transform .18s,box-shadow .18s;
+    overflow:hidden;
+  }
+  .shortcuts__card::after{
+    content:"";position:absolute;top:0;right:0;
+    width:80px;height:80px;
+    background:radial-gradient(circle at 100% 0%,var(--blue-100),transparent 70%);
+    opacity:0;transition:opacity .2s;
+    pointer-events:none;
+  }
+  .shortcuts__card:hover{
+    border-color:var(--blue-200);
+    transform:translateY(-3px);
+    box-shadow:0 20px 34px -20px rgba(2,132,199,.4);
+  }
+  .shortcuts__card:hover::after{opacity:1}
+
+  .shortcuts__icon{
+    display:flex;align-items:center;justify-content:center;
+    width:44px;height:44px;
+    border-radius:12px;
+    color:var(--blue-600);
+    background:var(--blue-50);
+    border:1px solid var(--blue-100);
+  }
+  .shortcuts__label{
+    font-size:15px;font-weight:800;
+    color:var(--ink);letter-spacing:-.2px;
+    margin-bottom:3px;
+  }
+  .shortcuts__desc-text{
+    font-size:12.5px;line-height:1.55;color:var(--muted);
+  }
+  .shortcuts__arrow{
+    align-self:flex-end;
+    margin-top:auto;
+    display:inline-flex;align-items:center;justify-content:center;
+    width:28px;height:28px;
+    border-radius:8px;
+    color:var(--blue-500);
+    background:#fff;
+    border:1px solid var(--line);
+    transition:all .18s;
+  }
+  .shortcuts__card:hover .shortcuts__arrow{
+    color:#fff;
+    background:linear-gradient(135deg,var(--blue-400),var(--blue-600));
+    border-color:transparent;
+    transform:translateX(2px);
+  }
+
+  /* =========================================================
+     9. FOOTER
      ========================================================= */
   .foot{
     position:relative;z-index:2;
@@ -442,34 +603,43 @@
   .foot span{color:var(--blue-600);font-weight:700}
 
   /* =========================================================
-     9. RESPONSIF
+     10. RESPONSIF
      ========================================================= */
-  @media (max-width:940px){
-    .stage{grid-template-columns:1fr;gap:40px;padding:40px 22px 44px}
-    .desc{max-width:none}
-    .panel{max-width:520px}
-    .ring--1{width:200px;height:200px;right:4%}
-    .ring--2{display:none}
+  @media (max-width:820px){
+    .shortcuts__grid{grid-template-columns:1fr}
+    .page{padding:40px 20px 44px;gap:40px}
+    .dl{padding:24px}
   }
   @media (max-width:640px){
-    .topbar{padding:12px 16px}
-    .brand img{width:36px;height:36px}
-    .topbar__status{font-size:11px;padding:6px 11px}
-    .stage{padding:32px 18px 40px}
-    .countdown{gap:8px}
-    .countdown__cell{padding:11px 6px 9px}
-    .btn{width:100%;padding:13px 20px;font-size:14.5px}
-    .panel{max-width:none}
-    .bg__grid{background-size:34px 34px}
+    .nav{padding:11px 14px;gap:10px;flex-wrap:wrap}
+    .nav__brand img{width:32px;height:32px}
+    .nav__brand b{font-size:14px}
+    .nav__links{gap:2px;width:100%;justify-content:flex-start}
+    .nav__link{padding:8px 13px;font-size:12.5px}
+
+    .page{padding:32px 16px 40px;gap:32px}
+
+    .hero__title{letter-spacing:-1px}
+
+    .dl{padding:20px;border-radius:18px}
+    .dl__head{gap:12px;margin-bottom:20px}
+    .dl__mark{width:42px;height:42px}
+    .dl__title{font-size:19px}
+    .dl__form{gap:8px}
+    .dl__field{flex:1 1 100%}
+    .dl__submit{width:100%;padding:13px 20px;font-size:14.5px}
+
+    .result__thumb{width:64px;height:64px}
+    .result__title{font-size:13.5px}
   }
   @media (max-width:380px){
-    .countdown__label{font-size:9px;letter-spacing:.05em}
-    .progress{padding:15px 16px}
-    .status-list li{font-size:12.5px}
+    .hero__title{font-size:28px}
+    .dl__title{font-size:17px}
+    .nav__link{padding:7px 11px;font-size:12px}
   }
 
   /* =========================================================
-     10. REDUCED MOTION
+     11. REDUCED MOTION
      ========================================================= */
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{
@@ -486,7 +656,7 @@
 <body class="is-loading">
 
 <!-- TRANSITION OVERLAY -->
-<div class="xfer" id="xfer" aria-hidden="true">
+<div class="xfer" aria-hidden="true">
   <div class="xfer__half xfer__half--top"></div>
   <div class="xfer__half xfer__half--bot"></div>
   <div class="xfer__seam"></div>
@@ -501,303 +671,499 @@
   <div class="bg__grid"></div>
   <div class="bg__orb bg__orb--a"></div>
   <div class="bg__orb bg__orb--b"></div>
-
-  <svg class="ring ring--1" viewBox="0 0 200 200" fill="none" aria-hidden="true">
-    <circle cx="100" cy="100" r="88" stroke="currentColor" stroke-width="2" stroke-dasharray="11 15"/>
-    <circle cx="100" cy="100" r="72" stroke="currentColor" stroke-width="1" stroke-dasharray="2 9"/>
-    <circle cx="100" cy="100" r="56" stroke="currentColor" stroke-width="1" stroke-dasharray="20 12" opacity=".7"/>
-  </svg>
-  <svg class="ring ring--2" viewBox="0 0 200 200" fill="none" aria-hidden="true">
-    <circle cx="100" cy="100" r="86" stroke="currentColor" stroke-width="3" stroke-dasharray="16 18"/>
-    <circle cx="100" cy="100" r="64" stroke="currentColor" stroke-width="1" stroke-dasharray="3 7"/>
-  </svg>
 </div>
 
-<!-- HEADER -->
-<header class="topbar reveal" style="--d:120ms">
-  <a class="brand" href="index.html" data-nav>
+<!-- TOOLBAR / NAV -->
+<header class="nav reveal" style="--d:80ms">
+  <a class="nav__brand" href="beranda.html" data-nav>
     <img src="logo.jpg" alt="Logo Insomnia Dev">
     <b>Insomnia<em>Dev</em></b>
   </a>
-  <div class="topbar__status">
-    <span class="pulse-dot"></span> Maintenance Aktif
-  </div>
+  <nav class="nav__links" aria-label="Navigasi utama">
+    <a href="beranda.html" class="nav__link is-active" data-nav>Beranda</a>
+    <a href="tools.html" class="nav__link" data-nav>Tools</a>
+    <a href="req.html" class="nav__link" data-nav>Req</a>
+    <a href="info.html" class="nav__link" data-nav>Information</a>
+  </nav>
 </header>
 
 <!-- MAIN -->
-<main class="stage">
+<main class="page">
 
-  <section class="hero">
-    <div class="badge reveal" style="--d:180ms">
-      <i></i> Mode Perbaikan
-    </div>
-    <h1 class="title reveal" style="--d:260ms">
-      Website sedang<br><em>diperbaiki.</em>
+  <!-- HERO -->
+  <section class="hero reveal" style="--d:160ms">
+    <div class="hero__badge"><i></i> Beranda</div>
+    <h1 class="hero__title">
+      Download apapun,<br><em>tanpa ribet.</em>
     </h1>
-    <p class="desc reveal" style="--d:340ms">
-      Halaman <strong>Beranda</strong> sedang dalam tahap pengerjaan.
-      Kami merapikan tampilan, mempercepat waktu muat, dan menyiapkan menu baru.
-      Coba kembali beberapa saat lagi.
+    <p class="hero__desc">
+      All-in-One Downloader untuk TikTok, Instagram, Facebook, YouTube, Twitter,
+      dan banyak platform lainnya. Gratis, cepat, tanpa registrasi.
     </p>
-
-    <div class="progress reveal" style="--d:420ms"
-         role="progressbar" aria-labelledby="progressLabel"
-         aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
-         id="progressWrap">
-      <div class="progress__head">
-        <span id="progressLabel">Penyelesaian</span>
-        <b id="progressVal">0%</b>
-      </div>
-      <div class="progress__track">
-        <span class="progress__bar" id="progressBar"></span>
-      </div>
-      <div class="progress__foot">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2.2"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="9"/>
-          <path d="M12 7v5l3 2"/>
-        </svg>
-        <span id="progressNote">Memuat status pengerjaan…</span>
-      </div>
-    </div>
-
-    <div class="countdown reveal" style="--d:500ms" id="countdown" aria-live="polite">
-      <div class="countdown__cell">
-        <span class="countdown__num" id="cdDay">00</span>
-        <span class="countdown__label">Hari</span>
-      </div>
-      <div class="countdown__cell">
-        <span class="countdown__num" id="cdHour">00</span>
-        <span class="countdown__label">Jam</span>
-      </div>
-      <div class="countdown__cell">
-        <span class="countdown__num" id="cdMin">00</span>
-        <span class="countdown__label">Menit</span>
-      </div>
-      <div class="countdown__cell">
-        <span class="countdown__num" id="cdSec">00</span>
-        <span class="countdown__label">Detik</span>
-      </div>
-    </div>
-
-    <div class="actions reveal" style="--d:580ms">
-      <a class="btn btn--primary" href="porto.html" data-nav>
-        Lihat Portofolio
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2.6"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M5 12h14"/>
-          <path d="M13 6l6 6-6 6"/>
-        </svg>
-      </a>
-      <button class="btn btn--ghost" id="retryBtn" type="button">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2.4"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 12a9 9 0 1 1-3.1-6.8"/>
-          <path d="M21 3v6h-6"/>
-        </svg>
-        Muat Ulang
-      </button>
-    </div>
   </section>
 
-  <aside class="panel reveal" style="--d:660ms" aria-label="Status layanan">
-    <div class="panel__head"><i></i> Status Layanan</div>
-
-    <ul class="status-list">
-      <li>
-        <span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2.2"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3" y="4" width="18" height="14" rx="2"/>
-            <path d="M8 21h8"/>
-          </svg>
-          Halaman Beranda
-        </span>
-        <span class="tag tag--off">Dikerjakan</span>
-      </li>
-      <li>
-        <span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2.2"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M4 5h16v14H4z"/>
-            <path d="M8 9h8M8 13h5"/>
-          </svg>
-          Halaman Portofolio
-        </span>
-        <span class="tag tag--ok">Normal</span>
-      </li>
-      <li>
-        <span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2.2"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="3.2"/>
-            <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>
-          </svg>
-          Aset &amp; Gambar
-        </span>
-        <span class="tag tag--ok">Normal</span>
-      </li>
-      <li>
-        <span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2.2"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 3l8 4v6c0 4.2-3.2 7.4-8 8-4.8-.6-8-3.8-8-8V7z"/>
-          </svg>
-          Performa &amp; Optimasi
-        </span>
-        <span class="tag tag--warn">Diuji</span>
-      </li>
-    </ul>
-
-    <div class="panel__foot">
-      <div class="panel__clock">
-        <span>Waktu server</span>
-        <b id="serverClock">--:--:--</b>
+  <!-- DOWNLOADER -->
+  <section class="dl reveal" style="--d:240ms" aria-labelledby="dlTitle">
+    <div class="dl__head">
+      <div class="dl__mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.4"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3v12"/>
+          <path d="M7 10l5 5 5-5"/>
+          <path d="M5 21h14"/>
+        </svg>
       </div>
-      Estimasi selesai: <span id="etaText">menghitung…</span>
+      <div>
+        <div class="dl__kicker">Tools Andalan</div>
+        <h2 class="dl__title" id="dlTitle">All-in-One <em>Downloader</em></h2>
+      </div>
     </div>
-  </aside>
+
+    <form class="dl__form" id="dlForm" novalidate>
+      <div class="dl__field">
+        <svg class="dl__field-icon" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+        </svg>
+        <input type="url" class="dl__input" id="dlUrl"
+               placeholder="Paste link TikTok, IG, FB, YT, Twitter…"
+               autocomplete="off" spellcheck="false"
+               inputmode="url" aria-label="URL yang akan diunduh">
+        <button type="button" class="dl__paste" id="dlPaste">Paste</button>
+      </div>
+      <button type="submit" class="dl__submit" id="dlSubmit">
+        <span class="dl__submit-label">Unduh</span>
+        <span class="dl__submit-spinner" id="dlSpinner" hidden></span>
+      </button>
+    </form>
+
+    <div class="dl__platforms" id="dlPlatforms">
+      <span>TikTok</span><span>Instagram</span><span>Facebook</span>
+      <span>YouTube</span><span>Twitter</span><span>Pinterest</span>
+      <span>Threads</span><span>Spotify</span>
+    </div>
+
+    <div class="dl__status" id="dlStatus" role="status" aria-live="polite" hidden></div>
+
+    <div class="dl__result" id="dlResult" hidden></div>
+  </section>
+
+  <!-- SHORTCUTS -->
+  <section class="shortcuts reveal" style="--d:320ms">
+    <div class="shortcuts__head">
+      <h2 class="shortcuts__title">Jelajahi halaman lain</h2>
+      <p class="shortcuts__desc">Shortcut cepat ke bagian penting situs.</p>
+    </div>
+    <div class="shortcuts__grid">
+
+      <a href="tools.html" class="shortcuts__card" data-nav>
+        <div class="shortcuts__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14.7 6.3a4 4 0 1 1-5.4 5.4"/>
+            <path d="M14.7 6.3 21 12.6"/>
+            <path d="M3 21l7-7"/>
+          </svg>
+        </div>
+        <div>
+          <div class="shortcuts__label">Tools</div>
+          <div class="shortcuts__desc-text">Kumpulan tools lainnya yang siap dipakai kapan saja.</div>
+        </div>
+        <div class="shortcuts__arrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.6"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14"/>
+            <path d="M13 6l6 6-6 6"/>
+          </svg>
+        </div>
+      </a>
+
+      <a href="req.html" class="shortcuts__card" data-nav>
+        <div class="shortcuts__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M22 2 11 13"/>
+            <path d="M22 2 15 22l-4-9-9-4z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="shortcuts__label">Request</div>
+          <div class="shortcuts__desc-text">Ajukan request tools atau fitur baru yang kamu butuhkan.</div>
+        </div>
+        <div class="shortcuts__arrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.6"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14"/>
+            <path d="M13 6l6 6-6 6"/>
+          </svg>
+        </div>
+      </a>
+
+      <a href="info.html" class="shortcuts__card" data-nav>
+        <div class="shortcuts__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 11v5"/>
+            <path d="M12 8h.01"/>
+          </svg>
+        </div>
+        <div>
+          <div class="shortcuts__label">Information</div>
+          <div class="shortcuts__desc-text">Info layanan, kebijakan, kontak, dan detail lainnya.</div>
+        </div>
+        <div class="shortcuts__arrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.6"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14"/>
+            <path d="M13 6l6 6-6 6"/>
+          </svg>
+        </div>
+      </a>
+
+    </div>
+  </section>
 
 </main>
 
 <!-- FOOTER -->
-<footer class="foot reveal" style="--d:740ms">
-  &copy; <span id="year">2025</span> <span>Insomnia Dev</span>. Semua hak dilindungi.
+<footer class="foot reveal" style="--d:400ms">
+  &copy; <span id="y">2025</span> <span>Insomnia Dev</span>. Semua hak dilindungi.
 </footer>
 
 <script>
 /* =========================================================
-   A. KONTEN + COUNTDOWN
+   A. HALPER
    ========================================================= */
 (function () {
   "use strict";
 
-  var MAINTENANCE_END = "2026-11-05T06:00:00+07:00";
-  var PROGRESS_TARGET = 68;
+  document.getElementById("y").textContent = new Date().getFullYear();
 
-  var progressWrap = document.getElementById("progressWrap");
-  var progressBar  = document.getElementById("progressBar");
-  var progressVal  = document.getElementById("progressVal");
-  var progressNote = document.getElementById("progressNote");
-  var etaText      = document.getElementById("etaText");
-  var serverClock  = document.getElementById("serverClock");
-  var yearEl       = document.getElementById("year");
-  var retryBtn     = document.getElementById("retryBtn");
-
-  var cdDay  = document.getElementById("cdDay");
-  var cdHour = document.getElementById("cdHour");
-  var cdMin  = document.getElementById("cdMin");
-  var cdSec  = document.getElementById("cdSec");
-
-  if (yearEl) yearEl.textContent = new Date().getFullYear();
-
-  /* ---------- PROGRESS ---------- */
-  function initProgress() {
-    if (!progressBar) return;
-    setTimeout(function () {
-      progressBar.style.width = PROGRESS_TARGET + "%";
-      progressWrap.setAttribute("aria-valuenow", String(PROGRESS_TARGET));
-      if (progressNote) {
-        progressNote.textContent = "Tahap akhir: penyesuaian tampilan dan pengujian.";
-      }
-      var start = null;
-      var duration = 1600;
-      function countUp(ts) {
-        if (start === null) start = ts;
-        var p = Math.min((ts - start) / duration, 1);
-        var eased = 1 - Math.pow(1 - p, 3);
-        var v = Math.round(PROGRESS_TARGET * eased);
-        if (progressVal) progressVal.textContent = v + "%";
-        if (p < 1) requestAnimationFrame(countUp);
-        else progressVal.textContent = PROGRESS_TARGET + "%";
-      }
-      requestAnimationFrame(countUp);
-    }, 700);
+  /* Escape HTML */
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
   }
 
-  /* ---------- COUNTDOWN ---------- */
-  var targetTime = new Date(MAINTENANCE_END).getTime();
-  var lastSecond = -1;
-  var finished = false;
-
-  function pad(v){return v<10?"0"+v:String(v)}
-
-  function markTick(el){
-    if(!el) return;
-    el.classList.add("is-tick");
-    setTimeout(function(){ el.classList.remove("is-tick"); },220);
+  /* Deteksi platform dari URL */
+  function detectPlatform(url) {
+    if (!url) return null;
+    var u = String(url).toLowerCase();
+    if (u.includes("tiktok.com")) return "TikTok";
+    if (u.includes("instagram.com")) return "Instagram";
+    if (u.includes("facebook.com") || u.includes("fb.watch")) return "Facebook";
+    if (u.includes("youtube.com") || u.includes("youtu.be")) return "YouTube";
+    if (u.includes("twitter.com") || u.includes("x.com")) return "Twitter";
+    if (u.includes("pinterest.com") || u.includes("pin.it")) return "Pinterest";
+    if (u.includes("threads.net")) return "Threads";
+    if (u.includes("spotify.com")) return "Spotify";
+    if (u.includes("soundcloud.com")) return "SoundCloud";
+    if (u.includes("snapchat.com")) return "Snapchat";
+    if (u.includes("twitch.tv")) return "Twitch";
+    if (u.includes("vimeo.com")) return "Vimeo";
+    return null;
   }
 
-  function updateCountdown(){
-    var diff = targetTime - Date.now();
-    if (diff <= 0) {
-      diff = 0;
-      if (!finished) {
-        finished = true;
-        if (progressNote) progressNote.textContent = "Pengerjaan hampir selesai. Silakan muat ulang halaman.";
-        if (etaText) etaText.textContent = "beberapa saat lagi";
+  /* Extract media dari response yang bentuknya tidak pasti */
+  function extractMediaList(payload) {
+    var items = [];
+    var seen = new Set();
+
+    function add(label, url, type) {
+      if (!url || typeof url !== "string") return;
+      if (!/^https?:\/\//i.test(url)) return;
+      if (url.indexOf("allinonedownloader.com") !== -1) return;
+      if (seen.has(url)) return;
+      seen.add(url);
+      items.push({ label: label || "Download", url: url, type: type || "" });
+    }
+
+    function walk(obj, depth) {
+      if (depth > 6) return;
+      if (!obj || typeof obj !== "object") return;
+      for (var k in obj) {
+        if (!Object.prototype.hasOwnProperty.call(obj, k)) continue;
+        var v = obj[k];
+        if (typeof v === "string" && /^https?:\/\//i.test(v)) {
+          add(k, v);
+        } else if (v && typeof v === "object") {
+          walk(v, depth + 1);
+        }
       }
     }
-    var totalSec = Math.floor(diff / 1000);
-    var days  = Math.floor(totalSec / 86400);
-    var hours = Math.floor((totalSec % 86400) / 3600);
-    var mins  = Math.floor((totalSec % 3600) / 60);
-    var secs  = totalSec % 60;
 
-    if (cdDay)  cdDay.textContent  = pad(days);
-    if (cdHour) cdHour.textContent = pad(hours);
-    if (cdMin)  cdMin.textContent  = pad(mins);
-    if (cdSec) {
-      cdSec.textContent = pad(secs);
-      if (secs !== lastSecond && lastSecond !== -1) markTick(cdSec);
+    if (Array.isArray(payload.medias)) {
+      for (var i = 0; i < payload.medias.length; i++) {
+        var m = payload.medias[i];
+        if (typeof m === "string") add("Media", m);
+        else if (m && typeof m === "object")
+          add(m.label || m.quality || m.type || m.name, m.url || m.link || m.src, m.type);
+      }
     }
-    lastSecond = secs;
+    if (Array.isArray(payload.links)) {
+      for (var j = 0; j < payload.links.length; j++) {
+        var l = payload.links[j];
+        if (typeof l === "string") add("Link", l);
+        else if (l && typeof l === "object")
+          add(l.label || l.name || l.quality, l.url || l.link || l.src, l.type);
+      }
+    }
+    if (Array.isArray(payload.downloads)) {
+      for (var d = 0; d < payload.downloads.length; d++) {
+        var x = payload.downloads[d];
+        if (x && typeof x === "object")
+          add(x.label || x.quality || x.type, x.url || x.link, x.type);
+      }
+    }
+    if (Array.isArray(payload.images)) {
+      for (var p = 0; p < payload.images.length; p++) {
+        var im = payload.images[p];
+        if (typeof im === "string") add("Gambar " + (p + 1), im, "image");
+        else if (im && im.url) add(im.label || "Gambar " + (p + 1), im.url, "image");
+      }
+    }
+    if (payload.urls && typeof payload.urls === "object" && !Array.isArray(payload.urls)) {
+      for (var key in payload.urls) {
+        if (!Object.prototype.hasOwnProperty.call(payload.urls, key)) continue;
+        var uv = payload.urls[key];
+        if (typeof uv === "string") add(key, uv);
+        else if (uv && uv.url) add(key, uv.url);
+      }
+    }
+
+    add("Video", payload.video || payload.video_url, "video");
+    add("Audio", payload.audio || payload.audio_url || payload.music || payload.music_url, "audio");
+    add("Gambar", payload.image_url || (payload.type === "image" ? payload.image : null), "image");
+
+    if (items.length === 0) walk(payload, 0);
+
+    return items;
   }
 
-  function updateClock(){
-    if (!serverClock) return;
-    var now = new Date();
-    serverClock.textContent = pad(now.getHours()) + ":" + pad(now.getMinutes()) + ":" + pad(now.getSeconds());
+  /* Render result */
+  function renderResult(raw) {
+    var result = document.getElementById("dlResult");
+    if (!result) return;
+
+    var payload = raw;
+    if (payload && typeof payload === "object" && !Array.isArray(payload)) {
+      if (payload.data && typeof payload.data === "object") payload = payload.data;
+      if (payload.result && typeof payload.result === "object") payload = payload.result;
+    }
+
+    var thumb = null, title = "";
+    if (payload && typeof payload === "object" && !Array.isArray(payload)) {
+      thumb = payload.thumbnail || payload.thumb || payload.cover ||
+              payload.image || payload.poster || payload.preview || null;
+      title = payload.title || payload.name || payload.desc ||
+              payload.description || payload.caption || "";
+    }
+
+    var medias = [];
+    if (Array.isArray(payload)) {
+      for (var i = 0; i < payload.length; i++) {
+        var it = payload[i];
+        if (it && it.url) medias.push({ label: it.label || it.name || "Media", url: it.url, type: it.type || "" });
+      }
+    } else if (payload && typeof payload === "object") {
+      medias = extractMediaList(payload);
+    }
+
+    var html = "";
+
+    if (thumb || title) {
+      html += '<div class="result__head">';
+      if (thumb) {
+        html += '<div class="result__thumb"><img src="' + escapeHtml(thumb) +
+                '" alt="" loading="lazy" referrerpolicy="no-referrer" ' +
+                'onerror="this.style.display=\'none\'"></div>';
+      }
+      html += '<div class="result__info">';
+      if (title) html += '<div class="result__title">' + escapeHtml(title) + '</div>';
+      html += '<div class="result__meta">' + medias.length + ' tautan siap</div>';
+      html += '</div></div>';
+    }
+
+    if (medias.length > 0) {
+      html += '<div class="result__list">';
+      for (var k = 0; k < medias.length; k++) {
+        html += '<a class="result__item" href="' + escapeHtml(medias[k].url) +
+                '" target="_blank" rel="noopener noreferrer">';
+        html += '<span class="result__item-label">' + escapeHtml(medias[k].label) + '</span>';
+        html += '<span class="result__item-icon">';
+        html += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>';
+        html += '</span></a>';
+      }
+      html += '</div>';
+    } else {
+      html += '<div class="result__empty">Tidak ada tautan yang bisa ditampilkan otomatis. Lihat respons mentah di bawah.</div>';
+    }
+
+    var rawStr = JSON.stringify(raw, null, 2);
+    if (rawStr.length > 50000) rawStr = rawStr.slice(0, 50000) + "\n\n... (dipotong)";
+
+    html += '<details class="result__raw">';
+    html += '<summary>Lihat respons mentah</summary>';
+    html += '<pre>' + escapeHtml(rawStr) + '</pre>';
+    html += '</details>';
+
+    result.innerHTML = html;
+    result.hidden = false;
+    result.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
-  function updateEta(){
-    if (!etaText) return;
-    var diff = targetTime - Date.now();
-    if (diff <= 0) { etaText.textContent = "beberapa saat lagi"; return; }
-    var d = new Date(targetTime);
-    var bulan = ["Januari","Februari","Maret","April","Mei","Juni",
-                 "Juli","Agustus","September","Oktober","November","Desember"];
-    etaText.textContent =
-      d.getDate() + " " + bulan[d.getMonth()] + " " + d.getFullYear() +
-      ", " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + " WIB";
+  /* Status bar */
+  var STATUS_ICONS = {
+    loading: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg>',
+    error:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>',
+    success: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+    info:    '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>'
+  };
+
+  function showStatus(text, type) {
+    var el = document.getElementById("dlStatus");
+    if (!el) return;
+    el.className = "dl__status is-" + (type || "info");
+    el.innerHTML = (STATUS_ICONS[type] || STATUS_ICONS.info) + "<span>" + escapeHtml(text) + "</span>";
+    el.hidden = false;
   }
 
-  updateCountdown(); updateClock(); updateEta();
-  setInterval(updateCountdown, 1000);
-  setInterval(updateClock, 1000);
-  setInterval(updateEta, 60000);
+  function hideStatus() {
+    var el = document.getElementById("dlStatus");
+    if (!el) return;
+    el.hidden = true;
+    el.innerHTML = "";
+  }
 
-  initProgress();
+  /* =========================================================
+     B. DOWNLOADER LOGIC
+     ========================================================= */
+  var form     = document.getElementById("dlForm");
+  var input    = document.getElementById("dlUrl");
+  var submit   = document.getElementById("dlSubmit");
+  var spinner  = document.getElementById("dlSpinner");
+  var label    = submit ? submit.querySelector(".dl__submit-label") : null;
+  var resultEl = document.getElementById("dlResult");
+  var pasteBtn = document.getElementById("dlPaste");
+  var chips    = document.querySelectorAll("#dlPlatforms span");
 
-  /* ---------- RETRY ---------- */
-  if (retryBtn) {
-    retryBtn.addEventListener("click", function () {
-      retryBtn.classList.add("is-spinning");
-      retryBtn.disabled = true;
-      setTimeout(function () { window.location.reload(); }, 260);
+  if (input && chips.length) {
+    input.addEventListener("input", function () {
+      var p = detectPlatform(input.value.trim());
+      for (var i = 0; i < chips.length; i++) {
+        chips[i].classList.toggle("is-detected", p && chips[i].textContent === p);
+      }
+    });
+  }
+
+  if (pasteBtn) {
+    pasteBtn.addEventListener("click", async function () {
+      try {
+        var text = await navigator.clipboard.readText();
+        if (text && input) {
+          input.value = text.trim();
+          input.dispatchEvent(new Event("input"));
+          input.focus();
+        }
+      } catch (err) {
+        showStatus("Izinkan akses clipboard, atau paste manual dengan Ctrl+V.", "info");
+        if (input) input.focus();
+      }
+    });
+  }
+
+  if (form) {
+    form.addEventListener("submit", async function (ev) {
+      ev.preventDefault();
+
+      var url = input ? input.value.trim() : "";
+
+      if (!url) {
+        showStatus("Masukkan link terlebih dahulu.", "error");
+        if (input) input.focus();
+        return;
+      }
+      if (!/^https?:\/\//i.test(url)) {
+        showStatus("Link harus dimulai dengan http:// atau https://", "error");
+        if (input) input.focus();
+        return;
+      }
+
+      /* Reset UI */
+      if (resultEl) { resultEl.hidden = true; resultEl.innerHTML = ""; }
+      submit.disabled = true;
+      if (input) input.disabled = true;
+      if (spinner) spinner.hidden = false;
+      if (label) label.textContent = "Memproses";
+
+      showStatus("Memproses link, mohon tunggu…", "loading");
+
+      /* Progress messages */
+      var timers = [];
+      var msgs = [
+        [8000,  "Mengambil data dari server…"],
+        [18000, "Menyelesaikan verifikasi keamanan…"],
+        [35000, "Hampir selesai, mohon tunggu…"],
+        [60000, "Server butuh waktu lebih lama, tetap menunggu…"]
+      ];
+      for (var i = 0; i < msgs.length; i++) {
+        (function (delay, text) {
+          timers.push(setTimeout(function () { showStatus(text, "loading"); }, delay));
+        })(msgs[i][0], msgs[i][1]);
+      }
+
+      try {
+        var controller = new AbortController();
+        var timeoutId = setTimeout(function () { controller.abort(); }, 120000);
+
+        var res = await fetch("/api/download", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: url }),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        var json;
+        try { json = await res.json(); }
+        catch (e) { throw new Error("Server mengembalikan respons tidak valid."); }
+
+        if (!json.ok) throw new Error(json.error || "Gagal memproses link.");
+
+        hideStatus();
+        renderResult(json.data);
+
+      } catch (err) {
+        if (err.name === "AbortError") {
+          showStatus("Waktu habis. Server tidak merespons dalam 2 menit.", "error");
+        } else {
+          showStatus(err.message || "Terjadi kesalahan saat memproses link.", "error");
+        }
+      } finally {
+        for (var t = 0; t < timers.length; t++) clearTimeout(timers[t]);
+        submit.disabled = false;
+        if (input) input.disabled = false;
+        if (spinner) spinner.hidden = true;
+        if (label) label.textContent = "Unduh";
+      }
     });
   }
 })();
 
 /* =========================================================
-   B. TRANSISI HALAMAN
+   C. TRANSISI HALAMAN
    ========================================================= */
 (function () {
   "use strict";
@@ -807,21 +1173,17 @@
 
   function reveal() {
     document.body.classList.remove("is-loading");
-    // beri jeda sedikit biar panel sudah mulai bergerak sebelum konten muncul
     setTimeout(function () {
       document.body.classList.add("is-ready");
     }, 380);
   }
 
-  if (document.readyState === "complete" ||
-      document.readyState === "interactive") {
+  if (document.readyState === "complete" || document.readyState === "interactive") {
     setTimeout(reveal, 60);
   } else {
-    document.addEventListener("DOMContentLoaded", function () {
-      setTimeout(reveal, 60);
-    });
+    document.addEventListener("DOMContentLoaded", function () { setTimeout(reveal, 60); });
   }
-  setTimeout(reveal, 2500); // fallback
+  setTimeout(reveal, 2500);
 
   function navigateTo(href) {
     if (reduceMotion) { window.location.href = href; return; }
@@ -841,7 +1203,6 @@
     });
   }
 
-  // bfcache
   window.addEventListener("pageshow", function (ev) {
     if (ev.persisted) {
       document.body.classList.remove("is-leaving", "is-ready");
