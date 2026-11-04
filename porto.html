@@ -16,10 +16,15 @@
     --blue-400: #38bdf8;
     --blue-500: #0ea5e9;
     --blue-600: #0284c7;
+    --blue-700: #0369a1;
     --ink:      #0b1220;
     --ink-2:    #334155;
     --muted:    #64748b;
     --line:     #e3eef8;
+  }
+
+  html, body {
+    overflow-x: hidden;
   }
 
   body {
@@ -32,7 +37,6 @@
       radial-gradient(700px 400px at 85% 0%, var(--blue-100) 0%, transparent 60%),
       radial-gradient(600px 380px at 0% 100%, var(--blue-50) 0%, transparent 60%),
       #fbfdff;
-    overflow-x: hidden;
   }
 
   /* ================= HEADER ================= */
@@ -77,19 +81,14 @@
   main {
     flex: 1;
     width: 100%;
-    max-width: 1080px;
+    max-width: 720px;
     margin: 0 auto;
-    padding: 48px 28px 56px;
+    padding: 36px 24px 56px;
   }
 
-  .hero {
-    display: grid;
-    grid-template-columns: 1.05fr 0.95fr;
-    gap: 56px;
-    align-items: center;
-  }
+  /* ----- INTRO ----- */
+  .intro { text-align: center; margin-bottom: 12px; }
 
-  /* ---- TEKS ---- */
   .badge {
     display: inline-block;
     font-size: 12px;
@@ -98,14 +97,14 @@
     background: var(--blue-100);
     padding: 6px 14px;
     border-radius: 99px;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
 
   h1 {
-    font-size: clamp(32px, 5vw, 52px);
-    line-height: 1.06;
-    letter-spacing: -1.5px;
-    margin-bottom: 18px;
+    font-size: clamp(30px, 5.4vw, 44px);
+    line-height: 1.1;
+    letter-spacing: -1.3px;
+    margin-bottom: 14px;
   }
   h1 em {
     font-style: normal;
@@ -116,115 +115,158 @@
   }
 
   .desc {
-    font-size: 15.5px;
-    line-height: 1.78;
+    font-size: 15px;
+    line-height: 1.72;
     color: var(--ink-2);
     max-width: 46ch;
-    margin-bottom: 26px;
+    margin: 0 auto 8px;
   }
 
-  .chips {
+  /* ================= LANYARD ================= */
+  .lanyard-zone {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 30px;
-  }
-  .chips span {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--blue-600);
-    background: #fff;
-    border: 1px solid var(--blue-100);
-    padding: 7px 14px;
-    border-radius: 99px;
-  }
-
-  .stats {
-    display: flex;
-    gap: 40px;
-    padding-top: 24px;
-    border-top: 1px solid var(--line);
-  }
-  .stat b {
-    display: block;
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: -.5px;
-  }
-  .stat b em { font-style: normal; color: var(--blue-500); }
-  .stat span {
-    display: block;
-    margin-top: 2px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    color: var(--muted);
-  }
-
-  /* ================= KARTU 3D ================= */
-  .tilt-wrap {
-    perspective: 1100px;
-    display: flex;
-    justify-content: center;
-    padding: 10px;
-  }
-
-  .tilt {
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 0 0;
     position: relative;
+  }
+
+  .scene {
+    perspective: 1200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 100%;
-    max-width: 340px;
+    padding-top: 10px;
+  }
+
+  /* titik pengait */
+  .anchor {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffffff 0%, #cbd5e1 55%, #94a3b8 100%);
+    box-shadow:
+      0 4px 10px rgba(2, 132, 199, .35),
+      inset 0 -2px 3px rgba(0, 0, 0, .18),
+      inset 0 2px 3px rgba(255, 255, 255, .9);
+    z-index: 5;
+    position: relative;
+  }
+  .anchor::after {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 40%, #f8fafc, #cbd5e1);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .15);
+  }
+
+  /* pendulum: berputar di sekitar ujung atas strap */
+  .pendulum {
+    transform-origin: 50% 0%;
     transform-style: preserve-3d;
     will-change: transform;
-    transform: rotateX(0deg) rotateY(0deg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    margin-top: -2px;
   }
 
-  /* kilau mengikuti kursor */
-  .tilt::after {
+  /* ----- strap lanyard ----- */
+  .strap {
+    width: 28px;
+    height: 110px;
+    position: relative;
+    border-radius: 2px;
+    background:
+      repeating-linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, .22) 0px,
+        rgba(255, 255, 255, .22) 4px,
+        transparent 4px,
+        transparent 14px
+      ),
+      linear-gradient(180deg, var(--blue-400) 0%, var(--blue-500) 45%, var(--blue-700) 100%);
+    box-shadow:
+      inset -3px 0 6px rgba(2, 40, 70, .35),
+      inset 3px 0 6px rgba(255, 255, 255, .35),
+      inset 0 -4px 6px rgba(2, 40, 70, .25);
+    margin-bottom: 0;
+    z-index: 1;
+  }
+  /* ulir vertikal halus di sepanjang strap */
+  .strap::before {
     content: "";
     position: absolute;
     inset: 0;
-    border-radius: 22px;
-    background: radial-gradient(
-      circle at var(--mx, 50%) var(--my, 50%),
-      rgba(56, 189, 248, .30) 0%,
-      rgba(56, 189, 248, 0) 58%
-    );
-    opacity: var(--glare, 0);
-    transition: opacity .35s ease;
+    background:
+      repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        transparent 10px,
+        rgba(0, 0, 0, .06) 10px,
+        rgba(0, 0, 0, .06) 12px
+      );
+    border-radius: 2px;
     pointer-events: none;
-    z-index: 5;
+  }
+  /* clip metal di ujung bawah strap */
+  .strap::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 18px;
+    height: 16px;
+    background: linear-gradient(180deg, #e2e8f0 0%, #94a3b8 100%);
+    border-radius: 3px 3px 4px 4px;
+    box-shadow:
+      0 2px 5px rgba(0, 0, 0, .25),
+      inset 0 1px 1px rgba(255, 255, 255, .8);
+    z-index: 3;
   }
 
+  /* ================= KARTU ID ================= */
   .idcard {
-    position: relative;
+    width: 100%;
+    max-width: 320px;
     background: #fff;
     border: 1px solid var(--line);
-    border-radius: 22px;
-    box-shadow: 0 30px 60px -30px rgba(2, 132, 199, .38);
-    padding: 20px 20px 22px;
-    transform-style: preserve-3d;
-    overflow: hidden;
+    border-radius: 18px;
+    box-shadow: 0 26px 50px -24px rgba(2, 132, 199, .42);
+    padding: 18px 18px 20px;
+    position: relative;
+    margin-top: 6px;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    will-change: transform;
+    transform-origin: 50% 0%;
   }
+  .idcard:active { cursor: grabbing; }
 
-  /* garis aksen atas */
   .idcard::before {
     content: "";
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 5px;
     background: linear-gradient(90deg, var(--blue-400), var(--blue-600));
+    border-radius: 18px 18px 0 0;
   }
 
   .idcard__top {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 18px;
-    transform: translateZ(14px);
+    margin-bottom: 14px;
+    margin-top: 4px;
   }
   .idcard__brand {
-    font-size: 10.5px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: .16em;
     color: var(--muted);
@@ -249,53 +291,51 @@
   }
 
   .idcard__photo {
-    width: 128px;
-    height: 158px;
-    margin: 0 auto 16px;
-    border-radius: 16px;
+    width: 118px;
+    height: 148px;
+    margin: 0 auto 14px;
+    border-radius: 14px;
     overflow: hidden;
     border: 1px solid var(--line);
     background: var(--blue-50);
-    box-shadow: 0 12px 26px -14px rgba(2, 132, 199, .55);
-    transform: translateZ(34px);
+    box-shadow: 0 12px 24px -14px rgba(2, 132, 199, .55);
   }
   .idcard__photo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
+    pointer-events: none;
+    -webkit-user-drag: none;
   }
 
   .idcard__name {
     text-align: center;
-    font-size: 21px;
+    font-size: 20px;
     font-weight: 800;
-    letter-spacing: -.6px;
-    transform: translateZ(22px);
+    letter-spacing: -.5px;
   }
   .idcard__role {
     text-align: center;
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 600;
     color: var(--blue-600);
-    margin-top: 4px;
-    margin-bottom: 18px;
-    transform: translateZ(18px);
+    margin-top: 3px;
+    margin-bottom: 16px;
   }
 
   .idcard__rows {
     list-style: none;
     border-top: 1px dashed var(--line);
-    padding-top: 14px;
-    transform: translateZ(10px);
+    padding-top: 12px;
   }
   .idcard__rows li {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
     gap: 12px;
-    padding: 7px 0;
-    font-size: 12.5px;
+    padding: 6px 0;
+    font-size: 12px;
   }
   .idcard__rows li + li { border-top: 1px solid #f1f7fd; }
   .idcard__rows dt {
@@ -310,18 +350,52 @@
   }
   .idcard__rows dd b { color: var(--blue-600); }
 
+  /* ----- hint ----- */
+  .hint {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-top: 22px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 7px 16px;
+    border-radius: 99px;
+  }
+  .hint svg { color: var(--blue-500); }
+
+  /* ================= CHIPS + DETAIL ================= */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 30px;
+  }
+  .chips span {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--blue-600);
+    background: #fff;
+    border: 1px solid var(--blue-100);
+    padding: 7px 14px;
+    border-radius: 99px;
+  }
+
   /* ================= TENTANG ================= */
   .about {
-    margin-top: 64px;
+    margin-top: 34px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
+    gap: 14px;
   }
   .about__card {
     background: #fff;
     border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 20px;
+    border-radius: 14px;
+    padding: 18px;
     transition: border-color .15s, transform .15s;
   }
   .about__card:hover {
@@ -329,16 +403,16 @@
     transform: translateY(-2px);
   }
   .about__card h3 {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 800;
     letter-spacing: .06em;
     text-transform: uppercase;
     color: var(--blue-600);
-    margin-bottom: 8px;
+    margin-bottom: 7px;
   }
   .about__card p {
-    font-size: 13.5px;
-    line-height: 1.7;
+    font-size: 13px;
+    line-height: 1.65;
     color: var(--ink-2);
   }
 
@@ -346,7 +420,7 @@
   footer {
     background: #fff;
     border-top: 1px solid var(--line);
-    padding: 28px;
+    padding: 26px;
     text-align: center;
   }
   .btn {
@@ -375,48 +449,36 @@
 
   footer small {
     display: block;
-    margin-top: 16px;
+    margin-top: 14px;
     font-size: 12px;
     color: var(--muted);
   }
 
   /* ================= RESPONSIVE ================= */
-  @media (max-width: 900px) {
-    main { padding: 32px 20px 44px; }
-
-    .hero {
-      grid-template-columns: 1fr;
-      gap: 44px;
-      text-align: center;
-    }
-    .desc { margin-left: auto; margin-right: auto; }
-    .chips { justify-content: center; }
-    .stats { justify-content: center; }
-    .tilt-wrap { order: -1; }
-
-    .about { grid-template-columns: 1fr; margin-top: 44px; }
+  @media (max-width: 720px) {
+    main { padding: 24px 18px 44px; }
+    .about { grid-template-columns: 1fr; }
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: 420px) {
     header { padding: 12px 16px; }
     .brand img { width: 34px; height: 34px; }
     .back { font-size: 12px; padding: 8px 12px; }
 
-    .tilt-wrap { perspective: none; padding: 0; }
-    .tilt { transform: none !important; }
+    h1 { letter-spacing: -1px; }
+    .desc { font-size: 14px; }
 
-    .idcard__photo { width: 112px; height: 138px; }
-    .idcard__name { font-size: 19px; }
-    .idcard__rows li { font-size: 12px; }
+    .idcard { max-width: 280px; padding: 16px; }
+    .idcard__photo { width: 100px; height: 124px; }
+    .idcard__name { font-size: 18px; }
+    .idcard__rows li { font-size: 11.5px; }
+    .strap { height: 90px; width: 24px; }
 
-    .stats { gap: 26px; }
-    .stat b { font-size: 17px; }
     .btn { width: 100%; justify-content: center; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .tilt { transform: none !important; }
-    .btn, .about__card { transition: none; }
+    .about__card, .btn, .back { transition: none; }
   }
 </style>
 </head>
@@ -434,47 +496,26 @@
 <!-- ================= MAIN ================= -->
 <main>
 
-  <section class="hero">
+  <!-- INTRO -->
+  <section class="intro">
+    <div class="badge">Portofolio</div>
+    <h1>Halo, saya<br><em>Insomnia Dev.</em></h1>
+    <p class="desc">
+      Nama asli <strong>Yudha</strong>. Tinggal di Dlingo, Bantul, Yogyakarta.
+      Sehari-hari ngoding web, IoT, dan Arduino — sudah <strong>65+ project</strong>
+      yang saya bangun sampai selesai.
+    </p>
+  </section>
 
-    <!-- ===== TEKS ===== -->
-    <div>
-      <div class="badge">Portofolio</div>
-      <h1>Halo, saya<br><em>Insomnia Dev.</em></h1>
-      <p class="desc">
-        Nama asli <strong>Yudha</strong>. Tinggal di Dlingo, Bantul, Yogyakarta.
-        Sehari-hari ngoding web, IoT, dan Arduino — sudah <strong>65+ project</strong>
-        yang saya bangun sampai selesai.
-      </p>
+  <!-- LANYARD -->
+  <section class="lanyard-zone">
+    <div class="scene">
+      <div class="anchor" aria-hidden="true"></div>
 
-      <div class="chips">
-        <span>HTML</span>
-        <span>CSS</span>
-        <span>C++</span>
-        <span>Arduino .ino</span>
-        <span>Internet of Things</span>
-      </div>
+      <div class="pendulum" id="pendulum">
+        <div class="strap" aria-hidden="true"></div>
 
-      <div class="stats">
-        <div class="stat">
-          <b>65<em>+</em></b>
-          <span>Project</span>
-        </div>
-        <div class="stat">
-          <b>3<em>+</em></b>
-          <span>Bidang</span>
-        </div>
-        <div class="stat">
-          <b>100<em>%</em></b>
-          <span>Belajar Terus</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== KARTU 3D ===== -->
-    <div class="tilt-wrap" id="tiltWrap">
-      <div class="tilt" id="tiltCard">
-        <div class="idcard">
-
+        <div class="idcard" id="card">
           <div class="idcard__top">
             <span class="idcard__brand">ID CARD</span>
             <span class="idcard__status"><i></i> AKTIF</span>
@@ -494,14 +535,31 @@
             <li><dt>Lahir</dt><dd>22 Agustus 2011</dd></li>
             <li><dt>Project</dt><dd><b>65+</b></dd></li>
           </ul>
-
         </div>
       </div>
     </div>
 
+    <div class="hint">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 11V6a2 2 0 0 0-4 0v5"/>
+        <path d="M14 10V4a2 2 0 0 0-4 0v6"/>
+        <path d="M10 10.5V6a2 2 0 0 0-4 0v8"/>
+        <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
+      </svg>
+      Geser kartunya
+    </div>
   </section>
 
-  <!-- ===== TENTANG ===== -->
+  <!-- CHIPS -->
+  <div class="chips">
+    <span>HTML</span>
+    <span>CSS</span>
+    <span>C++</span>
+    <span>Arduino .ino</span>
+    <span>Internet of Things</span>
+  </div>
+
+  <!-- TENTANG -->
   <section class="about">
     <article class="about__card">
       <h3>Fokus</h3>
@@ -531,63 +589,130 @@
 
   document.getElementById("y").textContent = new Date().getFullYear();
 
-  var wrap = document.getElementById("tiltWrap");
-  var card = document.getElementById("tiltCard");
-  if (!wrap || !card) return;
+  var anchorEl  = document.querySelector(".anchor");
+  var pendulum  = document.getElementById("pendulum");
+  var card      = document.getElementById("card");
+  if (!anchorEl || !pendulum || !card) return;
+
+  /* ---------- STATE ---------- */
+  var theta = 0.30;      // sudut saat ini (radian), 0 = menggantung lurus
+  var omega = 0;         // kecepatan sudut (rad/s)
+  var dragging = false;
+  var dragStartTheta = 0;
+  var dragStartCursorAngle = 0;
+  var lastMoveTime = 0;
+
+  /* ---------- TUNING FISIKA ---------- */
+  var K     = 20;        // gravitasi / panjang efektif (makin besar makin cepat)
+  var DAMP  = 1.2;       // redaman (makin besar makin cepat berhenti)
+  var MAX   = Math.PI * 0.42;   // batas ayunan ±75°
+  var OMEGA_CAP = 14;    // kecepatan sudut maksimum saat dilepas
 
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var finePointer  = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-  if (reduceMotion || !finePointer) return;
+  if (reduceMotion) { theta = 0; }
 
-  var MAX = 14;      // derajat kemiringan maksimum
-  var raf = null;
-
-  function apply(clientX, clientY) {
-    var r = wrap.getBoundingClientRect();
-    var px = (clientX - r.left) / r.width;   // 0 .. 1
-    var py = (clientY - r.top) / r.height;   // 0 .. 1
-
-    var ry = (px - 0.5) * MAX * 2;           // kiri/kanan
-    var rx = (0.5 - py) * MAX * 2;           // atas/bawah
-
-    card.style.transform =
-      "rotateX(" + rx.toFixed(2) + "deg) rotateY(" + ry.toFixed(2) + "deg)";
-    card.style.setProperty("--mx", (px * 100).toFixed(1) + "%");
-    card.style.setProperty("--my", (py * 100).toFixed(1) + "%");
+  /* ---------- UTIL ---------- */
+  function getAnchorCenter() {
+    var r = anchorEl.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
   }
 
-  wrap.addEventListener("mouseenter", function () {
-    card.style.transition = "none";
-    card.style.setProperty("--glare", "1");
-  });
+  function angleFromCursor(clientX, clientY) {
+    var a = getAnchorCenter();
+    var dx = clientX - a.x;
+    var dy = clientY - a.y;
+    if (dy < 1) dy = 1;   // hindari pembalikan arah kalau kursor di atas pengait
+    return Math.atan2(dx, dy);
+  }
 
-  wrap.addEventListener("mousemove", function (e) {
-    if (raf) return;
-    raf = requestAnimationFrame(function () {
-      apply(e.clientX, e.clientY);
-      raf = null;
-    });
-  });
+  /* ---------- RENDER ---------- */
+  function applyTransform() {
+    var deg = theta * 180 / Math.PI;
+    pendulum.style.transform = "rotate(" + deg.toFixed(3) + "deg)";
 
-  wrap.addEventListener("mouseleave", function () {
-    card.style.transition = "transform .6s cubic-bezier(.22,1,.36,1)";
-    card.style.transform = "rotateX(0deg) rotateY(0deg)";
-    card.style.setProperty("--mx", "50%");
-    card.style.setProperty("--my", "50%");
-    card.style.setProperty("--glare", "0");
-  });
+    // tilt 3D tipis mengikuti kecepatan (efek berdenyut saat diayun)
+    var t3d = Math.max(-7, Math.min(7, omega * 1.6));
+    card.style.transform = "rotateY(" + t3d.toFixed(2) + "deg)";
+  }
 
-  /* sentuhan layar (opsional, mobile) */
-  wrap.addEventListener("touchmove", function (e) {
-    var t = e.touches[0];
-    if (t) apply(t.clientX, t.clientY);
-  }, { passive: true });
+  /* ---------- LOOP FISIKA ---------- */
+  var lastTime = null;
+  function tick(now) {
+    if (lastTime === null) lastTime = now;
+    var dt = (now - lastTime) / 1000;
+    lastTime = now;
+    if (dt > 0.05) dt = 0.05;   // cap kalau tab sempat tidak fokus
 
-  wrap.addEventListener("touchend", function () {
-    card.style.transition = "transform .6s cubic-bezier(.22,1,.36,1)";
-    card.style.transform = "rotateX(0deg) rotateY(0deg)";
-    card.style.setProperty("--glare", "0");
-  });
+    if (!dragging && !reduceMotion) {
+      // pendulum: alpha = -K * sin(theta) - DAMP * omega
+      var alpha = -K * Math.sin(theta) - DAMP * omega;
+      omega += alpha * dt;
+      theta += omega * dt;
+
+      // berhenti total kalau sudah sangat kecil
+      if (Math.abs(theta) < 0.0015 && Math.abs(omega) < 0.015) {
+        theta = 0;
+        omega = 0;
+      }
+    }
+
+    applyTransform();
+    requestAnimationFrame(tick);
+  }
+
+  /* ---------- INTERAKSI DRAG ---------- */
+  function onPointerDown(e) {
+    if (reduceMotion) return;
+    dragging = true;
+    omega = 0;
+
+    dragStartTheta = theta;
+    dragStartCursorAngle = angleFromCursor(e.clientX, e.clientY);
+    lastMoveTime = performance.now();
+
+    try { card.setPointerCapture(e.pointerId); } catch (err) {}
+    e.preventDefault();
+  }
+
+  function onPointerMove(e) {
+    if (!dragging) return;
+
+    var cursorAngle = angleFromCursor(e.clientX, e.clientY);
+    var newTheta = dragStartTheta + (cursorAngle - dragStartCursorAngle);
+
+    // clamp biar kartu tidak pernah terbalik
+    if (newTheta >  MAX) newTheta =  MAX;
+    if (newTheta < -MAX) newTheta = -MAX;
+
+    // hitung kecepatan untuk dilepas nanti
+    var now = performance.now();
+    var dt = (now - lastMoveTime) / 1000;
+    if (dt > 0.001) {
+      var v = (newTheta - theta) / dt;
+      if (v >  OMEGA_CAP) v =  OMEGA_CAP;
+      if (v < -OMEGA_CAP) v = -OMEGA_CAP;
+      omega = v;
+      lastMoveTime = now;
+    }
+
+    theta = newTheta;
+  }
+
+  function onPointerUp(e) {
+    if (!dragging) return;
+    dragging = false;
+    try { card.releasePointerCapture(e.pointerId); } catch (err) {}
+  }
+
+  card.addEventListener("pointerdown", onPointerDown);
+  card.addEventListener("pointermove", onPointerMove);
+  card.addEventListener("pointerup", onPointerUp);
+  card.addEventListener("pointercancel", onPointerUp);
+  card.addEventListener("lostpointercapture", function () { dragging = false; });
+
+  /* ---------- MULAI ---------- */
+  applyTransform();
+  requestAnimationFrame(tick);
 })();
 </script>
 
