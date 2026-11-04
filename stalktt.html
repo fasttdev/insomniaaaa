@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTok Stalker — Insomnia Dev</title>
+<link rel="icon" href="logo.jpg" type="image/jpeg">
+<link rel="stylesheet" href="beranda.css">
+<link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="stalktt.css">
+</head>
+<body class="is-loading">
+
+<!-- TRANSITION OVERLAY -->
+<div class="xfer" aria-hidden="true">
+  <div class="xfer__half xfer__half--top"></div>
+  <div class="xfer__half xfer__half--bot"></div>
+  <div class="xfer__seam"></div>
+  <div class="xfer__brand">
+    <img src="logo.jpg" alt="">
+    <span>Insomnia<em>Dev</em></span>
+  </div>
+</div>
+
+<!-- LATAR -->
+<div class="bg" aria-hidden="true">
+  <div class="bg__grid"></div>
+</div>
+
+<!-- NAV -->
+<header class="nav reveal" style="--d:80ms">
+  <a class="nav__brand" href="beranda.html" data-nav>
+    <img src="logo.jpg" alt="Logo Insomnia Dev">
+    <b>Insomnia<em>Dev</em></b>
+  </a>
+  <nav class="nav__links" id="navViewport" aria-label="Navigasi utama">
+    <div class="nav__track" id="navTrack">
+      <a href="beranda.html" class="nav__link" data-nav>Beranda</a>
+      <a href="tools.html" class="nav__link is-active" data-nav>Tools</a>
+      <a href="req.html" class="nav__link" data-nav>Req</a>
+      <a href="info.html" class="nav__link" data-nav>Information</a>
+    </div>
+  </nav>
+</header>
+
+<!-- MAIN -->
+<main class="page">
+
+  <!-- HERO -->
+  <section class="hero reveal" style="--d:160ms">
+    <div class="hero__badge"><i></i> Tools · TikTok Stalker</div>
+    <h1 class="hero__title">
+      Intip profil TikTok<br><em>tanpa ribet.</em>
+    </h1>
+    <p class="hero__desc">
+      Lihat statistik publik, bio, dan info dasar profil TikTok siapa pun.
+      Cukup masukkan username atau tempel link profilnya.
+    </p>
+  </section>
+
+  <!-- STALKER -->
+  <section class="stalk reveal" style="--d:240ms" aria-labelledby="stalkTitle">
+    <div class="stalk__head">
+      <div class="stalk__mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.4"
+             stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="M21 21l-4.35-4.35"/>
+        </svg>
+      </div>
+      <div>
+        <div class="stalk__kicker">TikTok Stalker</div>
+        <h2 class="stalk__title" id="stalkTitle">Cari <em>profil TikTok</em></h2>
+      </div>
+    </div>
+
+    <form class="stalk__form" id="stalkForm" novalidate>
+      <div class="stalk__field">
+        <svg class="stalk__field-icon" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 21c0-4 4-7 8-7s8 3 8 7"/>
+        </svg>
+        <input type="text" class="stalk__input" id="stalkInput"
+               placeholder="@username atau tiktok.com/@username"
+               autocomplete="off" spellcheck="false"
+               autocapitalize="off" aria-label="Username atau URL TikTok">
+      </div>
+      <button type="submit" class="stalk__submit" id="stalkSubmit">
+        <span class="stalk__submit-label">Cari</span>
+        <span class="stalk__spinner" id="stalkSpinner" hidden></span>
+      </button>
+    </form>
+
+    <p class="stalk__hint">
+      Contoh: <strong>@charliedamelio</strong> atau
+      <strong>https://tiktok.com/@charliedamelio</strong>
+    </p>
+
+    <div class="stalk__status" id="stalkStatus" role="status" aria-live="polite" hidden></div>
+    <div class="profile" id="stalkResult" hidden></div>
+  </section>
+
+</main>
+
+<footer class="foot reveal" style="--d:320ms">
+  &copy; <span id="y">2025</span> <span>Insomnia Dev</span>. Semua hak dilindungi.
+</footer>
+
+<script src="app.js" defer></script>
+
+<script>
+/* =========================================================
+   STALKER — page-specific logic
+   ========================================================= */
+(function () {
+  "use strict";
+
+  function initStalker() {
+    var form = document.getElementById("stalkForm");
+    if (!form) return;
+
+    var yearEl = document.getElementById("y");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    var input    = document.getElementById("stalkInput");
+    var submit   = document.getElementById("stalkSubmit");
+    var spinner  = document.getElementById("stalkSpinner");
+    var label    = submit.querySelector(".stalk__submit-label");
+    var resultEl = document.getElementById("stalkResult");
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    function fmtNum(n) {
+      n = Number(n) || 0;
+      if (n >= 1e9) return (n / 1e9).toFixed(1).replace(/\.0$/, "") + "M";
+      if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, "") + "M";
+      if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, "") + "K";
+      return String(n);
+    }
+
+    function fmtFull(n) {
+      n = Number(n) || 0;
+      return n.toLocaleString("id-ID");
+    }
+
+    var ICONS = {
+      loading: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg>',
+      error:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>',
+      success: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+      info:    '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>'
+    };
+
+    function showStatus(text, type) {
+      var el = document.getElementById("stalkStatus");
+      if (!el) return;
+      el.className = "stalk__status is-" + (type || "info");
+      el.innerHTML = (ICONS[type] || ICONS.info) + "<span>" + escapeHtml(text) + "</span>";
+      el.hidden = false;
+    }
+    function hideStatus() {
+      var el = document.getElementById("stalkStatus");
+      if (!el) return;
+      el.hidden = true;
+      el.innerHTML = "";
+    }
+
+    function renderProfile(data) {
+      var p = data && data.profile ? data.profile : {};
+      var raw = data && data.raw ? data.raw : data;
+
+      var avatar = p.avatar || "";
+      var name = p.nickname || p.username || data.username || "Tanpa nama";
+      var uname = p.username || data.username || "";
+      var bio = p.bio || "";
+      var verified = !!p.verified;
+      var priv = !!p.privateAccount;
+      var region = p.region || "";
+
+      var html = "";
+
+      /* TOP */
+      html += '<div class="profile__top">';
+      html += '<div class="profile__avatar">';
+      if (avatar) {
+        html += '<img src="' + escapeHtml(avatar) + '" alt="" ' +
+                'referrerpolicy="no-referrer" loading="lazy" ' +
+                'onerror="this.style.display=\'none\'">';
+      }
+      html += '</div>';
+
+      html += '<div class="profile__info">';
+      html += '<div class="profile__name">';
+      html += '<span>' + escapeHtml(name) + '</span>';
+      if (verified) {
+        html += '<span class="profile__verified" title="Terverifikasi" aria-label="Terverifikasi">' +
+                '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>' +
+                '</span>';
+      }
+      html += '</div>';
+
+      if (uname) {
+        html += '<div class="profile__username">@' + escapeHtml(uname) + '</div>';
+      }
+
+      if (bio) {
+        html += '<div class="profile__bio">' + escapeHtml(bio) + '</div>';
+      } else {
+        html += '<div class="profile__bio is-empty">Tidak ada bio.</div>';
+      }
+      html += '</div>'; // info
+      html += '</div>'; // top
+
+      /* STATS */
+      html += '<div class="profile__stats">';
+      html += '<div class="profile__stat">' +
+              '<b title="' + fmtFull(p.followers) + '">' + fmtNum(p.followers) + '</b>' +
+              '<span>Followers</span></div>';
+      html += '<div class="profile__stat">' +
+              '<b title="' + fmtFull(p.following) + '">' + fmtNum(p.following) + '</b>' +
+              '<span>Following</span></div>';
+      html += '<div class="profile__stat">' +
+              '<b title="' + fmtFull(p.likes) + '">' + fmtNum(p.likes) + '</b>' +
+              '<span>Likes</span></div>';
+      html += '<div class="profile__stat">' +
+              '<b title="' + fmtFull(p.videos) + '">' + fmtNum(p.videos) + '</b>' +
+              '<span>Video</span></div>';
+      html += '</div>';
+
+      /* META */
+      html += '<div class="profile__meta">';
+      if (region) {
+        html += '<span class="profile__tag">Wilayah: <b>' + escapeHtml(region) + '</b></span>';
+      }
+      if (priv) {
+        html += '<span class="profile__tag profile__tag--off">Akun privat</span>';
+      } else {
+        html += '<span class="profile__tag profile__tag--ok">Akun publik</span>';
+      }
+      if (uname) {
+        var profileUrl = "https://www.tiktok.com/@" + encodeURIComponent(uname);
+        html += '<a class="profile__tag" href="' + escapeHtml(profileUrl) +
+                '" target="_blank" rel="noopener noreferrer">Buka di TikTok &rarr;</a>';
+      }
+      html += '</div>';
+
+      /* RAW */
+      var rawStr = JSON.stringify(raw, null, 2);
+      if (rawStr.length > 50000) rawStr = rawStr.slice(0, 50000) + "\n\n... (dipotong)";
+      html += '<details class="profile__raw">' +
+              '<summary>Lihat respons mentah</summary>' +
+              '<pre>' + escapeHtml(rawStr) + '</pre>' +
+              '</details>';
+
+      resultEl.innerHTML = html;
+      resultEl.hidden = false;
+      resultEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    form.addEventListener("submit", async function (ev) {
+      ev.preventDefault();
+
+      var value = input.value.trim();
+      if (!value) {
+        showStatus("Masukkan username atau URL TikTok.", "error");
+        input.focus();
+        return;
+      }
+
+      resultEl.hidden = true;
+      resultEl.innerHTML = "";
+      submit.disabled = true;
+      input.disabled = true;
+      spinner.hidden = false;
+      label.textContent = "Mencari";
+
+      showStatus("Mengambil profil, mohon tunggu…", "loading");
+
+      var timers = [];
+      var msgs = [
+        [6000,  "Menghubungi sumber data…"],
+        [15000, "Server sumber butuh waktu lebih lama, tetap menunggu…"]
+      ];
+      for (var i = 0; i < msgs.length; i++) {
+        (function (delay, text) {
+          timers.push(setTimeout(function () { showStatus(text, "loading"); }, delay));
+        })(msgs[i][0], msgs[i][1]);
+      }
+
+      try {
+        var controller = new AbortController();
+        var timeoutId = setTimeout(function () { controller.abort(); }, 60000);
+
+        var res = await fetch("/api/stalktt", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ input: value }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        var json;
+        try { json = await res.json(); }
+        catch (e) { throw new Error("Server mengembalikan respons tidak valid."); }
+
+        if (!json.ok) throw new Error(json.error || "Gagal mengambil profil.");
+
+        hideStatus();
+        renderProfile(json);
+      } catch (err) {
+        if (err.name === "AbortError") {
+          showStatus("Waktu habis. Sumber tidak merespons.", "error");
+        } else {
+          showStatus(err.message || "Terjadi kesalahan.", "error");
+        }
+      } finally {
+        for (var t = 0; t < timers.length; t++) clearTimeout(timers[t]);
+        submit.disabled = false;
+        input.disabled = false;
+        spinner.hidden = true;
+        label.textContent = "Cari";
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initStalker);
+  } else {
+    initStalker();
+  }
+})();
+</script>
+
+</body>
+</html>
