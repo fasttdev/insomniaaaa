@@ -1,0 +1,285 @@
+/*
+  Insomnia Dev — TikTok Stalker page styles
+  Layer tambahan di atas beranda.css + tools.css
+*/
+
+/* =========================================================
+   STALKER FORM
+   ========================================================= */
+.stalk{
+  position:relative;
+  background:#ffffff;
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:32px;
+  box-shadow:var(--shadow-card);
+  overflow:hidden;
+}
+.stalk::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:5px;
+  background:linear-gradient(90deg,var(--blue-400),var(--blue-600),var(--blue-400));
+}
+
+.stalk__head{
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:24px;
+}
+.stalk__mark{
+  display:flex;align-items:center;justify-content:center;
+  width:48px;height:48px;border-radius:14px;
+  background:linear-gradient(135deg,#0ea5e9,#0369a1);
+  color:#fff;flex-shrink:0;
+  box-shadow:0 10px 22px -10px rgba(2,132,199,.7);
+}
+.stalk__kicker{
+  font-size:11px;font-weight:800;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--blue-600);margin-bottom:2px;
+}
+.stalk__title{
+  font-size:22px;font-weight:800;
+  letter-spacing:-.5px;color:var(--ink);
+}
+.stalk__title em{font-style:normal;color:var(--blue-600)}
+
+.stalk__form{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.stalk__field{
+  position:relative;
+  flex:1 1 320px;min-width:0;
+  display:flex;align-items:center;
+  background:#fff;
+  border:1.5px solid var(--line);
+  border-radius:14px;
+  transition:border-color .18s,box-shadow .18s;
+}
+.stalk__field:focus-within{
+  border-color:var(--blue-400);
+  box-shadow:0 0 0 4px rgba(56,189,248,.15);
+}
+.stalk__field-icon{
+  position:absolute;left:14px;
+  color:var(--muted);pointer-events:none;
+  transition:color .18s;
+}
+.stalk__field:focus-within .stalk__field-icon{color:var(--blue-500)}
+.stalk__input{
+  flex:1;min-width:0;
+  padding:14px 20px 14px 42px;
+  font-size:14.5px;color:var(--ink);
+  background:transparent;border:none;outline:none;
+  border-radius:14px;
+}
+.stalk__input::placeholder{color:var(--muted);opacity:.85}
+.stalk__input:disabled{opacity:.6;cursor:not-allowed}
+
+.stalk__submit{
+  display:inline-flex;align-items:center;justify-content:center;
+  gap:9px;flex-shrink:0;
+  font-size:15px;font-weight:800;
+  color:#fff;
+  background:linear-gradient(135deg,var(--blue-400),var(--blue-600));
+  padding:14px 32px;border:none;border-radius:14px;
+  box-shadow:0 10px 24px -10px rgba(2,132,199,.65);
+  transition:background .18s,transform .15s,box-shadow .18s,opacity .15s;
+}
+.stalk__submit:hover:not(:disabled){
+  transform:translateY(-1px);
+  box-shadow:0 16px 30px -12px rgba(2,132,199,.75);
+}
+.stalk__submit:active:not(:disabled){transform:translateY(0) scale(.98)}
+.stalk__submit:disabled{opacity:.7;cursor:not-allowed}
+
+.stalk__spinner{
+  width:16px;height:16px;
+  border:2px solid rgba(255,255,255,.35);
+  border-top-color:#fff;
+  border-radius:50%;
+  animation:spin .75s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.stalk__hint{
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.55;
+  margin-top:2px;
+}
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+.stalk__status{
+  display:flex;align-items:flex-start;gap:9px;
+  margin-top:20px;
+  padding:13px 16px;
+  font-size:13.5px;line-height:1.55;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:var(--blue-50);
+  color:var(--ink-2);
+}
+.stalk__status svg{flex-shrink:0;margin-top:1px}
+.stalk__status.is-loading{color:var(--blue-700);background:var(--blue-50);border-color:var(--blue-100)}
+.stalk__status.is-loading svg{animation:spin .9s linear infinite}
+.stalk__status.is-error{color:var(--err);background:var(--err-bg);border-color:var(--err-line)}
+.stalk__status.is-success{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)}
+
+/* =========================================================
+   PROFILE CARD
+   ========================================================= */
+.profile{
+  margin-top:20px;
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  background:#ffffff;
+}
+
+.profile__top{
+  display:flex;gap:16px;align-items:flex-start;
+  padding:20px;
+  background:linear-gradient(180deg,#ffffff,var(--blue-50));
+  border-bottom:1px solid var(--line);
+}
+
+.profile__avatar{
+  width:88px;height:88px;flex-shrink:0;
+  border-radius:50%;
+  overflow:hidden;
+  background:var(--blue-100);
+  border:3px solid #ffffff;
+  box-shadow:0 8px 22px -8px rgba(2,132,199,.5);
+  position:relative;
+}
+.profile__avatar img{
+  width:100%;height:100%;
+  object-fit:cover;display:block;
+}
+
+.profile__info{flex:1;min-width:0;padding-top:2px}
+.profile__name{
+  font-size:17px;font-weight:800;
+  color:var(--ink);letter-spacing:-.3px;
+  line-height:1.3;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  margin-bottom:2px;
+}
+.profile__verified{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:16px;height:16px;flex-shrink:0;
+  border-radius:50%;
+  background:var(--blue-500);
+  color:#fff;
+}
+.profile__username{
+  font-size:13px;font-weight:700;
+  color:var(--blue-600);
+  margin-bottom:8px;
+}
+.profile__bio{
+  font-size:12.5px;line-height:1.55;
+  color:var(--ink-2);
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
+  overflow:hidden;
+  word-break:break-word;
+}
+.profile__bio.is-empty{
+  color:var(--muted);
+  font-style:italic;
+}
+
+.profile__stats{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:1px;
+  background:var(--line);
+}
+.profile__stat{
+  background:#ffffff;
+  padding:14px 10px;
+  text-align:center;
+}
+.profile__stat b{
+  display:block;
+  font-size:16px;
+  font-weight:800;
+  color:var(--ink);
+  letter-spacing:-.3px;
+  font-variant-numeric:tabular-nums;
+  line-height:1.1;
+  margin-bottom:4px;
+}
+.profile__stat span{
+  display:block;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+.profile__meta{
+  padding:14px 20px;
+  display:flex;flex-wrap:wrap;gap:8px;
+  border-top:1px solid var(--line);
+  background:#ffffff;
+}
+.profile__tag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11.5px;font-weight:700;
+  padding:5px 11px;border-radius:99px;
+  border:1px solid var(--line);
+  color:var(--ink-2);
+  background:#fafcff;
+}
+.profile__tag b{
+  color:var(--ink);
+  font-weight:800;
+}
+.profile__tag--ok{
+  color:#047857;background:#ecfdf5;border-color:#d1fae5;
+}
+.profile__tag--off{
+  color:var(--muted);background:#f1f5f9;border-color:#e2e8f0;
+}
+
+.profile__raw{
+  border-top:1px solid var(--line);
+  background:var(--blue-50);
+}
+.profile__raw summary{
+  padding:11px 16px;
+  font-size:11.5px;font-weight:800;
+  color:var(--muted);letter-spacing:.06em;
+  text-transform:uppercase;cursor:pointer;user-select:none;
+}
+.profile__raw summary:hover{color:var(--blue-600)}
+.profile__raw pre{
+  max-height:280px;overflow:auto;
+  margin:0 16px 14px;
+  padding:12px 14px;
+  background:#0b1220;color:#bae6fd;
+  border-radius:10px;
+  font-family:Consolas,"Courier New",monospace;
+  font-size:11.5px;line-height:1.55;
+  white-space:pre-wrap;word-break:break-word;
+}
+
+/* =========================================================
+   RESPONSIF
+   ========================================================= */
+@media (max-width:640px){
+  .stalk{padding:20px;border-radius:18px}
+  .stalk__head{gap:12px;margin-bottom:20px}
+  .stalk__mark{width:42px;height:42px}
+  .stalk__title{font-size:19px}
+  .stalk__form{gap:8px}
+  .stalk__field{flex:1 1 100%}
+  .stalk__submit{width:100%;padding:13px 20px;font-size:14.5px}
+
+  .profile__top{padding:16px;gap:14px}
+  .profile__avatar{width:72px;height:72px}
+  .profile__name{font-size:15.5px}
+  .profile__stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .profile__meta{padding:12px 16px}
+}
