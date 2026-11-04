@@ -6,488 +6,443 @@
 <title>Portofolio — Insomnia Dev</title>
 <link rel="icon" href="logo.jpg" type="image/jpeg">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* =========================================================
+     0. RESET
+     ========================================================= */
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
-  :root {
-    --blue-50:  #f0f8ff;
-    --blue-100: #e0f2fe;
-    --blue-200: #bae6fd;
-    --blue-300: #7dd3fc;
-    --blue-400: #38bdf8;
-    --blue-500: #0ea5e9;
-    --blue-600: #0284c7;
-    --blue-700: #0369a1;
-    --ink:      #0b1220;
-    --ink-2:    #334155;
-    --muted:    #64748b;
-    --line:     #e3eef8;
+  :root{
+    --blue-50:#f0f8ff;--blue-100:#e0f2fe;--blue-200:#bae6fd;--blue-300:#7dd3fc;
+    --blue-400:#38bdf8;--blue-500:#0ea5e9;--blue-600:#0284c7;--blue-700:#0369a1;
+    --blue-900:#0c4a6e;
+    --ink:#0b1220;--ink-2:#334155;--muted:#64748b;--line:#e3eef8;
   }
 
-  body {
-    font-family: "Segoe UI", system-ui, Arial, sans-serif;
-    color: var(--ink);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+
+  body{
+    font-family:"Segoe UI",system-ui,Arial,sans-serif;
+    color:var(--ink);
+    min-height:100vh;min-height:100dvh;
+    display:flex;flex-direction:column;
     background:
-      radial-gradient(700px 400px at 85% 0%, var(--blue-100) 0%, transparent 60%),
-      radial-gradient(600px 380px at 0% 100%, var(--blue-50) 0%, transparent 60%),
+      radial-gradient(700px 400px at 85% 0%,var(--blue-100) 0%,transparent 60%),
+      radial-gradient(600px 380px at 0% 100%,var(--blue-50) 0%,transparent 60%),
       #fbfdff;
-    overflow-x: hidden;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
   }
 
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 28px;
-    background: #fff;
-    border-bottom: 1px solid var(--line);
-  }
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-    color: inherit;
-  }
-  .brand img {
-    width: 42px; height: 42px;
-    border-radius: 10px;
-    object-fit: cover;
-    border: 1px solid var(--line);
-  }
-  .brand b { font-size: 16px; font-weight: 800; letter-spacing: -.3px; }
-  .brand b em { font-style: normal; color: var(--blue-500); }
-
-  .back {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--ink-2);
-    text-decoration: none;
-    background: #fff;
-    border: 1px solid var(--line);
-    padding: 9px 16px;
-    border-radius: 99px;
-    transition: color .15s, border-color .15s;
-  }
-  .back:hover { color: var(--blue-600); border-color: var(--blue-200); }
-
-  main {
-    flex: 1;
-    width: 100%;
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 28px 24px 56px;
+  /* =========================================================
+     1. TRANSITION OVERLAY
+     ========================================================= */
+  .xfer{
+    position:fixed;inset:0;
+    z-index:9999;
+    pointer-events:none;
+    overflow:hidden;
   }
 
-  .intro { text-align: center; }
+  .xfer__half{
+    position:absolute;left:0;right:0;height:50.5%;
+    background:linear-gradient(160deg,#0284c7 0%,#0369a1 55%,#0c4a6e 100%);
+    will-change:transform;
+    backface-visibility:hidden;
+    transform:translate3d(0,0,0);
+    transition:transform .58s cubic-bezier(.76,0,.24,1);
+  }
+  .xfer__half--bot{
+    background:linear-gradient(160deg,#0c4a6e 0%,#075985 45%,#0284c7 100%);
+    transition-delay:25ms;
+  }
+  .xfer__half--top{top:0;transform-origin:top center}
+  .xfer__half--bot{bottom:0;transform-origin:bottom center}
 
-  .badge {
-    display: inline-block;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--blue-600);
-    background: var(--blue-100);
-    padding: 6px 14px;
-    border-radius: 99px;
-    margin-bottom: 14px;
+  /* Saat idle: panel keluar dari layar */
+  body:not(.is-loading):not(.is-leaving) .xfer__half--top{
+    transform:translate3d(0,-101%,0);
+  }
+  body:not(.is-loading):not(.is-leaving) .xfer__half--bot{
+    transform:translate3d(0,101%,0);
+  }
+  /* Saat loading / leaving: panel menutup layar */
+  body.is-loading .xfer__half--top,
+  body.is-leaving .xfer__half--top{transform:translate3d(0,0,0)}
+  body.is-loading .xfer__half--bot,
+  body.is-leaving .xfer__half--bot{transform:translate3d(0,0,0)}
+
+  .xfer__seam{
+    position:absolute;left:0;right:0;top:50%;
+    height:2px;transform:translateY(-50%) scaleX(0);
+    transform-origin:center;
+    background:linear-gradient(90deg,transparent,#bae6fd 20%,#7dd3fc 50%,#bae6fd 80%,transparent);
+    box-shadow:0 0 22px rgba(56,189,248,.9),0 0 8px rgba(186,230,253,.9);
+    transition:transform .5s cubic-bezier(.76,0,.24,1) .22s;
+    opacity:0;
+  }
+  body.is-loading .xfer__seam,
+  body.is-leaving .xfer__seam{
+    transform:translateY(-50%) scaleX(1);
+    opacity:1;
   }
 
-  h1 {
-    font-size: clamp(26px, 4.6vw, 38px);
-    line-height: 1.1;
-    letter-spacing: -1.1px;
-    margin-bottom: 10px;
+  .xfer__brand{
+    position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    gap:11px;
+    color:#fff;
+    font-size:17px;font-weight:800;letter-spacing:-.3px;
+    opacity:0;
+    transition:opacity .3s ease .2s;
+    pointer-events:none;
   }
-  h1 em {
-    font-style: normal;
-    background: linear-gradient(90deg, var(--blue-500), var(--blue-300));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  .xfer__brand img{
+    width:36px;height:36px;
+    border-radius:8px;
+    object-fit:cover;
+    border:1px solid rgba(255,255,255,.3);
+    box-shadow:0 4px 12px rgba(0,0,0,.3);
+  }
+  .xfer__brand em{font-style:normal;color:#bae6fd}
+
+  body.is-loading .xfer__brand,
+  body.is-leaving .xfer__brand{opacity:1}
+
+  /* =========================================================
+     2. HEADER
+     ========================================================= */
+  header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 28px;
+    background:#fff;
+    border-bottom:1px solid var(--line);
+    position:relative;z-index:3;
+  }
+  .brand{
+    display:flex;align-items:center;gap:10px;
+    text-decoration:none;color:inherit;
+  }
+  .brand img{
+    width:42px;height:42px;
+    border-radius:10px;object-fit:cover;
+    border:1px solid var(--line);
+  }
+  .brand b{font-size:16px;font-weight:800;letter-spacing:-.3px}
+  .brand b em{font-style:normal;color:var(--blue-500)}
+
+  .back{
+    font-size:13px;font-weight:700;
+    color:var(--ink-2);text-decoration:none;
+    background:#fff;border:1px solid var(--line);
+    padding:9px 16px;border-radius:99px;
+    transition:color .15s,border-color .15s,transform .15s;
+  }
+  .back:hover{color:var(--blue-600);border-color:var(--blue-200);transform:translateY(-1px)}
+
+  /* =========================================================
+     3. MAIN
+     ========================================================= */
+  main{
+    flex:1;width:100%;max-width:760px;
+    margin:0 auto;
+    padding:28px 24px 56px;
   }
 
-  .desc {
-    font-size: 14px;
-    line-height: 1.7;
-    color: var(--ink-2);
-    max-width: 48ch;
-    margin: 0 auto;
+  .intro{text-align:center}
+  .badge{
+    display:inline-block;
+    font-size:12px;font-weight:700;
+    color:var(--blue-600);background:var(--blue-100);
+    padding:6px 14px;border-radius:99px;margin-bottom:14px;
+  }
+  h1{
+    font-size:clamp(26px,4.6vw,38px);
+    line-height:1.1;letter-spacing:-1.1px;margin-bottom:10px;
+  }
+  h1 em{
+    font-style:normal;
+    background:linear-gradient(90deg,var(--blue-500),var(--blue-300));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .desc{
+    font-size:14px;line-height:1.7;
+    color:var(--ink-2);max-width:48ch;margin:0 auto;
   }
 
-  .scene {
-    position: relative;
-    width: 100%;
-    height: 660px;
-    margin-top: 4px;
-    overflow: visible;
+  /* =========================================================
+     4. SCENE + STRAP
+     ========================================================= */
+  .scene{
+    position:relative;width:100%;height:660px;
+    margin-top:4px;overflow:visible;
   }
-
-  .svg-strap {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-    pointer-events: none;
-    z-index: 1;
+  .svg-strap{
+    position:absolute;inset:0;width:100%;height:100%;
+    overflow:visible;pointer-events:none;z-index:1;
   }
-
-  .anchor {
-    position: absolute;
-    top: 4px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background:
-      radial-gradient(circle at 35% 30%, #ffffff 0%, #e2e8f0 30%, #94a3b8 70%, #475569 100%);
+  .anchor{
+    position:absolute;top:4px;left:50%;
+    transform:translateX(-50%);
+    width:30px;height:30px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fff 0%,#e2e8f0 30%,#94a3b8 70%,#475569 100%);
     box-shadow:
-      0 6px 14px rgba(2, 50, 80, .35),
-      inset 0 -3px 4px rgba(0, 0, 0, .35),
-      inset 0 3px 4px rgba(255, 255, 255, .95);
-    z-index: 3;
+      0 6px 14px rgba(2,50,80,.35),
+      inset 0 -3px 4px rgba(0,0,0,.35),
+      inset 0 3px 4px rgba(255,255,255,.95);
+    z-index:3;
   }
-  .anchor::after {
-    content: "";
-    position: absolute;
-    inset: 9px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 40% 40%, #cbd5e1, #475569);
+  .anchor::after{
+    content:"";position:absolute;inset:9px;border-radius:50%;
+    background:radial-gradient(circle at 40% 40%,#cbd5e1,#475569);
+    box-shadow:inset 0 2px 3px rgba(0,0,0,.4),0 1px 0 rgba(255,255,255,.6);
+  }
+
+  /* =========================================================
+     5. ID CARD
+     ========================================================= */
+  .idcard{
+    position:absolute;top:0;left:0;
+    width:282px;
+    background:#fff;border-radius:20px;
     box-shadow:
-      inset 0 2px 3px rgba(0, 0, 0, .4),
-      0 1px 0 rgba(255, 255, 255, .6);
+      0 30px 60px -28px rgba(2,132,199,.45),
+      0 4px 12px -4px rgba(2,132,199,.15);
+    padding:0 0 16px;
+    z-index:2;
+    transform-origin:50% 20px;
+    cursor:grab;
+    touch-action:none;
+    user-select:none;-webkit-user-select:none;
+    will-change:transform;
+    backface-visibility:hidden;
+    overflow:hidden;
+    background-image:radial-gradient(circle at 1px 1px,rgba(14,165,233,.07) 1px,transparent 0);
+    background-size:12px 12px;
   }
+  .idcard:active{cursor:grabbing}
 
-  .idcard {
-    position: absolute;
-    top: 0; left: 0;
-    width: 282px;
-    background: #ffffff;
-    border-radius: 20px;
+  .idcard__bar{
+    height:6px;
+    background:linear-gradient(90deg,var(--blue-400),var(--blue-600),var(--blue-400));
+  }
+  .idcard__hole{
+    width:52px;height:10px;margin:9px auto 12px;border-radius:99px;
+    background:linear-gradient(180deg,#64748b 0%,#334155 45%,#1e293b 100%);
     box-shadow:
-      0 30px 60px -28px rgba(2, 132, 199, .45),
-      0 4px 12px -4px rgba(2, 132, 199, .15);
-    padding: 0 0 16px;
-    z-index: 2;
-    transform-origin: 50% 20px;
-    cursor: grab;
-    touch-action: none;
-    user-select: none;
-    -webkit-user-select: none;
-    will-change: transform;
-    backface-visibility: hidden;
-    overflow: hidden;
-    background-image:
-      radial-gradient(circle at 1px 1px, rgba(14,165,233,.07) 1px, transparent 0);
-    background-size: 12px 12px;
+      inset 0 2px 3px rgba(0,0,0,.55),
+      inset 0 -1px 1px rgba(255,255,255,.25),
+      0 1px 0 rgba(255,255,255,.8);
+    position:relative;
   }
-  .idcard:active { cursor: grabbing; }
-
-  .idcard__bar {
-    height: 6px;
-    background: linear-gradient(90deg, var(--blue-400), var(--blue-600), var(--blue-400));
+  .idcard__hole::after{
+    content:"";position:absolute;inset:2px 3px;border-radius:99px;
+    background:#0b1220;box-shadow:inset 0 1px 2px rgba(0,0,0,.8);
   }
 
-  .idcard__hole {
-    width: 52px;
-    height: 10px;
-    margin: 9px auto 12px;
-    border-radius: 99px;
-    background:
-      linear-gradient(180deg, #64748b 0%, #334155 45%, #1e293b 100%);
-    box-shadow:
-      inset 0 2px 3px rgba(0, 0, 0, .55),
-      inset 0 -1px 1px rgba(255, 255, 255, .25),
-      0 1px 0 rgba(255, 255, 255, .8);
-    position: relative;
+  .idcard__header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 16px;margin-bottom:12px;
   }
-  .idcard__hole::after {
-    content: "";
-    position: absolute;
-    inset: 2px 3px;
-    border-radius: 99px;
-    background: #0b1220;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .8);
+  .idcard__brand{
+    font-size:9.5px;font-weight:800;letter-spacing:.18em;color:var(--muted);
+  }
+  .idcard__status{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:9px;font-weight:800;letter-spacing:.1em;
+    color:var(--blue-700);background:var(--blue-50);
+    border:1px solid var(--blue-100);
+    padding:3px 8px;border-radius:99px;
+  }
+  .idcard__status i{
+    width:5px;height:5px;border-radius:50%;background:var(--blue-500);
   }
 
-  .idcard__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 16px;
-    margin-bottom: 12px;
+  .idcard__photo-wrap{
+    width:108px;height:132px;margin:0 auto 12px;position:relative;
   }
-  .idcard__brand {
-    font-size: 9.5px;
-    font-weight: 800;
-    letter-spacing: .18em;
-    color: var(--muted);
+  .idcard__photo-wrap::before{
+    content:"";position:absolute;inset:-4px;border-radius:16px;
+    background:linear-gradient(135deg,var(--blue-300),var(--blue-500),var(--blue-300));
+    z-index:0;
   }
-  .idcard__status {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 9px;
-    font-weight: 800;
-    letter-spacing: .1em;
-    color: var(--blue-700);
-    background: var(--blue-50);
-    border: 1px solid var(--blue-100);
-    padding: 3px 8px;
-    border-radius: 99px;
+  .idcard__photo-wrap::after{
+    content:"";position:absolute;inset:-7px;border-radius:20px;
+    border:1px dashed var(--blue-200);z-index:0;
   }
-  .idcard__status i {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: var(--blue-500);
+  .idcard__photo{
+    position:relative;width:100%;height:100%;
+    border-radius:14px;overflow:hidden;
+    background:var(--blue-50);z-index:1;
+    box-shadow:0 8px 18px -8px rgba(2,132,199,.5);
+  }
+  .idcard__photo img{
+    width:100%;height:100%;object-fit:cover;display:block;
+    pointer-events:none;-webkit-user-drag:none;
   }
 
-  .idcard__photo-wrap {
-    width: 108px;
-    height: 132px;
-    margin: 0 auto 12px;
-    position: relative;
+  .idcard__name{
+    text-align:center;font-size:19px;font-weight:800;
+    letter-spacing:-.5px;padding:0 16px;
+    background:linear-gradient(90deg,var(--ink) 0%,var(--blue-700) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
   }
-  .idcard__photo-wrap::before {
-    content: "";
-    position: absolute;
-    inset: -4px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, var(--blue-300), var(--blue-500), var(--blue-300));
-    z-index: 0;
-  }
-  .idcard__photo-wrap::after {
-    content: "";
-    position: absolute;
-    inset: -7px;
-    border-radius: 20px;
-    border: 1px dashed var(--blue-200);
-    z-index: 0;
-  }
-  .idcard__photo {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    border-radius: 14px;
-    overflow: hidden;
-    background: var(--blue-50);
-    z-index: 1;
-    box-shadow: 0 8px 18px -8px rgba(2, 132, 199, .5);
-  }
-  .idcard__photo img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    pointer-events: none;
-    -webkit-user-drag: none;
+  .idcard__role{
+    text-align:center;font-size:10.5px;font-weight:700;
+    letter-spacing:.06em;color:var(--blue-600);
+    text-transform:uppercase;margin-top:4px;margin-bottom:14px;
   }
 
-  .idcard__name {
-    text-align: center;
-    font-size: 19px;
-    font-weight: 800;
-    letter-spacing: -.5px;
-    padding: 0 16px;
-    background: linear-gradient(90deg, var(--ink) 0%, var(--blue-700) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .idcard__role {
-    text-align: center;
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: .06em;
-    color: var(--blue-600);
-    text-transform: uppercase;
-    margin-top: 4px;
-    margin-bottom: 14px;
+  .idcard__divider{
+    height:1px;margin:0 16px 12px;
+    background:linear-gradient(90deg,transparent,var(--line) 20%,var(--line) 80%,transparent);
   }
 
-  .idcard__divider {
-    height: 1px;
-    margin: 0 16px 12px;
-    background:
-      linear-gradient(90deg, transparent, var(--line) 20%, var(--line) 80%, transparent);
+  .idcard__rows{list-style:none;padding:0 16px}
+  .idcard__rows li{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:10px;padding:5.5px 0;font-size:11.5px;
+  }
+  .idcard__rows li+li{border-top:1px solid #f1f7fd}
+  .idcard__rows dt{color:var(--muted);font-weight:600;flex-shrink:0}
+  .idcard__rows dd{color:var(--ink);font-weight:700;text-align:right}
+  .idcard__rows dd b{color:var(--blue-600)}
+
+  .idcard__footer{
+    padding:14px 16px 0;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  .idcard__code{
+    font-family:Consolas,monospace;
+    font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--muted);
+  }
+  .idcard__barcode{
+    height:22px;width:100px;
+    background:repeating-linear-gradient(90deg,
+      var(--ink) 0px,var(--ink) 2px,transparent 2px,transparent 4px,
+      var(--ink) 4px,var(--ink) 5px,transparent 5px,transparent 7px,
+      var(--ink) 7px,var(--ink) 10px,transparent 10px,transparent 12px,
+      var(--ink) 12px,var(--ink) 13px,transparent 13px,transparent 16px);
+    border-radius:2px;opacity:.85;
   }
 
-  .idcard__rows {
-    list-style: none;
-    padding: 0 16px;
+  /* =========================================================
+     6. HINT + CHIPS
+     ========================================================= */
+  .hint-wrap{text-align:center;margin-top:6px}
+  .hint{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12px;font-weight:600;color:var(--muted);
+    background:#fff;border:1px solid var(--line);
+    padding:7px 16px;border-radius:99px;
   }
-  .idcard__rows li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 5.5px 0;
-    font-size: 11.5px;
-  }
-  .idcard__rows li + li { border-top: 1px solid #f1f7fd; }
-  .idcard__rows dt { color: var(--muted); font-weight: 600; flex-shrink: 0; }
-  .idcard__rows dd { color: var(--ink); font-weight: 700; text-align: right; }
-  .idcard__rows dd b { color: var(--blue-600); }
+  .hint svg{color:var(--blue-500)}
 
-  .idcard__footer {
-    padding: 14px 16px 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+  .chips{
+    display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:22px;
   }
-  .idcard__code {
-    font-family: Consolas, monospace;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: .12em;
-    color: var(--muted);
-  }
-  .idcard__barcode {
-    height: 22px;
-    width: 100px;
-    background:
-      repeating-linear-gradient(
-        90deg,
-        var(--ink) 0px, var(--ink) 2px,
-        transparent 2px, transparent 4px,
-        var(--ink) 4px, var(--ink) 5px,
-        transparent 5px, transparent 7px,
-        var(--ink) 7px, var(--ink) 10px,
-        transparent 10px, transparent 12px,
-        var(--ink) 12px, var(--ink) 13px,
-        transparent 13px, transparent 16px
-      );
-    border-radius: 2px;
-    opacity: .85;
+  .chips span{
+    font-size:12px;font-weight:700;color:var(--blue-600);
+    background:#fff;border:1px solid var(--blue-100);
+    padding:7px 14px;border-radius:99px;
   }
 
-  .hint-wrap { text-align: center; margin-top: 6px; }
-  .hint {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--muted);
-    background: #fff;
-    border: 1px solid var(--line);
-    padding: 7px 16px;
-    border-radius: 99px;
+  /* =========================================================
+     7. ABOUT
+     ========================================================= */
+  .about{
+    margin-top:26px;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
   }
-  .hint svg { color: var(--blue-500); }
+  .about__card{
+    background:#fff;border:1px solid var(--line);
+    border-radius:14px;padding:18px;
+    transition:border-color .15s,transform .15s;
+  }
+  .about__card:hover{border-color:var(--blue-200);transform:translateY(-2px)}
+  .about__card h3{
+    font-size:12px;font-weight:800;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--blue-600);margin-bottom:7px;
+  }
+  .about__card p{font-size:13px;line-height:1.65;color:var(--ink-2)}
 
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 22px;
+  /* =========================================================
+     8. FOOTER
+     ========================================================= */
+  footer{
+    background:#fff;border-top:1px solid var(--line);
+    padding:26px;text-align:center;
   }
-  .chips span {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--blue-600);
-    background: #fff;
-    border: 1px solid var(--blue-100);
-    padding: 7px 14px;
-    border-radius: 99px;
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:inherit;font-size:15px;font-weight:700;
+    color:#fff;background:linear-gradient(135deg,var(--blue-400),var(--blue-600));
+    padding:14px 34px;border:none;border-radius:99px;
+    text-decoration:none;cursor:pointer;
+    box-shadow:0 10px 24px -10px rgba(2,132,199,.6);
+    transition:background .15s,transform .15s,box-shadow .15s;
   }
-
-  .about {
-    margin-top: 26px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
+  .btn:hover{
+    background:var(--blue-600);transform:translateY(-2px);
+    box-shadow:0 16px 30px -12px rgba(2,132,199,.65);
   }
-  .about__card {
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 18px;
-    transition: border-color .15s, transform .15s;
-  }
-  .about__card:hover {
-    border-color: var(--blue-200);
-    transform: translateY(-2px);
-  }
-  .about__card h3 {
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-    color: var(--blue-600);
-    margin-bottom: 7px;
-  }
-  .about__card p {
-    font-size: 13px;
-    line-height: 1.65;
-    color: var(--ink-2);
+  footer small{
+    display:block;margin-top:14px;font-size:12px;color:var(--muted);
   }
 
-  footer {
-    background: #fff;
-    border-top: 1px solid var(--line);
-    padding: 26px;
-    text-align: center;
+  /* =========================================================
+     9. RESPONSIF
+     ========================================================= */
+  @media (max-width:640px){
+    main{padding:20px 16px 44px}
+    .scene{height:600px}
+    .about{grid-template-columns:1fr}
+    .btn{width:100%;justify-content:center}
   }
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 700;
-    color: #fff;
-    background: linear-gradient(135deg, var(--blue-400), var(--blue-600));
-    padding: 14px 34px;
-    border: none;
-    border-radius: 99px;
-    text-decoration: none;
-    cursor: pointer;
-    box-shadow: 0 10px 24px -10px rgba(2, 132, 199, .6);
-    transition: background .15s, transform .15s, box-shadow .15s;
-  }
-  .btn:hover {
-    background: var(--blue-600);
-    transform: translateY(-2px);
-    box-shadow: 0 16px 30px -12px rgba(2, 132, 199, .65);
-  }
-  footer small {
-    display: block;
-    margin-top: 14px;
-    font-size: 12px;
-    color: var(--muted);
+  @media (max-width:400px){
+    .idcard{width:252px}
+    .idcard__photo-wrap{width:96px;height:118px}
+    .idcard__name{font-size:17px}
+    .idcard__rows li{font-size:11px}
+    .scene{height:570px}
   }
 
-  @media (max-width: 640px) {
-    main { padding: 20px 16px 44px; }
-    .scene { height: 600px; }
-    .about { grid-template-columns: 1fr; }
-    .btn { width: 100%; justify-content: center; }
-  }
-  @media (max-width: 400px) {
-    .idcard { width: 252px; }
-    .idcard__photo-wrap { width: 96px; height: 118px; }
-    .idcard__name { font-size: 17px; }
-    .idcard__rows li { font-size: 11px; }
-    .scene { height: 570px; }
+  /* =========================================================
+     10. REDUCED MOTION
+     ========================================================= */
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{
+      animation-duration:.001ms!important;
+      animation-iteration-count:1!important;
+      transition-duration:.001ms!important;
+    }
+    .xfer{display:none!important}
+    html{scroll-behavior:auto}
   }
 </style>
 </head>
-<body>
+<body class="is-loading">
 
+<!-- TRANSITION OVERLAY -->
+<div class="xfer" id="xfer" aria-hidden="true">
+  <div class="xfer__half xfer__half--top"></div>
+  <div class="xfer__half xfer__half--bot"></div>
+  <div class="xfer__seam"></div>
+  <div class="xfer__brand">
+    <img src="logo.jpg" alt="">
+    <span>Insomnia<em>Dev</em></span>
+  </div>
+</div>
+
+<!-- HEADER -->
 <header>
-  <a class="brand" href="index.html">
+  <a class="brand" href="index.html" data-nav>
     <img src="logo.jpg" alt="Logo Insomnia Dev">
     <b>Insomnia<em>Dev</em></b>
   </a>
-  <a class="back" href="index.html">&larr; Landing</a>
+  <a class="back" href="beranda.html" data-nav>&larr; Beranda</a>
 </header>
 
+<!-- MAIN -->
 <main>
   <section class="intro">
     <div class="badge">Portofolio</div>
@@ -502,15 +457,14 @@
     <svg class="svg-strap" id="svgStrap" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="strapGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%"   stop-color="#075985"/>
-          <stop offset="18%"  stop-color="#0369a1"/>
-          <stop offset="42%"  stop-color="#38bdf8"/>
-          <stop offset="58%"  stop-color="#38bdf8"/>
-          <stop offset="82%"  stop-color="#0369a1"/>
+          <stop offset="0%" stop-color="#075985"/>
+          <stop offset="18%" stop-color="#0369a1"/>
+          <stop offset="42%" stop-color="#38bdf8"/>
+          <stop offset="58%" stop-color="#38bdf8"/>
+          <stop offset="82%" stop-color="#0369a1"/>
           <stop offset="100%" stop-color="#075985"/>
         </linearGradient>
       </defs>
-
       <path id="strapShadow" fill="none" stroke="#0c4a6e" stroke-width="30"
             stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
       <path id="strapBase" fill="none" stroke="url(#strapGrad)" stroke-width="26"
@@ -528,23 +482,18 @@
     <div class="idcard" id="card">
       <div class="idcard__bar"></div>
       <div class="idcard__hole"></div>
-
       <div class="idcard__header">
         <span class="idcard__brand">INSOMNIA DEV</span>
         <span class="idcard__status"><i></i> AKTIF</span>
       </div>
-
       <div class="idcard__photo-wrap">
         <div class="idcard__photo">
           <img src="saya.jpg" alt="Foto Yudha — Insomnia Dev">
         </div>
       </div>
-
       <div class="idcard__name">Insomnia Dev</div>
       <div class="idcard__role">Web &amp; IoT Developer</div>
-
       <div class="idcard__divider"></div>
-
       <ul class="idcard__rows">
         <li><dt>Nama</dt><dd>Yudha</dd></li>
         <li><dt>Domisili</dt><dd>Dlingo, Bantul</dd></li>
@@ -552,13 +501,11 @@
         <li><dt>Lahir</dt><dd>22 Agu 2011</dd></li>
         <li><dt>Project</dt><dd><b>65+</b></dd></li>
       </ul>
-
       <div class="idcard__footer">
         <span class="idcard__code">ID · 1108 · 22</span>
         <div class="idcard__barcode"></div>
       </div>
     </div>
-
   </section>
 
   <div class="hint-wrap">
@@ -595,12 +542,16 @@
   </section>
 </main>
 
+<!-- FOOTER -->
 <footer>
-  <a class="btn" href="beranda.html">Ke Menu &rarr;</a>
+  <a class="btn" href="beranda.html" data-nav>Ke Beranda &rarr;</a>
   <small>&copy; <span id="y">2025</span> Insomnia Dev. Semua hak dilindungi.</small>
 </footer>
 
 <script>
+/* =========================================================
+   A. FISIKA KARTU
+   ========================================================= */
 (function () {
   "use strict";
 
@@ -615,7 +566,6 @@
   var pathStitch = document.getElementById("strapStitch");
   if (!scene || !card || !pathBase) return;
 
-  /* ============ KONSTANTA ============ */
   var SEGS        = 10;
   var ITER        = 14;
   var G           = 2400;
@@ -628,21 +578,24 @@
   var anchorX = 0, anchorY = 0;
   var chain = [];
 
-  /* ============ DRAG STATE ============ */
   var dragging   = false;
   var pointerId  = null;
-  var grabStartX = 0, grabStartY = 0;   // cursor saat pointerdown
-  var grabHoleX  = 0, grabHoleY  = 0;   // hole saat pointerdown
+  var grabStartX = 0, grabStartY = 0;
+  var grabHoleX  = 0, grabHoleY  = 0;
   var dragTarget = { x: 0, y: 0, z: 0 };
-
   var cursorVel = { x: 0, y: 0 };
   var lastPointer = { x: 0, y: 0, t: 0 };
 
   var lastTime = 0;
   var raf = null;
+  var paused = false;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ============ INIT ============ */
+  window.__portoPause = function (v) {
+    paused = !!v;
+    if (!paused) lastTime = performance.now();
+  };
+
   function computeL() {
     var w = window.innerWidth;
     if (w < 400) return 145;
@@ -672,7 +625,6 @@
     measureAnchor();
     buildChain();
     if (!reduceMotion) {
-      // dorongan awal kecil biar hidup
       var last = chain[SEGS];
       last.px = last.x - 1.4;
       last.py = last.y - 0.2;
@@ -682,7 +634,6 @@
     if (!raf) raf = requestAnimationFrame(tick);
   }
 
-  /* ============ FISIKA ============ */
   function integrate(dt) {
     var dt2 = dt * dt;
     var damp = Math.pow(DAMP, dt * 60);
@@ -726,7 +677,6 @@
     }
   }
 
-  /* ============ PROJECT ============ */
   function project(p) {
     var s = PERSP / (PERSP + p.z);
     if (s < 0.5) s = 0.5;
@@ -738,7 +688,6 @@
     };
   }
 
-  /* ============ RENDER ============ */
   function catmullRom(pts) {
     if (pts.length < 2) return "";
     var d = "M " + pts[0].x.toFixed(2) + " " + pts[0].y.toFixed(2);
@@ -770,15 +719,12 @@
     pathStitch.setAttribute("d", d);
 
     var last = projected[SEGS];
-
-    // Sudut Z dari rantai ASLI (bukan proyeksi) → tidak terbalik
     var rax = chain[SEGS].x - anchorX;
     var ray = chain[SEGS].y - anchorY;
     var angleZ = Math.atan2(rax, ray) * 180 / Math.PI;
     if (angleZ >  80) angleZ =  80;
     if (angleZ < -80) angleZ = -80;
 
-    // Rotasi X: z negatif = maju ke viewer → bawah kartu menghadap kita
     var zRaw = chain[SEGS].z;
     var angleX = -zRaw / L * 30;
     if (angleX >  22) angleX =  22;
@@ -792,18 +738,20 @@
       "scale(" + last.s.toFixed(3) + ")";
   }
 
-  /* ============ TICK ============ */
   function tick(now) {
+    raf = requestAnimationFrame(tick);
+
+    if (paused) {
+      lastTime = now;
+      return;
+    }
+
     var dt = Math.min((now - lastTime) / 1000, 0.033);
     lastTime = now;
 
-    if (!dragging) {
-      integrate(dt);
-    }
+    if (!dragging) integrate(dt);
     solveConstraints();
 
-    // Kalau dragging, paksa ujung SETELAH solve — supaya constraint
-    // tidak bisa menariknya balik
     if (dragging) {
       var last = chain[SEGS];
       last.x = dragTarget.x;
@@ -815,17 +763,14 @@
     }
 
     render();
-    raf = requestAnimationFrame(tick);
   }
 
-  /* ============ DRAG ============ */
   function onPointerDown(e) {
-    if (reduceMotion) return;
+    if (reduceMotion || paused) return;
     if (e.button !== undefined && e.button !== 0) return;
 
     dragging = true;
     pointerId = e.pointerId;
-
     grabStartX = e.clientX;
     grabStartY = e.clientY;
     grabHoleX  = chain[SEGS].x;
@@ -838,14 +783,12 @@
     lastPointer = { x: e.clientX, y: e.clientY, t: performance.now() };
     cursorVel = { x: 0, y: 0 };
 
-    // freeze chain supaya tidak ada momentum lama
     for (var i = 1; i <= SEGS; i++) {
       chain[i].px = chain[i].x;
       chain[i].py = chain[i].y;
       chain[i].pz = chain[i].z;
     }
 
-    // listener di window: tetap menerima event walau kursor keluar kartu
     window.addEventListener("pointermove", onPointerMove, { passive: false });
     window.addEventListener("pointerup", onPointerUp);
     window.addEventListener("pointercancel", onPointerUp);
@@ -857,14 +800,11 @@
   function onPointerMove(e) {
     if (!dragging || e.pointerId !== pointerId) return;
 
-    // Delta kursor (screen px = scene px, karena scene hanya di-translate)
     var dx = e.clientX - grabStartX;
     var dy = e.clientY - grabStartY;
-
     var tx = grabHoleX + dx;
     var ty = grabHoleY + dy;
 
-    // clamp ke radius L (strap tetap taut) — HANYA kalau melebihi
     var adx = tx - anchorX;
     var ady = ty - anchorY;
     var dist = Math.sqrt(adx * adx + ady * ady);
@@ -872,11 +812,8 @@
       tx = anchorX + (adx / dist) * L;
       ty = anchorY + (ady / dist) * L;
     }
-
-    // cegah kartu lewat atas anchor (strap tidak bisa lipat ke atas)
     if (ty < anchorY + 50) ty = anchorY + 50;
 
-    // hitung velocity kursor untuk dilepas nanti
     var now = performance.now();
     var pdt = (now - lastPointer.t) / 1000;
     if (pdt > 0.008) {
@@ -887,7 +824,6 @@
     }
     lastPointer = { x: e.clientX, y: e.clientY, t: now };
 
-    // sedikitz saat drag cepat → kartu terasa "diangkat"
     var targetZ = 0;
     var spd = Math.abs(cursorVel.x);
     if (spd > 800) targetZ = -Math.min(40, (spd - 800) * 0.05);
@@ -906,13 +842,11 @@
     var speed = Math.sqrt(cursorVel.x * cursorVel.x + cursorVel.y * cursorVel.y);
 
     if (speed < 60) {
-      // hentikan saja — tidak ada momentum
       var last = chain[SEGS];
       last.px = last.x;
       last.py = last.y;
       last.pz = last.z;
     } else {
-      // transfer momentum kursor ke ujung rantai
       var dt = 1 / 60;
       var last = chain[SEGS];
       last.px = last.x - cursorVel.x * dt;
@@ -930,7 +864,6 @@
 
   card.addEventListener("pointerdown", onPointerDown);
 
-  /* ============ RESIZE ============ */
   var resizeTimer = null;
   window.addEventListener("resize", function () {
     clearTimeout(resizeTimer);
@@ -943,6 +876,67 @@
   });
 
   init();
+})();
+
+/* =========================================================
+   B. TRANSISI HALAMAN
+   ========================================================= */
+(function () {
+  "use strict";
+
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var EXIT_MS = 620;
+
+  function reveal() {
+    document.body.classList.remove("is-loading");
+  }
+
+  if (document.readyState === "complete" ||
+      document.readyState === "interactive") {
+    setTimeout(reveal, 60);
+  } else {
+    document.addEventListener("DOMContentLoaded", function () {
+      setTimeout(reveal, 60);
+    });
+  }
+  // fallback
+  setTimeout(reveal, 2500);
+
+  function navigateTo(href) {
+    if (reduceMotion) {
+      window.location.href = href;
+      return;
+    }
+
+    if (window.__portoPause) window.__portoPause(true);
+    document.body.classList.add("is-leaving");
+
+    setTimeout(function () {
+      window.location.href = href;
+    }, EXIT_MS);
+  }
+
+  var links = document.querySelectorAll("a[data-nav]");
+  for (var i = 0; i < links.length; i++) {
+    links[i].addEventListener("click", function (ev) {
+      var href = this.getAttribute("href");
+      if (!href) return;
+      if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+      if (ev.button !== undefined && ev.button !== 0) return;
+      ev.preventDefault();
+      navigateTo(href);
+    });
+  }
+
+  // bfcache
+  window.addEventListener("pageshow", function (ev) {
+    if (ev.persisted) {
+      document.body.classList.remove("is-leaving");
+      document.body.classList.add("is-loading");
+      if (window.__portoPause) window.__portoPause(false);
+      setTimeout(reveal, 60);
+    }
+  });
 })();
 </script>
 
