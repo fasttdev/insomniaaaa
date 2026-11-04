@@ -1,6 +1,5 @@
 /*
   Insomnia Dev — TikTok Stalker page styles
-  Layer tambahan di atas beranda.css + tools.css
 */
 
 /* =========================================================
@@ -149,7 +148,6 @@
   background:var(--blue-100);
   border:3px solid #ffffff;
   box-shadow:0 8px 22px -8px rgba(2,132,199,.5);
-  position:relative;
 }
 .profile__avatar img{
   width:100%;height:100%;
@@ -188,6 +186,9 @@
   font-style:italic;
 }
 
+/* =========================================================
+   STATS
+   ========================================================= */
 .profile__stats{
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
@@ -218,6 +219,66 @@
   color:var(--muted);
 }
 
+/* =========================================================
+   ANALYTICS
+   ========================================================= */
+.profile__analytics{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  padding:16px 20px;
+  background:#fafcff;
+  border-top:1px solid var(--line);
+}
+.profile__metric{
+  padding:14px;
+  background:#ffffff;
+  border:1px solid var(--line);
+  border-radius:12px;
+}
+.profile__metric-label{
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:5px;
+}
+.profile__metric-value{
+  font-size:16px;
+  font-weight:800;
+  color:var(--ink);
+  letter-spacing:-.3px;
+  line-height:1.15;
+  font-variant-numeric:tabular-nums;
+}
+.profile__metric-sub{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:3px;
+  line-height:1.4;
+}
+.profile__metric-bar{
+  margin-top:9px;
+  height:5px;
+  background:var(--blue-50);
+  border-radius:99px;
+  overflow:hidden;
+}
+.profile__metric-bar span{
+  display:block;
+  height:100%;
+  border-radius:99px;
+  background:linear-gradient(90deg,var(--blue-400),var(--blue-600));
+  transition:width .8s cubic-bezier(.16,1,.3,1);
+}
+.profile__metric--wide{
+  grid-column:1 / -1;
+}
+
+/* =========================================================
+   META TAGS
+   ========================================================= */
 .profile__meta{
   padding:14px 20px;
   display:flex;flex-wrap:wrap;gap:8px;
@@ -231,18 +292,17 @@
   border:1px solid var(--line);
   color:var(--ink-2);
   background:#fafcff;
+  text-decoration:none;
+  transition:background .15s,border-color .15s,color .15s;
 }
-.profile__tag b{
-  color:var(--ink);
-  font-weight:800;
-}
-.profile__tag--ok{
-  color:#047857;background:#ecfdf5;border-color:#d1fae5;
-}
-.profile__tag--off{
-  color:var(--muted);background:#f1f5f9;border-color:#e2e8f0;
-}
+.profile__tag b{color:var(--ink);font-weight:800}
+.profile__tag--ok{color:#047857;background:#ecfdf5;border-color:#d1fae5}
+.profile__tag--off{color:var(--muted);background:#f1f5f9;border-color:#e2e8f0}
+a.profile__tag:hover{color:var(--blue-700);border-color:var(--blue-200);background:var(--blue-50)}
 
+/* =========================================================
+   RAW
+   ========================================================= */
 .profile__raw{
   border-top:1px solid var(--line);
   background:var(--blue-50);
@@ -281,5 +341,6 @@
   .profile__avatar{width:72px;height:72px}
   .profile__name{font-size:15.5px}
   .profile__stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .profile__analytics{grid-template-columns:1fr;padding:12px 16px}
   .profile__meta{padding:12px 16px}
 }
