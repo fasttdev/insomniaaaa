@@ -46,7 +46,6 @@
 <!-- MAIN -->
 <main class="page">
 
-  <!-- HERO -->
   <section class="hero reveal" style="--d:160ms">
     <div class="hero__badge"><i></i> Tools · TikTok Stalker</div>
     <h1 class="hero__title">
@@ -58,7 +57,6 @@
     </p>
   </section>
 
-  <!-- STALKER -->
   <section class="stalk reveal" style="--d:240ms" aria-labelledby="stalkTitle">
     <div class="stalk__head">
       <div class="stalk__mark" aria-hidden="true">
@@ -112,9 +110,6 @@
 <script src="app.js" defer></script>
 
 <script>
-/* =========================================================
-   STALKER — page-specific logic
-   ========================================================= */
 (function () {
   "use strict";
 
@@ -132,14 +127,14 @@
     var resultEl = document.getElementById("stalkResult");
 
     function escapeHtml(s) {
-      return String(s).replace(/[&<>"']/g, function (c) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
         return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
       });
     }
 
     function fmtNum(n) {
       n = Number(n) || 0;
-      if (n >= 1e9) return (n / 1e9).toFixed(1).replace(/\.0$/, "") + "M";
+      if (n >= 1e9) return (n / 1e9).toFixed(1).replace(/\.0$/, "") + "B";
       if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, "") + "M";
       if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, "") + "K";
       return String(n);
@@ -148,6 +143,13 @@
     function fmtFull(n) {
       n = Number(n) || 0;
       return n.toLocaleString("id-ID");
+    }
+
+    function numOrFallback(num, formatted) {
+      if (formatted && /[KMB]$/i.test(String(formatted).trim())) {
+        return String(formatted).trim();
+      }
+      return fmtNum(num);
     }
 
     var ICONS = {
@@ -172,20 +174,26 @@
     }
 
     function renderProfile(data) {
-      var p = data && data.profile ? data.profile : {};
-      var raw = data && data.raw ? data.raw : data;
+      var p = (data && data.profile) ? data.profile : {};
+      var raw = (data && data.raw) ? data.raw : data;
 
-      var avatar = p.avatar || "";
-      var name = p.nickname || p.username || data.username || "Tanpa nama";
-      var uname = p.username || data.username || "";
-      var bio = p.bio || "";
+      var avatar   = p.avatar || "";
+      var name     = p.nickname || p.username || "Tanpa nama";
+      var uname    = p.username || "";
+      var bio      = p.bio || "";
       var verified = !!p.verified;
-      var priv = !!p.privateAccount;
-      var region = p.region || "";
+      var priv     = !!p.privateAccount;
+      var region   = p.region || "";
+      var profileUrl = p.profileUrl || (uname ? "https://www.tiktok.com/@" + uname : "");
+
+      var followersTxt = numOrFallback(p.followers, p.followersFormatted);
+      var followingTxt = numOrFallback(p.following, p.followingFormatted);
+      var likesTxt     = numOrFallback(p.likes, p.likesFormatted);
+      var videosTxt    = fmtNum(p.videos);
 
       var html = "";
 
-      /* TOP */
+      /* ============ TOP ============ */
       html += '<div class="profile__top">';
       html += '<div class="profile__avatar">';
       if (avatar) {
@@ -217,40 +225,95 @@
       html += '</div>'; // info
       html += '</div>'; // top
 
-      /* STATS */
+      /* ============ STATS ============ */
       html += '<div class="profile__stats">';
       html += '<div class="profile__stat">' +
-              '<b title="' + fmtFull(p.followers) + '">' + fmtNum(p.followers) + '</b>' +
+              '<b title="' + fmtFull(p.followers) + '">' + escapeHtml(followersTxt) + '</b>' +
               '<span>Followers</span></div>';
       html += '<div class="profile__stat">' +
-              '<b title="' + fmtFull(p.following) + '">' + fmtNum(p.following) + '</b>' +
+              '<b title="' + fmtFull(p.following) + '">' + escapeHtml(followingTxt) + '</b>' +
               '<span>Following</span></div>';
       html += '<div class="profile__stat">' +
-              '<b title="' + fmtFull(p.likes) + '">' + fmtNum(p.likes) + '</b>' +
+              '<b title="' + fmtFull(p.likes) + '">' + escapeHtml(likesTxt) + '</b>' +
               '<span>Likes</span></div>';
       html += '<div class="profile__stat">' +
-              '<b title="' + fmtFull(p.videos) + '">' + fmtNum(p.videos) + '</b>' +
+              '<b title="' + fmtFull(p.videos) + '">' + escapeHtml(videosTxt) + '</b>' +
               '<span>Video</span></div>';
       html += '</div>';
 
-      /* META */
+      /* ============ ANALYTICS ============ */
+      var hasAnalytics = p.engagementRate || p.activityScore > 0 || p.reachMin || p.reachMax || p.avgLikes > 0;
+
+      if (hasAnalytics) {
+        html += '<div class="profile__analytics">';
+
+        if (p.engagementRate) {
+          var erPercent = Math.min(100, Math.max(0, (p.engagementPercent || 0) * 10));
+          html += '<div class="profile__metric">';
+          html += '<div class="profile__metric-label">Engagement Rate</div>';
+          html += '<div class="profile__metric-value">' + escapeHtml(p.engagementRate) + '</div>';
+          if (p.engagementGrade) {
+            html += '<div class="profile__metric-sub">Grade: ' + escapeHtml(p.engagementGrade) + '</div>';
+          }
+          html += '<div class="profile__metric-bar"><span style="width:' + erPercent.toFixed(0) + '%"></span></div>';
+          html += '</div>';
+        }
+
+        if (p.activityScore > 0) {
+          var score = Math.min(100, Math.max(0, p.activityScore));
+          html += '<div class="profile__metric">';
+          html += '<div class="profile__metric-label">Activity Score</div>';
+          html += '<div class="profile__metric-value">' + score + '<span style="font-size:11px;font-weight:700;color:var(--muted);">/100</span></div>';
+          html += '<div class="profile__metric-sub">Tingkat keaktifan akun</div>';
+          html += '<div class="profile__metric-bar"><span style="width:' + score + '%"></span></div>';
+          html += '</div>';
+        }
+
+        if (p.avgLikes > 0) {
+          html += '<div class="profile__metric">';
+          html += '<div class="profile__metric-label">Rata-rata Likes</div>';
+          html += '<div class="profile__metric-value">' +
+                  escapeHtml(p.avgLikesFormatted || fmtNum(p.avgLikes)) + '</div>';
+          html += '<div class="profile__metric-sub">Per video</div>';
+          html += '</div>';
+        }
+
+        if (p.reachMin || p.reachMax) {
+          html += '<div class="profile__metric">';
+          html += '<div class="profile__metric-label">Estimasi Jangkauan</div>';
+          html += '<div class="profile__metric-value">' +
+                  escapeHtml((p.reachMin || "?") + " – " + (p.reachMax || "?")) + '</div>';
+          html += '<div class="profile__metric-sub">Per video</div>';
+          html += '</div>';
+        }
+
+        html += '</div>';
+      }
+
+      /* ============ META ============ */
       html += '<div class="profile__meta">';
+
       if (region) {
         html += '<span class="profile__tag">Wilayah: <b>' + escapeHtml(region) + '</b></span>';
+      }
+      if (p.accountAge) {
+        html += '<span class="profile__tag">Umur akun: <b>' + escapeHtml(p.accountAge) + '</b></span>';
+      }
+      if (p.createdAt) {
+        html += '<span class="profile__tag">Dibuat: <b>' + escapeHtml(p.createdAt) + '</b></span>';
       }
       if (priv) {
         html += '<span class="profile__tag profile__tag--off">Akun privat</span>';
       } else {
         html += '<span class="profile__tag profile__tag--ok">Akun publik</span>';
       }
-      if (uname) {
-        var profileUrl = "https://www.tiktok.com/@" + encodeURIComponent(uname);
+      if (profileUrl) {
         html += '<a class="profile__tag" href="' + escapeHtml(profileUrl) +
                 '" target="_blank" rel="noopener noreferrer">Buka di TikTok &rarr;</a>';
       }
       html += '</div>';
 
-      /* RAW */
+      /* ============ RAW ============ */
       var rawStr = JSON.stringify(raw, null, 2);
       if (rawStr.length > 50000) rawStr = rawStr.slice(0, 50000) + "\n\n... (dipotong)";
       html += '<details class="profile__raw">' +
