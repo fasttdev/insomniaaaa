@@ -1,353 +1,420 @@
-/*
-  Insomnia Dev — TikTok Stalker page styles
-*/
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTok Stalker — Insomnia Dev</title>
+<link rel="icon" href="logo.jpg" type="image/jpeg">
+<link rel="stylesheet" href="beranda.css">
+<link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="stalktt.css">
+</head>
+<body class="is-loading">
 
-/* =========================================================
-   STALKER FORM
-   ========================================================= */
-.stalk{
-  position:relative;
-  background:#ffffff;
-  border:1px solid var(--line);
-  border-radius:22px;
-  padding:32px;
-  box-shadow:var(--shadow-card);
-  overflow:hidden;
-}
-.stalk::before{
-  content:"";position:absolute;top:0;left:0;right:0;height:5px;
-  background:linear-gradient(90deg,var(--blue-400),var(--blue-600),var(--blue-400));
-}
+<!-- TRANSITION OVERLAY -->
+<div class="xfer" aria-hidden="true">
+  <div class="xfer__half xfer__half--top"></div>
+  <div class="xfer__half xfer__half--bot"></div>
+  <div class="xfer__seam"></div>
+  <div class="xfer__brand">
+    <img src="logo.jpg" alt="">
+    <span>Insomnia<em>Dev</em></span>
+  </div>
+</div>
 
-.stalk__head{
-  display:flex;align-items:center;gap:14px;
-  margin-bottom:24px;
-}
-.stalk__mark{
-  display:flex;align-items:center;justify-content:center;
-  width:48px;height:48px;border-radius:14px;
-  background:linear-gradient(135deg,#0ea5e9,#0369a1);
-  color:#fff;flex-shrink:0;
-  box-shadow:0 10px 22px -10px rgba(2,132,199,.7);
-}
-.stalk__kicker{
-  font-size:11px;font-weight:800;
-  letter-spacing:.12em;text-transform:uppercase;
-  color:var(--blue-600);margin-bottom:2px;
-}
-.stalk__title{
-  font-size:22px;font-weight:800;
-  letter-spacing:-.5px;color:var(--ink);
-}
-.stalk__title em{font-style:normal;color:var(--blue-600)}
+<!-- LATAR -->
+<div class="bg" aria-hidden="true">
+  <div class="bg__grid"></div>
+</div>
 
-.stalk__form{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
-.stalk__field{
-  position:relative;
-  flex:1 1 320px;min-width:0;
-  display:flex;align-items:center;
-  background:#fff;
-  border:1.5px solid var(--line);
-  border-radius:14px;
-  transition:border-color .18s,box-shadow .18s;
-}
-.stalk__field:focus-within{
-  border-color:var(--blue-400);
-  box-shadow:0 0 0 4px rgba(56,189,248,.15);
-}
-.stalk__field-icon{
-  position:absolute;left:14px;
-  color:var(--muted);pointer-events:none;
-  transition:color .18s;
-}
-.stalk__field:focus-within .stalk__field-icon{color:var(--blue-500)}
-.stalk__input{
-  flex:1;min-width:0;
-  padding:14px 20px 14px 42px;
-  font-size:14.5px;color:var(--ink);
-  background:transparent;border:none;outline:none;
-  border-radius:14px;
-}
-.stalk__input::placeholder{color:var(--muted);opacity:.85}
-.stalk__input:disabled{opacity:.6;cursor:not-allowed}
+<!-- NAV -->
+<header class="nav reveal" style="--d:80ms">
+  <a class="nav__brand" href="beranda.html" data-nav>
+    <img src="logo.jpg" alt="Logo Insomnia Dev">
+    <b>Insomnia<em>Dev</em></b>
+  </a>
+  <nav class="nav__links" id="navViewport" aria-label="Navigasi utama">
+    <div class="nav__track" id="navTrack">
+      <a href="beranda.html" class="nav__link" data-nav>Beranda</a>
+      <a href="tools.html" class="nav__link is-active" data-nav>Tools</a>
+      <a href="req.html" class="nav__link" data-nav>Req</a>
+      <a href="info.html" class="nav__link" data-nav>Information</a>
+    </div>
+  </nav>
+</header>
 
-.stalk__submit{
-  display:inline-flex;align-items:center;justify-content:center;
-  gap:9px;flex-shrink:0;
-  font-size:15px;font-weight:800;
-  color:#fff;
-  background:linear-gradient(135deg,var(--blue-400),var(--blue-600));
-  padding:14px 32px;border:none;border-radius:14px;
-  box-shadow:0 10px 24px -10px rgba(2,132,199,.65);
-  transition:background .18s,transform .15s,box-shadow .18s,opacity .15s;
-}
-.stalk__submit:hover:not(:disabled){
-  transform:translateY(-1px);
-  box-shadow:0 16px 30px -12px rgba(2,132,199,.75);
-}
-.stalk__submit:active:not(:disabled){transform:translateY(0) scale(.98)}
-.stalk__submit:disabled{opacity:.7;cursor:not-allowed}
+<!-- MAIN -->
+<main class="page">
 
-.stalk__spinner{
-  width:16px;height:16px;
-  border:2px solid rgba(255,255,255,.35);
-  border-top-color:#fff;
-  border-radius:50%;
-  animation:spin .75s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
+  <section class="hero reveal" style="--d:160ms">
+    <div class="hero__badge"><i></i> Tools · TikTok Stalker</div>
+    <h1 class="hero__title">
+      Intip profil TikTok<br><em>tanpa ribet.</em>
+    </h1>
+    <p class="hero__desc">
+      Lihat statistik publik, bio, region akun, dan info dasar profil TikTok siapa pun.
+      Cukup masukkan username atau tempel link profilnya.
+    </p>
+  </section>
 
-.stalk__hint{
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.55;
-  margin-top:2px;
-}
+  <section class="stalk reveal" style="--d:240ms" aria-labelledby="stalkTitle">
+    <div class="stalk__head">
+      <div class="stalk__mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.4"
+             stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="M21 21l-4.35-4.35"/>
+        </svg>
+      </div>
+      <div>
+        <div class="stalk__kicker">TikTok Stalker</div>
+        <h2 class="stalk__title" id="stalkTitle">Cari <em>profil TikTok</em></h2>
+      </div>
+    </div>
 
-/* =========================================================
-   STATUS
-   ========================================================= */
-.stalk__status{
-  display:flex;align-items:flex-start;gap:9px;
-  margin-top:20px;
-  padding:13px 16px;
-  font-size:13.5px;line-height:1.55;
-  border-radius:12px;
-  border:1px solid var(--line);
-  background:var(--blue-50);
-  color:var(--ink-2);
-  word-break:break-word;
-}
-.stalk__status svg{flex-shrink:0;margin-top:1px}
-.stalk__status.is-loading{color:var(--blue-700);background:var(--blue-50);border-color:var(--blue-100)}
-.stalk__status.is-loading svg{animation:spin .9s linear infinite}
-.stalk__status.is-error{color:var(--err);background:var(--err-bg);border-color:var(--err-line)}
-.stalk__status.is-success{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)}
+    <form class="stalk__form" id="stalkForm" novalidate>
+      <div class="stalk__field">
+        <svg class="stalk__field-icon" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 21c0-4 4-7 8-7s8 3 8 7"/>
+        </svg>
+        <input type="text" class="stalk__input" id="stalkInput"
+               placeholder="@username atau tiktok.com/@username"
+               autocomplete="off" spellcheck="false"
+               autocapitalize="off" aria-label="Username atau URL TikTok">
+      </div>
+      <button type="submit" class="stalk__submit" id="stalkSubmit">
+        <span class="stalk__submit-label">Cari</span>
+        <span class="stalk__spinner" id="stalkSpinner" hidden></span>
+      </button>
+    </form>
 
-/* =========================================================
-   PROFILE CARD
-   ========================================================= */
-.profile{
-  margin-top:20px;
-  border-radius:16px;
-  overflow:hidden;
-  border:1px solid var(--line);
-  background:#ffffff;
-}
+    <p class="stalk__hint">
+      Contoh: <strong>@charliedamelio</strong> atau
+      <strong>https://tiktok.com/@charliedamelio</strong>
+    </p>
 
-.profile__top{
-  display:flex;gap:16px;align-items:flex-start;
-  padding:20px;
-  background:linear-gradient(180deg,#ffffff,var(--blue-50));
-  border-bottom:1px solid var(--line);
-}
+    <div class="stalk__status" id="stalkStatus" role="status" aria-live="polite" hidden></div>
+    <div class="profile" id="stalkResult" hidden></div>
+  </section>
 
-.profile__avatar{
-  width:88px;height:88px;flex-shrink:0;
-  border-radius:50%;
-  overflow:hidden;
-  background:var(--blue-100);
-  border:3px solid #ffffff;
-  box-shadow:0 8px 22px -8px rgba(2,132,199,.5);
-}
-.profile__avatar img{
-  width:100%;height:100%;
-  object-fit:cover;display:block;
-}
+</main>
 
-.profile__info{flex:1;min-width:0;padding-top:2px}
-.profile__name{
-  font-size:17px;font-weight:800;
-  color:var(--ink);letter-spacing:-.3px;
-  line-height:1.3;
-  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
-  margin-bottom:2px;
-}
-.profile__verified{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:16px;height:16px;flex-shrink:0;
-  border-radius:50%;
-  background:var(--blue-500);
-  color:#fff;
-}
-.profile__username{
-  font-size:13px;font-weight:700;
-  color:var(--blue-600);
-  margin-bottom:8px;
-}
-.profile__bio{
-  font-size:12.5px;line-height:1.55;
-  color:var(--ink-2);
-  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
-  overflow:hidden;
-  word-break:break-word;
-}
-.profile__bio.is-empty{
-  color:var(--muted);
-  font-style:italic;
-}
-.profile__bio-link{
-  display:inline-flex;align-items:center;gap:5px;
-  margin-top:8px;
-  font-size:12px;font-weight:700;
-  color:var(--blue-600);
-  padding:4px 10px;border-radius:99px;
-  background:var(--blue-50);
-  border:1px solid var(--blue-100);
-  text-decoration:none;
-  max-width:100%;
-  overflow:hidden;
-  transition:background .15s,border-color .15s;
-}
-.profile__bio-link:hover{
-  background:var(--blue-100);border-color:var(--blue-200);
-}
-.profile__bio-link span{
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
+<footer class="foot reveal" style="--d:320ms">
+  &copy; <span id="y">2025</span> <span>Insomnia Dev</span>. Semua hak dilindungi.
+</footer>
 
-/* =========================================================
-   STATS
-   ========================================================= */
-.profile__stats{
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:1px;
-  background:var(--line);
-}
-.profile__stat{
-  background:#ffffff;
-  padding:14px 10px;
-  text-align:center;
-}
-.profile__stat b{
-  display:block;
-  font-size:16px;
-  font-weight:800;
-  color:var(--ink);
-  letter-spacing:-.3px;
-  font-variant-numeric:tabular-nums;
-  line-height:1.1;
-  margin-bottom:4px;
-}
-.profile__stat span{
-  display:block;
-  font-size:10px;
-  font-weight:800;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  color:var(--muted);
-}
+<script src="app.js" defer></script>
 
-/* =========================================================
-   REGION BLOCK
-   ========================================================= */
-.profile__region{
-  display:flex;align-items:center;gap:14px;
-  padding:16px 20px;
-  background:#fafcff;
-  border-top:1px solid var(--line);
-}
-.profile__region-flag{
-  font-size:34px;
-  line-height:1;
-  flex-shrink:0;
-  filter:drop-shadow(0 4px 8px rgba(2,132,199,.2));
-}
-.profile__region-info{flex:1;min-width:0}
-.profile__region-label{
-  font-size:10px;
-  font-weight:800;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  color:var(--muted);
-  margin-bottom:3px;
-}
-.profile__region-value{
-  font-size:15px;
-  font-weight:800;
-  color:var(--ink);
-  letter-spacing:-.2px;
-  line-height:1.2;
-  margin-bottom:3px;
-}
-.profile__region-sub{
-  font-size:11.5px;
-  color:var(--muted);
-  line-height:1.5;
-}
-.profile__region-sub b{
-  color:var(--ink-2);
-  font-weight:700;
-}
+<script>
+(function () {
+  "use strict";
 
-/* =========================================================
-   META TAGS
-   ========================================================= */
-.profile__meta{
-  padding:14px 20px;
-  display:flex;flex-wrap:wrap;gap:8px;
-  border-top:1px solid var(--line);
-  background:#ffffff;
-}
-.profile__tag{
-  display:inline-flex;align-items:center;gap:6px;
-  font-size:11.5px;font-weight:700;
-  padding:5px 11px;border-radius:99px;
-  border:1px solid var(--line);
-  color:var(--ink-2);
-  background:#fafcff;
-  text-decoration:none;
-  transition:background .15s,border-color .15s,color .15s;
-}
-.profile__tag b{color:var(--ink);font-weight:800}
-.profile__tag--ok{color:#047857;background:#ecfdf5;border-color:#d1fae5}
-.profile__tag--off{color:var(--muted);background:#f1f5f9;border-color:#e2e8f0}
-a.profile__tag:hover{color:var(--blue-700);border-color:var(--blue-200);background:var(--blue-50)}
+  function initStalker() {
+    var form = document.getElementById("stalkForm");
+    if (!form) return;
 
-/* =========================================================
-   RAW
-   ========================================================= */
-.profile__raw{
-  border-top:1px solid var(--line);
-  background:var(--blue-50);
-}
-.profile__raw summary{
-  padding:11px 16px;
-  font-size:11.5px;font-weight:800;
-  color:var(--muted);letter-spacing:.06em;
-  text-transform:uppercase;cursor:pointer;user-select:none;
-}
-.profile__raw summary:hover{color:var(--blue-600)}
-.profile__raw pre{
-  max-height:280px;overflow:auto;
-  margin:0 16px 14px;
-  padding:12px 14px;
-  background:#0b1220;color:#bae6fd;
-  border-radius:10px;
-  font-family:Consolas,"Courier New",monospace;
-  font-size:11.5px;line-height:1.55;
-  white-space:pre-wrap;word-break:break-word;
-}
+    var yearEl = document.getElementById("y");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-/* =========================================================
-   RESPONSIF
-   ========================================================= */
-@media (max-width:640px){
-  .stalk{padding:20px;border-radius:18px}
-  .stalk__head{gap:12px;margin-bottom:20px}
-  .stalk__mark{width:42px;height:42px}
-  .stalk__title{font-size:19px}
-  .stalk__form{gap:8px}
-  .stalk__field{flex:1 1 100%}
-  .stalk__submit{width:100%;padding:13px 20px;font-size:14.5px}
+    var input    = document.getElementById("stalkInput");
+    var submit   = document.getElementById("stalkSubmit");
+    var spinner  = document.getElementById("stalkSpinner");
+    var label    = submit.querySelector(".stalk__submit-label");
+    var resultEl = document.getElementById("stalkResult");
 
-  .profile__top{padding:16px;gap:14px}
-  .profile__avatar{width:72px;height:72px}
-  .profile__name{font-size:15.5px}
-  .profile__stats{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .profile__region{padding:14px 16px;gap:12px}
-  .profile__region-flag{font-size:28px}
-  .profile__region-value{font-size:14px}
-  .profile__meta{padding:12px 16px}
-}
+    function escapeHtml(s) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    function fmtNum(n) {
+      n = Number(n) || 0;
+      if (n >= 1e9) return (n / 1e9).toFixed(1).replace(/\.0$/, "") + "B";
+      if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, "") + "M";
+      if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, "") + "K";
+      return String(n);
+    }
+
+    function fmtFull(n) {
+      n = Number(n) || 0;
+      return n.toLocaleString("id-ID");
+    }
+
+    function computeAge(iso) {
+      if (!iso) return "";
+      var d = new Date(iso);
+      if (isNaN(d.getTime())) return "";
+      var now = new Date();
+      var months = (now.getFullYear() - d.getFullYear()) * 12 + (now.getMonth() - d.getMonth());
+      if (now.getDate() < d.getDate()) months--;
+      if (months < 0) months = 0;
+      var years = Math.floor(months / 12);
+      var remMonths = months % 12;
+      if (years === 0 && remMonths === 0) return "Baru";
+      var parts = [];
+      if (years > 0) parts.push(years + " Tahun");
+      if (remMonths > 0) parts.push(remMonths + " Bulan");
+      return parts.join(" ");
+    }
+
+    function shortUrl(u) {
+      try {
+        var url = new URL(u);
+        var path = url.pathname.replace(/^\/+/, "");
+        return url.hostname.replace(/^www\./, "") + (path ? "/" + path : "");
+      } catch (e) {
+        return u;
+      }
+    }
+
+    var ICONS = {
+      loading: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg>',
+      error:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>',
+      success: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+      info:    '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>'
+    };
+
+    function showStatus(text, type) {
+      var el = document.getElementById("stalkStatus");
+      if (!el) return;
+      el.className = "stalk__status is-" + (type || "info");
+      el.innerHTML = (ICONS[type] || ICONS.info) + "<span>" + escapeHtml(text) + "</span>";
+      el.hidden = false;
+    }
+    function hideStatus() {
+      var el = document.getElementById("stalkStatus");
+      if (!el) return;
+      el.hidden = true;
+      el.innerHTML = "";
+    }
+
+    function renderProfile(data) {
+      var p = (data && data.profile) ? data.profile : {};
+      var raw = (data && data.raw) ? data.raw : data;
+
+      var avatar     = p.avatar || "";
+      var name       = p.nickname || p.username || "Tanpa nama";
+      var uname      = p.username || "";
+      var bio        = p.bio || "";
+      var bioLink    = p.bioLink || "";
+      var verified   = !!p.verified;
+      var priv       = !!p.privateAccount;
+      var profileUrl = p.profileUrl || (uname ? "https://www.tiktok.com/@" + uname : "");
+
+      var regionCode  = p.regionCode || "";
+      var regionName  = p.regionCountry || "";
+      var regionFlag  = p.regionFlag || "";
+
+      var currentCode = p.currentRegionCode || "";
+      var currentName = p.currentRegionCountry || "";
+      var currentFlag = p.currentRegionFlag || "";
+
+      var regCode     = p.registeredRegionCode || "";
+      var regName     = p.registeredRegionCountry || "";
+      var regFlag     = p.registeredRegionFlag || "";
+
+      var age = computeAge(p.createdAt);
+
+      var html = "";
+
+      /* ============ TOP ============ */
+      html += '<div class="profile__top">';
+      html += '<div class="profile__avatar">';
+      if (avatar) {
+        html += '<img src="' + escapeHtml(avatar) + '" alt="" ' +
+                'referrerpolicy="no-referrer" loading="lazy" ' +
+                'onerror="this.style.display=\'none\'">';
+      }
+      html += '</div>';
+
+      html += '<div class="profile__info">';
+      html += '<div class="profile__name">';
+      html += '<span>' + escapeHtml(name) + '</span>';
+      if (verified) {
+        html += '<span class="profile__verified" title="Terverifikasi" aria-label="Terverifikasi">' +
+                '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>' +
+                '</span>';
+      }
+      html += '</div>';
+
+      if (uname) {
+        html += '<div class="profile__username">@' + escapeHtml(uname) + '</div>';
+      }
+
+      if (bio) {
+        html += '<div class="profile__bio">' + escapeHtml(bio) + '</div>';
+      } else {
+        html += '<div class="profile__bio is-empty">Tidak ada bio.</div>';
+      }
+
+      if (bioLink) {
+        html += '<a class="profile__bio-link" href="' + escapeHtml(bioLink) + '" ' +
+                'target="_blank" rel="noopener noreferrer">' +
+                '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">' +
+                '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>' +
+                '<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>' +
+                '</svg><span>' + escapeHtml(shortUrl(bioLink)) + '</span></a>';
+      }
+
+      html += '</div>'; // info
+      html += '</div>'; // top
+
+      /* ============ STATS ============ */
+      html += '<div class="profile__stats">';
+      html += '<div class="profile__stat">' +
+              '<b title="' + fmtFull(p.followers) + '">' + fmtNum(p.followers) + '</b>' +
+              '<span>Followers</span></div>';
+      html += '<div class="profile__stat">' +
+              '<b title="' + fmtFull(p.following) + '">' + fmtNum(p.following) + '</b>' +
+              '<span>Following</span></div>';
+      html += '<div class="profile__stat">' +
+              '<b title="' + fmtFull(p.likes) + '">' + fmtNum(p.likes) + '</b>' +
+              '<span>Likes</span></div>';
+      html += '<div class="profile__stat">' +
+              '<b title="' + fmtFull(p.videos) + '">' + fmtNum(p.videos) + '</b>' +
+              '<span>Video</span></div>';
+      html += '</div>';
+
+      /* ============ REGION ============ */
+      if (regionCode || currentCode) {
+        var displayFlag = regionFlag || currentFlag || "";
+        var displayName = regionName || currentName || regionCode || currentCode || "";
+        var subs = [];
+        if (currentName || currentCode) {
+          subs.push("Current: " + escapeHtml((currentFlag ? currentFlag + " " : "") + (currentName || currentCode)));
+        }
+        if (regName || regCode) {
+          subs.push("Registered: " + escapeHtml((regFlag ? regFlag + " " : "") + (regName || regCode)));
+        }
+
+        html += '<div class="profile__region">';
+        if (displayFlag) {
+          html += '<div class="profile__region-flag" aria-hidden="true">' + displayFlag + '</div>';
+        }
+        html += '<div class="profile__region-info">';
+        html += '<div class="profile__region-label">Region Akun</div>';
+        html += '<div class="profile__region-value">' + escapeHtml(displayName) + '</div>';
+        if (subs.length) {
+          html += '<div class="profile__region-sub">' + subs.join(" &middot; ") + '</div>';
+        }
+        html += '</div>';
+        html += '</div>';
+      }
+
+      /* ============ META ============ */
+      html += '<div class="profile__meta">';
+
+      if (age) {
+        html += '<span class="profile__tag">Umur akun: <b>' + escapeHtml(age) + '</b></span>';
+      }
+      if (p.language) {
+        html += '<span class="profile__tag">Bahasa: <b>' + escapeHtml(p.language) + '</b></span>';
+      }
+      if (p.friends) {
+        html += '<span class="profile__tag">Teman: <b>' + fmtNum(p.friends) + '</b></span>';
+      }
+      if (priv) {
+        html += '<span class="profile__tag profile__tag--off">Akun privat</span>';
+      } else {
+        html += '<span class="profile__tag profile__tag--ok">Akun publik</span>';
+      }
+      if (profileUrl) {
+        html += '<a class="profile__tag" href="' + escapeHtml(profileUrl) +
+                '" target="_blank" rel="noopener noreferrer">Buka di TikTok &rarr;</a>';
+      }
+      html += '</div>';
+
+      /* ============ RAW ============ */
+      var rawStr = JSON.stringify(raw, null, 2);
+      if (rawStr.length > 50000) rawStr = rawStr.slice(0, 50000) + "\n\n... (dipotong)";
+      html += '<details class="profile__raw">' +
+              '<summary>Lihat respons mentah</summary>' +
+              '<pre>' + escapeHtml(rawStr) + '</pre>' +
+              '</details>';
+
+      resultEl.innerHTML = html;
+      resultEl.hidden = false;
+      resultEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    form.addEventListener("submit", async function (ev) {
+      ev.preventDefault();
+
+      var value = input.value.trim();
+      if (!value) {
+        showStatus("Masukkan username atau URL TikTok.", "error");
+        input.focus();
+        return;
+      }
+
+      resultEl.hidden = true;
+      resultEl.innerHTML = "";
+      submit.disabled = true;
+      input.disabled = true;
+      spinner.hidden = false;
+      label.textContent = "Mencari";
+
+      showStatus("Mengambil profil, mohon tunggu…", "loading");
+
+      var timers = [];
+      var msgs = [
+        [6000,  "Menghubungi sumber data…"],
+        [12000, "Masih memproses, tetap menunggu…"]
+      ];
+      for (var i = 0; i < msgs.length; i++) {
+        (function (delay, text) {
+          timers.push(setTimeout(function () { showStatus(text, "loading"); }, delay));
+        })(msgs[i][0], msgs[i][1]);
+      }
+
+      try {
+        var controller = new AbortController();
+        var timeoutId = setTimeout(function () { controller.abort(); }, 30000);
+
+        var res = await fetch("/api/stalktt", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ input: value }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        var json;
+        try { json = await res.json(); }
+        catch (e) { throw new Error("Server mengembalikan respons tidak valid."); }
+
+        if (!json.ok) throw new Error(json.error || "Gagal mengambil profil.");
+
+        hideStatus();
+        renderProfile(json);
+      } catch (err) {
+        if (err.name === "AbortError") {
+          showStatus("Waktu habis. Sumber tidak merespons.", "error");
+        } else {
+          showStatus(err.message || "Terjadi kesalahan.", "error");
+        }
+      } finally {
+        for (var t = 0; t < timers.length; t++) clearTimeout(timers[t]);
+        submit.disabled = false;
+        input.disabled = false;
+        spinner.hidden = true;
+        label.textContent = "Cari";
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initStalker);
+  } else {
+    initStalker();
+  }
+})();
+</script>
+
+</body>
+</html>
