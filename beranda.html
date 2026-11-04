@@ -18,7 +18,6 @@
     --ink:#0b1220;--ink-2:#334155;--muted:#64748b;--line:#e3eef8;
     --panel:#ffffff;
     --ok:#047857;--ok-bg:#ecfdf5;--ok-line:#d1fae5;
-    --warn:#b45309;--warn-bg:#fffbeb;--warn-line:#fef3c7;
     --err:#b91c1c;--err-bg:#fef2f2;--err-line:#fee2e2;
     --shadow-soft:0 20px 40px -20px rgba(2,132,199,.30);
     --shadow-card:0 30px 60px -34px rgba(2,132,199,.45);
@@ -48,7 +47,7 @@
   :focus-visible{outline:2px solid var(--blue-500);outline-offset:3px;border-radius:6px}
 
   /* =========================================================
-     1. TRANSITION OVERLAY
+     1. TRANSITION OVERLAY (transform-only = GPU)
      ========================================================= */
   .xfer{
     position:fixed;inset:0;z-index:9999;
@@ -57,7 +56,6 @@
   .xfer__half{
     position:absolute;left:0;right:0;height:50.5%;
     background:linear-gradient(160deg,#0284c7 0%,#0369a1 55%,#0c4a6e 100%);
-    will-change:transform;
     backface-visibility:hidden;
     transform:translate3d(0,0,0);
     transition:transform .58s cubic-bezier(.76,0,.24,1);
@@ -66,8 +64,8 @@
     background:linear-gradient(160deg,#0c4a6e 0%,#075985 45%,#0284c7 100%);
     transition-delay:25ms;
   }
-  .xfer__half--top{top:0;transform-origin:top center}
-  .xfer__half--bot{bottom:0;transform-origin:bottom center}
+  .xfer__half--top{top:0}
+  .xfer__half--bot{bottom:0}
 
   body:not(.is-loading):not(.is-leaving) .xfer__half--top{transform:translate3d(0,-101%,0)}
   body:not(.is-loading):not(.is-leaving) .xfer__half--bot{transform:translate3d(0,101%,0)}
@@ -80,7 +78,7 @@
     position:absolute;left:0;right:0;top:50%;
     height:2px;transform:translateY(-50%) scaleX(0);
     background:linear-gradient(90deg,transparent,#bae6fd 20%,#7dd3fc 50%,#bae6fd 80%,transparent);
-    box-shadow:0 0 22px rgba(56,189,248,.9),0 0 8px rgba(186,230,253,.9);
+    box-shadow:0 0 16px rgba(56,189,248,.8);
     opacity:0;
     transition:transform .5s cubic-bezier(.76,0,.24,1) .22s,opacity .35s ease .22s;
   }
@@ -97,49 +95,58 @@
   .xfer__brand img{
     width:36px;height:36px;border-radius:8px;object-fit:cover;
     border:1px solid rgba(255,255,255,.3);
-    box-shadow:0 4px 12px rgba(0,0,0,.3);
   }
   .xfer__brand em{font-style:normal;color:#bae6fd}
   body.is-loading .xfer__brand,
   body.is-leaving .xfer__brand{opacity:1}
 
   /* =========================================================
-     2. LATAR BELAKANG
+     2. LATAR BELAKANG (ringan — statis + transform-only)
      ========================================================= */
   .bg{
     position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
     background:
-      radial-gradient(760px 460px at 82% -6%,var(--blue-100) 0%,transparent 62%),
-      radial-gradient(680px 420px at -4% 104%,var(--blue-50) 0%,transparent 62%),
+      radial-gradient(700px 400px at 82% -6%,var(--blue-100) 0%,transparent 55%),
+      radial-gradient(600px 360px at -4% 104%,var(--blue-50) 0%,transparent 55%),
       #fbfdff;
   }
+
+  /* Orb "blur" pakai radial-gradient — dipaint sekali, animasi cuma transform */
+  .bg::before,
+  .bg::after{
+    content:"";
+    position:absolute;
+    border-radius:50%;
+    pointer-events:none;
+    backface-visibility:hidden;
+    will-change:transform;
+  }
+  .bg::before{
+    width:500px;height:500px;
+    top:-150px;right:-100px;
+    background:radial-gradient(circle,var(--blue-200) 0%,transparent 62%);
+    opacity:.55;
+    animation:orbFloat 18s ease-in-out infinite;
+  }
+  .bg::after{
+    width:420px;height:420px;
+    bottom:-120px;left:-80px;
+    background:radial-gradient(circle,var(--blue-100) 0%,transparent 62%);
+    opacity:.6;
+    animation:orbFloat 22s ease-in-out infinite reverse;
+  }
+  @keyframes orbFloat{
+    0%,100%{transform:translate3d(0,0,0)}
+    50%{transform:translate3d(-20px,25px,0)}
+  }
+
+  /* Grid statis — tanpa mask, tanpa animasi */
   .bg__grid{
     position:absolute;inset:0;
     background-image:
-      linear-gradient(to right,rgba(14,165,233,.09) 1px,transparent 1px),
-      linear-gradient(to bottom,rgba(14,165,233,.09) 1px,transparent 1px);
+      linear-gradient(to right,rgba(14,165,233,.05) 1px,transparent 1px),
+      linear-gradient(to bottom,rgba(14,165,233,.05) 1px,transparent 1px);
     background-size:46px 46px;
-    -webkit-mask-image:radial-gradient(circle at 50% 42%,#000 0%,transparent 68%);
-    mask-image:radial-gradient(circle at 50% 42%,#000 0%,transparent 68%);
-  }
-  .bg__orb{
-    position:absolute;border-radius:50%;
-    filter:blur(50px);opacity:.55;
-    will-change:transform;
-  }
-  .bg__orb--a{
-    width:340px;height:340px;top:-90px;right:-60px;
-    background:var(--blue-200);
-    animation:orbFloat 17s ease-in-out infinite;
-  }
-  .bg__orb--b{
-    width:280px;height:280px;bottom:-110px;left:-70px;
-    background:var(--blue-100);
-    animation:orbFloat 21s ease-in-out infinite reverse;
-  }
-  @keyframes orbFloat{
-    0%,100%{transform:translate3d(0,0,0) scale(1)}
-    50%{transform:translate3d(-28px,34px,0) scale(1.09)}
   }
 
   /* =========================================================
@@ -153,15 +160,18 @@
   body.is-ready .reveal{opacity:1;transform:translateY(0)}
 
   /* =========================================================
-     4. NAV / TOOLBAR
+     4. NAV — AUTO-SCROLL
      ========================================================= */
   .nav{
     position:sticky;top:0;z-index:50;
     display:flex;align-items:center;justify-content:space-between;
-    gap:16px;padding:14px 28px;
+    gap:14px;padding:14px 28px;
     background:#fff;border-bottom:1px solid var(--line);
   }
-  .nav__brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .nav__brand{
+    display:flex;align-items:center;gap:10px;
+    flex-shrink:0;
+  }
   .nav__brand img{
     width:38px;height:38px;border-radius:10px;
     object-fit:cover;border:1px solid var(--line);
@@ -169,22 +179,43 @@
   .nav__brand b{font-size:15.5px;font-weight:800;letter-spacing:-.3px}
   .nav__brand b em{font-style:normal;color:var(--blue-500)}
 
+  /* Viewport (yang meng-clip) */
   .nav__links{
-    display:flex;align-items:center;gap:4px;
-    overflow-x:auto;overflow-y:hidden;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
+    flex:1;
+    min-width:0;
+    overflow:hidden;
     padding:2px;
-    max-width:100%;
+    position:relative;
   }
-  .nav__links::-webkit-scrollbar{display:none}
+
+  /* Track (yang bergerak) */
+  .nav__track{
+    display:inline-flex;
+    align-items:center;
+    width:max-content;
+    flex-shrink:0;
+  }
+  .nav__track.is-scrolling{
+    animation:navScroll 28s linear infinite;
+    will-change:transform;
+  }
+  .nav__track.is-scrolling:hover{
+    animation-play-state:paused;
+  }
+  @keyframes navScroll{
+    from{transform:translate3d(0,0,0)}
+    to{transform:translate3d(-50%,0,0)}
+  }
 
   .nav__link{
     display:inline-flex;align-items:center;
-    padding:9px 16px;border-radius:99px;
+    padding:9px 16px;
+    margin-right:4px;
+    border-radius:99px;
     font-size:13.5px;font-weight:700;
     color:var(--ink-2);
     white-space:nowrap;
+    flex-shrink:0;
     transition:color .15s,background .15s;
   }
   .nav__link:hover{color:var(--blue-600);background:var(--blue-50)}
@@ -192,6 +223,9 @@
     color:#fff;
     background:linear-gradient(135deg,var(--blue-400),var(--blue-600));
     box-shadow:0 8px 18px -10px rgba(2,132,199,.7);
+  }
+  .nav__link.is-active:hover{
+    color:#fff;
   }
 
   /* =========================================================
@@ -231,14 +265,8 @@
   }
   .hero__title em{
     font-style:normal;
-    background:linear-gradient(90deg,var(--blue-500),var(--blue-300),var(--blue-500));
-    background-size:220% 100%;
+    background:linear-gradient(90deg,var(--blue-500),var(--blue-300) 55%,var(--blue-500));
     -webkit-background-clip:text;background-clip:text;color:transparent;
-    animation:shimmer 5.5s ease-in-out infinite;
-  }
-  @keyframes shimmer{
-    0%,100%{background-position:0% 50%}
-    50%{background-position:100% 50%}
   }
   .hero__desc{
     font-size:15.5px;line-height:1.75;
@@ -260,8 +288,6 @@
   .dl::before{
     content:"";position:absolute;top:0;left:0;right:0;height:5px;
     background:linear-gradient(90deg,var(--blue-400),var(--blue-600),var(--blue-400));
-    background-size:200% 100%;
-    animation:shimmer 5.5s ease-in-out infinite;
   }
 
   .dl__head{
@@ -284,16 +310,9 @@
     font-size:22px;font-weight:800;
     letter-spacing:-.5px;color:var(--ink);
   }
-  .dl__title em{
-    font-style:normal;color:var(--blue-600);
-  }
+  .dl__title em{font-style:normal;color:var(--blue-600)}
 
-  /* Form */
-  .dl__form{
-    display:flex;gap:10px;
-    margin-bottom:16px;
-    flex-wrap:wrap;
-  }
+  .dl__form{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
   .dl__field{
     position:relative;
     flex:1 1 320px;min-width:0;
@@ -362,27 +381,21 @@
   }
   @keyframes spin{to{transform:rotate(360deg)}}
 
-  /* Platform chips */
-  .dl__platforms{
-    display:flex;flex-wrap:wrap;gap:7px;
-    margin-top:4px;
-  }
+  .dl__platforms{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
   .dl__platforms span{
     font-size:11.5px;font-weight:700;
     color:var(--muted);
     background:#fff;
     border:1px solid var(--line);
     padding:5px 12px;border-radius:99px;
-    transition:all .18s var(--ease);
+    transition:color .18s,background .18s,border-color .18s;
   }
   .dl__platforms span.is-detected{
     color:var(--blue-700);
     background:var(--blue-100);
     border-color:var(--blue-200);
-    box-shadow:0 4px 10px -4px rgba(2,132,199,.4);
   }
 
-  /* Status */
   .dl__status{
     display:flex;align-items:flex-start;gap:9px;
     margin-top:20px;
@@ -394,35 +407,15 @@
     color:var(--ink-2);
   }
   .dl__status svg{flex-shrink:0;margin-top:1px}
-  .dl__status.is-loading{
-    color:var(--blue-700);
-    background:var(--blue-50);
-    border-color:var(--blue-100);
-  }
+  .dl__status.is-loading{color:var(--blue-700);background:var(--blue-50);border-color:var(--blue-100)}
   .dl__status.is-loading svg{animation:spin .9s linear infinite}
-  .dl__status.is-error{
-    color:var(--err);
-    background:var(--err-bg);
-    border-color:var(--err-line);
-  }
-  .dl__status.is-success{
-    color:var(--ok);
-    background:var(--ok-bg);
-    border-color:var(--ok-line);
-  }
+  .dl__status.is-error{color:var(--err);background:var(--err-bg);border-color:var(--err-line)}
+  .dl__status.is-success{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)}
 
-  /* Result */
   .dl__result{
     margin-top:20px;
-    border-radius:16px;
-    overflow:hidden;
-    border:1px solid var(--line);
-    background:#fff;
-    animation:revealResult .45s var(--ease-out) both;
-  }
-  @keyframes revealResult{
-    from{opacity:0;transform:translateY(8px)}
-    to{opacity:1;transform:translateY(0)}
+    border-radius:16px;overflow:hidden;
+    border:1px solid var(--line);background:#fff;
   }
 
   .result__head{
@@ -444,25 +437,18 @@
     font-size:14.5px;font-weight:800;color:var(--ink);
     line-height:1.4;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
-    overflow:hidden;
-    margin-bottom:3px;
+    overflow:hidden;margin-bottom:3px;
   }
   .result__meta{
-    font-size:11.5px;font-weight:700;
-    color:var(--muted);
+    font-size:11.5px;font-weight:700;color:var(--muted);
     text-transform:uppercase;letter-spacing:.06em;
   }
 
-  .result__list{
-    display:flex;flex-direction:column;gap:1px;
-    background:var(--line);
-  }
+  .result__list{display:flex;flex-direction:column;gap:1px;background:var(--line)}
   .result__item{
     display:flex;align-items:center;justify-content:space-between;
     gap:10px;padding:13px 16px;
-    background:#fff;
-    color:var(--ink);
-    text-decoration:none;
+    background:#fff;color:var(--ink);
     transition:background .15s;
   }
   .result__item:hover{background:var(--blue-50)}
@@ -488,17 +474,12 @@
     text-align:center;background:#fff;
   }
 
-  .result__raw{
-    border-top:1px solid var(--line);
-    background:var(--blue-50);
-  }
+  .result__raw{border-top:1px solid var(--line);background:var(--blue-50)}
   .result__raw summary{
     padding:11px 16px;
     font-size:11.5px;font-weight:800;
     color:var(--muted);letter-spacing:.06em;
-    text-transform:uppercase;
-    cursor:pointer;
-    user-select:none;
+    text-transform:uppercase;cursor:pointer;user-select:none;
   }
   .result__raw summary:hover{color:var(--blue-600)}
   .result__raw pre{
@@ -522,9 +503,7 @@
     letter-spacing:-.4px;color:var(--ink);
     margin-bottom:6px;
   }
-  .shortcuts__desc{
-    font-size:13.5px;color:var(--muted);line-height:1.6;
-  }
+  .shortcuts__desc{font-size:13.5px;color:var(--muted);line-height:1.6}
   .shortcuts__grid{
     display:grid;
     grid-template-columns:repeat(3,minmax(0,1fr));
@@ -532,35 +511,22 @@
   }
   .shortcuts__card{
     display:flex;flex-direction:column;align-items:flex-start;
-    gap:12px;
-    padding:22px;
-    background:#fff;
-    border:1px solid var(--line);
-    border-radius:16px;
-    text-decoration:none;
-    color:inherit;
+    gap:12px;padding:22px;
+    background:#fff;border:1px solid var(--line);
+    border-radius:16px;color:inherit;
     position:relative;
     transition:border-color .18s,transform .18s,box-shadow .18s;
     overflow:hidden;
-  }
-  .shortcuts__card::after{
-    content:"";position:absolute;top:0;right:0;
-    width:80px;height:80px;
-    background:radial-gradient(circle at 100% 0%,var(--blue-100),transparent 70%);
-    opacity:0;transition:opacity .2s;
-    pointer-events:none;
+    contain:layout paint;
   }
   .shortcuts__card:hover{
     border-color:var(--blue-200);
     transform:translateY(-3px);
     box-shadow:0 20px 34px -20px rgba(2,132,199,.4);
   }
-  .shortcuts__card:hover::after{opacity:1}
-
   .shortcuts__icon{
     display:flex;align-items:center;justify-content:center;
-    width:44px;height:44px;
-    border-radius:12px;
+    width:44px;height:44px;border-radius:12px;
     color:var(--blue-600);
     background:var(--blue-50);
     border:1px solid var(--blue-100);
@@ -570,19 +536,14 @@
     color:var(--ink);letter-spacing:-.2px;
     margin-bottom:3px;
   }
-  .shortcuts__desc-text{
-    font-size:12.5px;line-height:1.55;color:var(--muted);
-  }
+  .shortcuts__desc-text{font-size:12.5px;line-height:1.55;color:var(--muted)}
   .shortcuts__arrow{
-    align-self:flex-end;
-    margin-top:auto;
+    align-self:flex-end;margin-top:auto;
     display:inline-flex;align-items:center;justify-content:center;
-    width:28px;height:28px;
-    border-radius:8px;
-    color:var(--blue-500);
-    background:#fff;
+    width:28px;height:28px;border-radius:8px;
+    color:var(--blue-500);background:#fff;
     border:1px solid var(--line);
-    transition:all .18s;
+    transition:color .18s,background .18s,border-color .18s,transform .18s;
   }
   .shortcuts__card:hover .shortcuts__arrow{
     color:#fff;
@@ -611,14 +572,12 @@
     .dl{padding:24px}
   }
   @media (max-width:640px){
-    .nav{padding:11px 14px;gap:10px;flex-wrap:wrap}
+    .nav{padding:11px 14px;gap:10px}
     .nav__brand img{width:32px;height:32px}
     .nav__brand b{font-size:14px}
-    .nav__links{gap:2px;width:100%;justify-content:flex-start}
     .nav__link{padding:8px 13px;font-size:12.5px}
 
     .page{padding:32px 16px 40px;gap:32px}
-
     .hero__title{letter-spacing:-1px}
 
     .dl{padding:20px;border-radius:18px}
@@ -649,6 +608,7 @@
     }
     .xfer{display:none!important}
     .reveal{opacity:1!important;transform:none!important}
+    .nav__track.is-scrolling{animation:none!important}
     html{scroll-behavior:auto}
   }
 </style>
@@ -669,28 +629,32 @@
 <!-- LATAR -->
 <div class="bg" aria-hidden="true">
   <div class="bg__grid"></div>
-  <div class="bg__orb bg__orb--a"></div>
-  <div class="bg__orb bg__orb--b"></div>
 </div>
 
-<!-- TOOLBAR / NAV -->
+<!-- NAV -->
 <header class="nav reveal" style="--d:80ms">
   <a class="nav__brand" href="beranda.html" data-nav>
     <img src="logo.jpg" alt="Logo Insomnia Dev">
     <b>Insomnia<em>Dev</em></b>
   </a>
   <nav class="nav__links" aria-label="Navigasi utama">
-    <a href="beranda.html" class="nav__link is-active" data-nav>Beranda</a>
-    <a href="tools.html" class="nav__link" data-nav>Tools</a>
-    <a href="req.html" class="nav__link" data-nav>Req</a>
-    <a href="info.html" class="nav__link" data-nav>Information</a>
+    <div class="nav__track" id="navTrack">
+      <a href="beranda.html" class="nav__link is-active" data-nav>Beranda</a>
+      <a href="tools.html" class="nav__link" data-nav>Tools</a>
+      <a href="req.html" class="nav__link" data-nav>Req</a>
+      <a href="info.html" class="nav__link" data-nav>Information</a>
+      <!-- duplikat untuk loop mulus -->
+      <a href="beranda.html" class="nav__link is-active" data-nav aria-hidden="true" tabindex="-1">Beranda</a>
+      <a href="tools.html" class="nav__link" data-nav aria-hidden="true" tabindex="-1">Tools</a>
+      <a href="req.html" class="nav__link" data-nav aria-hidden="true" tabindex="-1">Req</a>
+      <a href="info.html" class="nav__link" data-nav aria-hidden="true" tabindex="-1">Information</a>
+    </div>
   </nav>
 </header>
 
 <!-- MAIN -->
 <main class="page">
 
-  <!-- HERO -->
   <section class="hero reveal" style="--d:160ms">
     <div class="hero__badge"><i></i> Beranda</div>
     <h1 class="hero__title">
@@ -702,7 +666,6 @@
     </p>
   </section>
 
-  <!-- DOWNLOADER -->
   <section class="dl reveal" style="--d:240ms" aria-labelledby="dlTitle">
     <div class="dl__head">
       <div class="dl__mark" aria-hidden="true">
@@ -747,11 +710,9 @@
     </div>
 
     <div class="dl__status" id="dlStatus" role="status" aria-live="polite" hidden></div>
-
     <div class="dl__result" id="dlResult" hidden></div>
   </section>
 
-  <!-- SHORTCUTS -->
   <section class="shortcuts reveal" style="--d:320ms">
     <div class="shortcuts__head">
       <h2 class="shortcuts__title">Jelajahi halaman lain</h2>
@@ -777,8 +738,7 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                stroke="currentColor" stroke-width="2.6"
                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 12h14"/>
-            <path d="M13 6l6 6-6 6"/>
+            <path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>
           </svg>
         </div>
       </a>
@@ -788,8 +748,7 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
                stroke="currentColor" stroke-width="2.2"
                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M22 2 11 13"/>
-            <path d="M22 2 15 22l-4-9-9-4z"/>
+            <path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/>
           </svg>
         </div>
         <div>
@@ -800,8 +759,7 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                stroke="currentColor" stroke-width="2.6"
                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 12h14"/>
-            <path d="M13 6l6 6-6 6"/>
+            <path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>
           </svg>
         </div>
       </a>
@@ -812,8 +770,7 @@
                stroke="currentColor" stroke-width="2.2"
                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="12" r="9"/>
-            <path d="M12 11v5"/>
-            <path d="M12 8h.01"/>
+            <path d="M12 11v5"/><path d="M12 8h.01"/>
           </svg>
         </div>
         <div>
@@ -824,8 +781,7 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                stroke="currentColor" stroke-width="2.6"
                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 12h14"/>
-            <path d="M13 6l6 6-6 6"/>
+            <path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>
           </svg>
         </div>
       </a>
@@ -835,28 +791,73 @@
 
 </main>
 
-<!-- FOOTER -->
 <footer class="foot reveal" style="--d:400ms">
   &copy; <span id="y">2025</span> <span>Insomnia Dev</span>. Semua hak dilindungi.
 </footer>
 
 <script>
 /* =========================================================
-   A. HALPER
+   A. NAV AUTO-SCROLL
+   ========================================================= */
+(function () {
+  "use strict";
+
+  var nav = document.querySelector(".nav__links");
+  var track = document.getElementById("navTrack");
+  if (!nav || !track) return;
+
+  function updateScrollable() {
+    // reset dulu supaya scrollWidth bisa diukur natural
+    track.classList.remove("is-scrolling");
+    void track.offsetWidth;
+
+    // track punya 2x konten → lebar 1 copy = scrollWidth / 2
+    var singleWidth = track.scrollWidth / 2;
+
+    if (singleWidth > nav.clientWidth + 4) {
+      track.classList.add("is-scrolling");
+    }
+  }
+
+  // first paint
+  requestAnimationFrame(updateScrollable);
+
+  // resize (debounce)
+  var rt = null;
+  window.addEventListener("resize", function () {
+    clearTimeout(rt);
+    rt = setTimeout(updateScrollable, 180);
+  });
+
+  // pause saat disentuh di mobile
+  var resumeTimer = null;
+  track.addEventListener("touchstart", function () {
+    track.style.animationPlayState = "paused";
+    clearTimeout(resumeTimer);
+  }, { passive: true });
+
+  track.addEventListener("touchend", function () {
+    clearTimeout(resumeTimer);
+    resumeTimer = setTimeout(function () {
+      track.style.animationPlayState = "";
+    }, 1200);
+  }, { passive: true });
+})();
+
+/* =========================================================
+   B. DOWNLOADER LOGIC
    ========================================================= */
 (function () {
   "use strict";
 
   document.getElementById("y").textContent = new Date().getFullYear();
 
-  /* Escape HTML */
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
 
-  /* Deteksi platform dari URL */
   function detectPlatform(url) {
     if (!url) return null;
     var u = String(url).toLowerCase();
@@ -868,18 +869,12 @@
     if (u.includes("pinterest.com") || u.includes("pin.it")) return "Pinterest";
     if (u.includes("threads.net")) return "Threads";
     if (u.includes("spotify.com")) return "Spotify";
-    if (u.includes("soundcloud.com")) return "SoundCloud";
-    if (u.includes("snapchat.com")) return "Snapchat";
-    if (u.includes("twitch.tv")) return "Twitch";
-    if (u.includes("vimeo.com")) return "Vimeo";
     return null;
   }
 
-  /* Extract media dari response yang bentuknya tidak pasti */
   function extractMediaList(payload) {
     var items = [];
     var seen = new Set();
-
     function add(label, url, type) {
       if (!url || typeof url !== "string") return;
       if (!/^https?:\/\//i.test(url)) return;
@@ -888,21 +883,16 @@
       seen.add(url);
       items.push({ label: label || "Download", url: url, type: type || "" });
     }
-
     function walk(obj, depth) {
       if (depth > 6) return;
       if (!obj || typeof obj !== "object") return;
       for (var k in obj) {
         if (!Object.prototype.hasOwnProperty.call(obj, k)) continue;
         var v = obj[k];
-        if (typeof v === "string" && /^https?:\/\//i.test(v)) {
-          add(k, v);
-        } else if (v && typeof v === "object") {
-          walk(v, depth + 1);
-        }
+        if (typeof v === "string" && /^https?:\/\//i.test(v)) add(k, v);
+        else if (v && typeof v === "object") walk(v, depth + 1);
       }
     }
-
     if (Array.isArray(payload.medias)) {
       for (var i = 0; i < payload.medias.length; i++) {
         var m = payload.medias[i];
@@ -941,17 +931,13 @@
         else if (uv && uv.url) add(key, uv.url);
       }
     }
-
     add("Video", payload.video || payload.video_url, "video");
     add("Audio", payload.audio || payload.audio_url || payload.music || payload.music_url, "audio");
     add("Gambar", payload.image_url || (payload.type === "image" ? payload.image : null), "image");
-
     if (items.length === 0) walk(payload, 0);
-
     return items;
   }
 
-  /* Render result */
   function renderResult(raw) {
     var result = document.getElementById("dlResult");
     if (!result) return;
@@ -1001,9 +987,9 @@
         html += '<a class="result__item" href="' + escapeHtml(medias[k].url) +
                 '" target="_blank" rel="noopener noreferrer">';
         html += '<span class="result__item-label">' + escapeHtml(medias[k].label) + '</span>';
-        html += '<span class="result__item-icon">';
-        html += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>';
-        html += '</span></a>';
+        html += '<span class="result__item-icon">' +
+                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' +
+                '<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></span></a>';
       }
       html += '</div>';
     } else {
@@ -1013,17 +999,14 @@
     var rawStr = JSON.stringify(raw, null, 2);
     if (rawStr.length > 50000) rawStr = rawStr.slice(0, 50000) + "\n\n... (dipotong)";
 
-    html += '<details class="result__raw">';
-    html += '<summary>Lihat respons mentah</summary>';
-    html += '<pre>' + escapeHtml(rawStr) + '</pre>';
-    html += '</details>';
+    html += '<details class="result__raw"><summary>Lihat respons mentah</summary><pre>' +
+            escapeHtml(rawStr) + '</pre></details>';
 
     result.innerHTML = html;
     result.hidden = false;
     result.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
-  /* Status bar */
   var STATUS_ICONS = {
     loading: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg>',
     error:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>',
@@ -1038,7 +1021,6 @@
     el.innerHTML = (STATUS_ICONS[type] || STATUS_ICONS.info) + "<span>" + escapeHtml(text) + "</span>";
     el.hidden = false;
   }
-
   function hideStatus() {
     var el = document.getElementById("dlStatus");
     if (!el) return;
@@ -1046,9 +1028,6 @@
     el.innerHTML = "";
   }
 
-  /* =========================================================
-     B. DOWNLOADER LOGIC
-     ========================================================= */
   var form     = document.getElementById("dlForm");
   var input    = document.getElementById("dlUrl");
   var submit   = document.getElementById("dlSubmit");
@@ -1086,21 +1065,11 @@
   if (form) {
     form.addEventListener("submit", async function (ev) {
       ev.preventDefault();
-
       var url = input ? input.value.trim() : "";
 
-      if (!url) {
-        showStatus("Masukkan link terlebih dahulu.", "error");
-        if (input) input.focus();
-        return;
-      }
-      if (!/^https?:\/\//i.test(url)) {
-        showStatus("Link harus dimulai dengan http:// atau https://", "error");
-        if (input) input.focus();
-        return;
-      }
+      if (!url) { showStatus("Masukkan link terlebih dahulu.", "error"); if (input) input.focus(); return; }
+      if (!/^https?:\/\//i.test(url)) { showStatus("Link harus dimulai dengan http:// atau https://", "error"); if (input) input.focus(); return; }
 
-      /* Reset UI */
       if (resultEl) { resultEl.hidden = true; resultEl.innerHTML = ""; }
       submit.disabled = true;
       if (input) input.disabled = true;
@@ -1109,7 +1078,6 @@
 
       showStatus("Memproses link, mohon tunggu…", "loading");
 
-      /* Progress messages */
       var timers = [];
       var msgs = [
         [8000,  "Mengambil data dari server…"],
@@ -1133,7 +1101,6 @@
           body: JSON.stringify({ url: url }),
           signal: controller.signal
         });
-
         clearTimeout(timeoutId);
 
         var json;
@@ -1144,7 +1111,6 @@
 
         hideStatus();
         renderResult(json.data);
-
       } catch (err) {
         if (err.name === "AbortError") {
           showStatus("Waktu habis. Server tidak merespons dalam 2 menit.", "error");
