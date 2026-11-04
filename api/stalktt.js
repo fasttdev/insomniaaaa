@@ -1,19 +1,23 @@
 /*
   Insomnia Dev — TikTok Stalker (core)
-  Source: tokviewer.net
+  Source: tikip.us via VamxAPI backend (Vamz Spectre)
   Export: handler(req, res)  → Express & Vercel compatible
 */
 
 const https = require("https");
+const { URL } = require("url");
 
 /* =========================================================
    KONFIGURASI
    ========================================================= */
-const API_HOST = "tokviewer.net";
-const API_PATH = "/api/tiktok/get-profile";
+const BACKEND_API_BASE =
+  "https://shinyfrydgdghfdgdgmouse-a6de.issam1996kech.workers.dev/api/v1/profile";
+
 const UA =
-  "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 " +
-  "(KHTML, like Gecko) Chrome/139.0.0.0 Mobile Safari/537.36";
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+  "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+
+const REQUEST_TIMEOUT = 15000;
 
 /* =========================================================
    RATE LIMIT
@@ -29,54 +33,59 @@ function checkRate(ip) {
   }
   entry.count++;
   rateStore.set(ip, entry);
-  return entry.count <= 8;
+  return entry.count <= 10;
 }
 
 /* =========================================================
-   HTTP
+   HTTP REQUEST (IPv4-forced)
    ========================================================= */
-function postJson(payload) {
+function request(urlStr) {
   return new Promise(function (resolve, reject) {
-    var postData = JSON.stringify(payload);
+    var parsed;
+    try {
+      parsed = new URL(urlStr);
+    } catch (e) {
+      return reject(new Error("URL tidak valid: " + urlStr));
+    }
 
-    var options = {
-      method: "POST",
-      hostname: API_HOST,
-      path: API_PATH,
-      headers: {
-        "User-Agent": UA,
-        "Content-Type": "application/json",
-        "Content-Length": Buffer.byteLength(postData),
-        Origin: "https://" + API_HOST,
-        Referer: "https://" + API_HOST + "/id",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "same-origin",
+    var req = https.request(
+      parsed,
+      {
+        method: "GET",
+        family: 4,
+        headers: {
+          "User-Agent": UA,
+          Accept: "application/json, text/plain, */*",
+          "Accept-Language": "en-US,en;q=0.9",
+          Origin: "https://tikip.us",
+          Referer: "https://tikip.us/",
+        },
+        timeout: REQUEST_TIMEOUT,
       },
-      timeout: 30000,
-    };
+      function (res) {
+        var chunks = [];
+        res.on("data", function (c) { chunks.push(c); });
+        res.on("end", function () {
+          var body = Buffer.concat(chunks).toString("utf-8");
+          try {
+            var json = JSON.parse(body);
+            resolve({ status: res.statusCode, data: json, raw: body });
+          } catch (e) {
+            resolve({ status: res.statusCode, raw: body });
+          }
+        });
+      }
+    );
 
-    var req = https.request(options, function (res) {
-      var data = "";
-      res.setEncoding("utf8");
-      res.on("data", function (chunk) {
-        data += chunk;
-      });
-      res.on("end", function () {
-        try {
-          resolve(JSON.parse(data));
-        } catch (e) {
-          reject(new Error("Respons dari sumber tidak valid."));
-        }
-      });
+    req.on("error", function (err) {
+      reject(new Error("Koneksi ke sumber gagal: " + err.message));
     });
 
-    req.on("error", reject);
     req.on("timeout", function () {
-      req.destroy(new Error("Sumber tidak merespons. Coba lagi."));
+      req.destroy();
+      reject(new Error("Sumber tidak merespons dalam " + (REQUEST_TIMEOUT / 1000) + " detik."));
     });
 
-    req.write(postData);
     req.end();
   });
 }
@@ -98,134 +107,106 @@ function extractUsername(input) {
 }
 
 /* =========================================================
-   HELPER NORMALISASI
-   ========================================================= */
-function pick(obj, paths) {
-  if (!obj) return null;
-  for (var i = 0; i < paths.length; i++) {
-    var parts = paths[i].split(".");
-    var val = obj;
-    var ok = true;
-    for (var j = 0; j < parts.length; j++) {
-      if (val == null || typeof val !== "object") {
-        ok = false;
-        break;
-      }
-      val = val[parts[j]];
-    }
-    if (ok && val != null && val !== "") return val;
-  }
-  return null;
-}
-
-function toNum(v) {
-  if (v == null) return 0;
-  var n = Number(v);
-  return isFinite(n) ? n : 0;
-}
-
-function toStr(v) {
-  if (v == null) return "";
-  return String(v);
-}
-
-function toBool(v) {
-  if (v === true || v === "true" || v === 1) return true;
-  return false;
-}
-
-/* =========================================================
-   NORMALISASI — cocok dengan shape tokviewer.net
-   Support juga kalau bentukannya beda (nested data/user/stats)
-   ========================================================= */
-function normalize(raw) {
-  if (!raw || typeof raw !== "object") return null;
-
-  // sumber utama
-  var src = raw;
-  if (raw.result && typeof raw.result === "object") src = raw.result;
-  else if (raw.data && typeof raw.data === "object") src = raw.data;
-
-  // kalau ada nested lebih dalam lagi
-  if (src.result && typeof src.result === "object" && !src.username && !src.uniqueId) {
-    src = src.result;
-  }
-
-  var badges = src.badges || {};
-  var analytics = src.analytics || {};
-  var er = analytics.engagement_rate || {};
-
-  return {
-    username: toStr(pick(src, ["username", "uniqueId", "unique_id"])),
-    nickname: toStr(pick(src, ["nickname", "nickName", "name", "displayName"])),
-    id: toStr(pick(src, ["id", "userId", "uid"])),
-    bio: toStr(pick(src, ["bio", "signature", "desc", "description"])),
-
-    avatar: toStr(
-      pick(src, [
-        "avatar_url",
-        "downloads.avatar_hd",
-        "downloads.avatar_cdn",
-        "avatarLarger",
-        "avatarUrl",
-        "avatar",
-      ])
-    ),
-
-    profileUrl: toStr(pick(src, ["profile_url", "profileUrl"])),
-
-    verified: toBool(pick(src, ["verified", "badges.verified", "isVerified"])),
-    privateAccount: toBool(
-      pick(src, ["is_private", "badges.is_private", "privateAccount", "isPrivate"])
-    ),
-    region: toStr(pick(src, ["region", "country", "countryCode"])),
-
-    followers: toNum(pick(src, ["followers", "followerCount", "follower_count"])),
-    followersFormatted: toStr(pick(src, ["followers_formatted"])),
-
-    following: toNum(pick(src, ["following", "followingCount", "following_count"])),
-    followingFormatted: toStr(pick(src, ["following_formatted"])),
-
-    likes: toNum(pick(src, ["likes", "heartCount", "like_count"])),
-    likesFormatted: toStr(pick(src, ["likes_formatted"])),
-
-    videos: toNum(pick(src, ["video_count", "videoCount", "video"])),
-
-    accountAge: toStr(pick(src, ["account_age", "badges.account_age"])),
-    createdAt: toStr(pick(src, ["created_at", "badges.created_at"])),
-
-    avgLikes: toNum(pick(src, ["average_likes_per_video"])),
-    avgLikesFormatted: toStr(pick(src, ["average_likes_formatted"])),
-
-    engagementRate: toStr(pick(er, ["rate", "formatted"])),
-    engagementPercent: toNum(pick(er, ["percentage"])),
-    engagementGrade: toStr(pick(er, ["grade"])),
-
-    activityScore: toNum(pick(analytics, ["activity_score"])),
-
-    reachMin: toStr(pick(analytics, ["estimated_reach.min_formatted"])),
-    reachMax: toStr(pick(analytics, ["estimated_reach.max_formatted"])),
-  };
-}
-
-/* =========================================================
    CORE
    ========================================================= */
 async function fetchProfile(username) {
-  var parsed = await postJson({ unique_id: username });
+  var url = BACKEND_API_BASE + "?username=" + encodeURIComponent(username);
+  var res = await request(url);
 
-  if (!parsed || typeof parsed !== "object") {
-    throw new Error("Respons kosong dari sumber.");
+  if (!res.data || typeof res.data !== "object") {
+    var snippet = String(res.raw || "").substring(0, 200).replace(/\s+/g, " ").trim();
+    throw new Error(
+      "Sumber mengembalikan respons tidak valid (status " + res.status + ")" +
+      (snippet ? " — cuplikan: " + snippet : "")
+    );
   }
 
-  if (parsed.status === false) {
-    throw new Error(parsed.message || parsed.msg || "Gagal mengambil profil.");
-  }
-  if (parsed.code !== undefined && parsed.code !== 0 && parsed.code !== 200) {
-    throw new Error(parsed.message || parsed.msg || "Gagal mengambil profil.");
+  if (res.data.status === "error") {
+    throw new Error(res.data.error || "Akun tidak ditemukan.");
   }
 
-  return parsed.result || parsed.data || parsed;
+  if (res.data.status !== "success" || !res.data.data || !res.data.data.user) {
+    throw new Error(res.data.message || "Data profil tidak lengkap dari sumber.");
+  }
+
+  return res.data.data;
+}
+
+/* =========================================================
+   NORMALISASI — shape seragam untuk frontend
+   ========================================================= */
+function fixOverflow(n) {
+  var v = Number(n);
+  if (!isFinite(v)) return 0;
+  if (v < 0) return v >>> 0;
+  return v;
+}
+
+function flagEmoji(code) {
+  if (!code || typeof code !== "string" || code.length !== 2) return "";
+  try {
+    var cps = code
+      .toUpperCase()
+      .split("")
+      .map(function (c) { return 127397 + c.charCodeAt(0); });
+    return String.fromCodePoint.apply(null, cps);
+  } catch (e) {
+    return "";
+  }
+}
+
+function normalize(raw) {
+  if (!raw || typeof raw !== "object") return null;
+
+  var user = raw.user || {};
+  var stats = raw.stats || {};
+  var region = raw.region || {};
+  var avatar = raw.avatar || {};
+
+  var curr = region.current_region || {};
+  var reg  = region.registered_region || {};
+  var lock = region.locked_region || {};
+
+  return {
+    id: user.id || "",
+    secUid: user.sec_uid || "",
+    username: user.username || "",
+    nickname: user.nickname || "",
+    bio: user.bio || "",
+    bioLink: user.bio_link || "",
+    profileUrl: user.profile_url || (user.username ? "https://www.tiktok.com/@" + user.username : ""),
+
+    verified: !!user.verified,
+    privateAccount: !!user.private,
+
+    language: user.language || "",
+    createdAt: user.created_at || "",
+    createdTimestamp: user.created_timestamp || null,
+
+    avatar: avatar.hd || avatar.medium || avatar.thumb || "",
+
+    regionCode: region.code || "",
+    regionCountry: region.country || "",
+    regionFlag: region.flag || flagEmoji(region.code),
+
+    currentRegionCode: curr.code || "",
+    currentRegionCountry: curr.country || "",
+    currentRegionFlag: curr.flag || flagEmoji(curr.code),
+
+    registeredRegionCode: reg.code || "",
+    registeredRegionCountry: reg.country || "",
+    registeredRegionFlag: reg.flag || flagEmoji(reg.code),
+
+    lockedRegionCode: lock.code || "",
+    lockedRegionCountry: lock.country || "",
+    lockedRegionFlag: lock.flag || flagEmoji(lock.code),
+
+    followers: fixOverflow(stats.followers),
+    following: fixOverflow(stats.following),
+    likes: fixOverflow(stats.likes),
+    videos: fixOverflow(stats.videos),
+    friends: fixOverflow(stats.friends),
+  };
 }
 
 /* =========================================================
@@ -257,11 +238,7 @@ async function handler(req, res) {
 
   var body = req.body;
   if (typeof body === "string") {
-    try {
-      body = JSON.parse(body);
-    } catch (e) {
-      body = {};
-    }
+    try { body = JSON.parse(body); } catch (e) { body = {}; }
   }
 
   var input = body && typeof body.input === "string" ? body.input.trim() : "";
@@ -289,9 +266,7 @@ async function handler(req, res) {
     var rawData = await fetchProfile(username);
     var profile = normalize(rawData);
 
-    console.log(
-      "[STALK OK] @" + username + " (" + (Date.now() - started) + "ms)"
-    );
+    console.log("[STALK OK] @" + username + " (" + (Date.now() - started) + "ms)");
 
     return sendJson(res, 200, {
       ok: true,
