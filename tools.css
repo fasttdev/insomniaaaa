@@ -1,0 +1,146 @@
+/*
+  Insomnia Dev — Tools page styles
+  Layer tambahan di atas beranda.css (base + nav + downloader + hero semua dari sana)
+*/
+
+/* =========================================================
+   KATALOG TOOLS
+   ========================================================= */
+.tools{
+  max-width:1000px;width:100%;margin:0 auto;
+}
+.tools__head{text-align:center;margin-bottom:22px}
+.tools__title{
+  font-size:20px;font-weight:800;
+  letter-spacing:-.4px;color:var(--ink);
+  margin-bottom:6px;
+}
+.tools__desc{
+  font-size:13.5px;color:var(--muted);line-height:1.6;
+}
+
+.tool-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:14px;
+}
+
+/* =========================================================
+   TOOL CARD
+   ========================================================= */
+.tool-card{
+  display:flex;flex-direction:column;
+  gap:12px;padding:22px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:16px;
+  color:inherit;text-decoration:none;
+  position:relative;
+  transition:border-color .18s,transform .18s,box-shadow .18s;
+  overflow:hidden;
+  contain:layout paint;
+}
+
+.tool-card__badge{
+  position:absolute;top:14px;right:14px;
+  font-size:10px;font-weight:800;
+  letter-spacing:.08em;text-transform:uppercase;
+  padding:4px 10px;border-radius:99px;
+}
+
+/* === Aktif === */
+.tool-card--active{
+  cursor:pointer;
+  border-color:var(--blue-200);
+}
+.tool-card--active:hover{
+  border-color:var(--blue-400);
+  transform:translateY(-3px);
+  box-shadow:0 20px 34px -20px rgba(2,132,199,.45);
+}
+.tool-card--active .tool-card__icon{
+  color:#fff;
+  background:linear-gradient(135deg,var(--blue-400),var(--blue-600));
+  border-color:transparent;
+  box-shadow:0 10px 22px -10px rgba(2,132,199,.6);
+}
+.tool-card--active .tool-card__badge{
+  color:#047857;
+  background:#ecfdf5;
+  border:1px solid #d1fae5;
+}
+.tool-card--active .tool-card__cta{
+  color:var(--blue-600);
+}
+
+/* === Coming soon === */
+.tool-card--soon{
+  opacity:.7;
+  cursor:not-allowed;
+  background:#fafcff;
+}
+.tool-card--soon .tool-card__badge{
+  color:var(--muted);
+  background:#f1f5f9;
+  border:1px solid #e2e8f0;
+}
+.tool-card--soon .tool-card__cta{
+  color:var(--muted);
+}
+
+/* =========================================================
+   Elemen dalam card
+   ========================================================= */
+.tool-card__icon{
+  display:flex;align-items:center;justify-content:center;
+  width:48px;height:48px;border-radius:12px;
+  color:var(--blue-600);
+  background:var(--blue-50);
+  border:1px solid var(--blue-100);
+  flex-shrink:0;
+}
+
+.tool-card__title{
+  font-size:15px;font-weight:800;
+  color:var(--ink);letter-spacing:-.2px;
+  margin-bottom:2px;
+}
+
+.tool-card__desc{
+  font-size:12.5px;line-height:1.55;
+  color:var(--muted);
+}
+
+.tool-card__cta{
+  margin-top:auto;padding-top:4px;
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:800;
+  letter-spacing:.04em;text-transform:uppercase;
+}
+
+/* =========================================================
+   NOTE di bawah grid
+   ========================================================= */
+.tools__note{
+  margin-top:18px;
+  text-align:center;
+  font-size:12.5px;
+  color:var(--muted);
+  line-height:1.6;
+}
+.tools__note strong{
+  color:var(--blue-600);
+  font-weight:800;
+}
+
+/* =========================================================
+   RESPONSIF
+   ========================================================= */
+@media (max-width:640px){
+  .tool-grid{
+    grid-template-columns:1fr;
+  }
+  .tool-card{
+    padding:18px;
+  }
+}
