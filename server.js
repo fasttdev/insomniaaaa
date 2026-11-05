@@ -12,6 +12,7 @@ const webtoapkHandler     = require("./api/webtoapk");
 const bypassHandler       = require("./api/bypass");
 const vtsearchHandler     = require("./api/vtsearch");
 const pinterestHandler    = require("./api/pinterest");
+const texttoimageHandler  = require("./api/texttoimage");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -49,6 +50,7 @@ app.post("/api/webtoapk",     webtoapkHandler);
 app.post("/api/bypass",       bypassHandler);
 app.post("/api/vtsearch",     vtsearchHandler);
 app.post("/api/pinterest",    pinterestHandler);
+app.post("/api/texttoimage",  texttoimageHandler);
 
 /* =========================================================
    STATIC FILES
