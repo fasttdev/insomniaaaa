@@ -4,9 +4,10 @@
 
 const express = require("express");
 const path = require("path");
-const downloadHandler = require("./api/download");
-const stalkttHandler  = require("./api/stalktt");
-const reqHandler      = require("./api/req");
+const downloadHandler     = require("./api/download");
+const stalkttHandler      = require("./api/stalktt");
+const reqHandler          = require("./api/req");
+const wainspectorHandler  = require("./api/wainspector");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -36,9 +37,10 @@ app.use((req, res, next) => {
 /* =========================================================
    API ROUTES
    ========================================================= */
-app.post("/api/download", downloadHandler);
-app.post("/api/stalktt",  stalkttHandler);
-app.post("/api/req",      reqHandler);
+app.post("/api/download",     downloadHandler);
+app.post("/api/stalktt",      stalkttHandler);
+app.post("/api/req",          reqHandler);
+app.post("/api/wainspector",  wainspectorHandler);
 
 /* =========================================================
    STATIC FILES
