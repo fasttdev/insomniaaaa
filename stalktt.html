@@ -4,33 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TikTok Stalker — Insomnia Dev</title>
-<link rel="icon" href="logo.jpg" type="image/jpeg">
+<link rel="icon" href="logo.png" type="image/png">
 <link rel="stylesheet" href="beranda.css">
 <link rel="stylesheet" href="tools.css">
 <link rel="stylesheet" href="stalktt.css">
 </head>
 <body class="is-loading">
 
-<!-- TRANSITION OVERLAY -->
 <div class="xfer" aria-hidden="true">
   <div class="xfer__half xfer__half--top"></div>
   <div class="xfer__half xfer__half--bot"></div>
   <div class="xfer__seam"></div>
   <div class="xfer__brand">
-    <img src="logo.jpg" alt="">
+    <img src="logo.png" alt="">
     <span>Insomnia<em>Dev</em></span>
   </div>
 </div>
 
-<!-- LATAR -->
 <div class="bg" aria-hidden="true">
   <div class="bg__grid"></div>
 </div>
 
-<!-- NAV -->
 <header class="nav reveal" style="--d:80ms">
   <a class="nav__brand" href="beranda.html" data-nav>
-    <img src="logo.jpg" alt="Logo Insomnia Dev">
+    <img src="logo.png" alt="Logo Insomnia Dev">
     <b>Insomnia<em>Dev</em></b>
   </a>
   <nav class="nav__links" id="navViewport" aria-label="Navigasi utama">
@@ -43,7 +40,6 @@
   </nav>
 </header>
 
-<!-- MAIN -->
 <main class="page">
 
   <section class="hero reveal" style="--d:160ms">
@@ -225,7 +221,6 @@
 
       var html = "";
 
-      /* ============ TOP ============ */
       html += '<div class="profile__top">';
       html += '<div class="profile__avatar">';
       if (avatar) {
@@ -264,10 +259,9 @@
                 '</svg><span>' + escapeHtml(shortUrl(bioLink)) + '</span></a>';
       }
 
-      html += '</div>'; // info
-      html += '</div>'; // top
+      html += '</div>';
+      html += '</div>';
 
-      /* ============ STATS ============ */
       html += '<div class="profile__stats">';
       html += '<div class="profile__stat">' +
               '<b title="' + fmtFull(p.followers) + '">' + fmtNum(p.followers) + '</b>' +
@@ -283,7 +277,6 @@
               '<span>Video</span></div>';
       html += '</div>';
 
-      /* ============ REGION ============ */
       if (regionCode || currCode) {
         var displayFlag = regionFlag || currFlag || "";
         var displayName = regionName || currName || regionCode || currCode || "";
@@ -313,7 +306,6 @@
         html += '</div>';
       }
 
-      /* ============ META ============ */
       html += '<div class="profile__meta">';
 
       if (age) {
