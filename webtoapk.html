@@ -197,26 +197,10 @@
 
     <div class="wa__result" id="waResult" hidden></div>
 
-    <div class="wa__history">
-      <div class="wa__history-head">
-        <div class="wa__history-title">Riwayat Build</div>
-        <button type="button" class="wa__history-btn" id="waHistoryBtn">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2.6"
-               stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12a9 9 0 1 1-3.1-6.8"/>
-            <path d="M21 3v6h-6"/>
-          </svg>
-          Muat Riwayat
-        </button>
-      </div>
-      <div class="wa__history-list" id="waHistoryList"></div>
-    </div>
-
     <div class="wa__note">
-      <strong>Catatan:</strong> Proses build biasanya memakan waktu 1–2 menit.
-      Kalau halaman terlihat diam terlalu lama, jangan ditutup — build tetap berjalan di server.
-      Kalau timeout, cek lewat tombol <strong>Muat Riwayat</strong> untuk melihat hasil yang sudah selesai.
+      <strong>Catatan:</strong> Proses build memakan waktu 1–2 menit. 
+      API ini memiliki batas harian (Free: 3x/hari, Pro: 20x/hari). 
+      Jangan tutup halaman saat proses build sedang berjalan.
     </div>
 
   </section>
@@ -254,8 +238,6 @@
     var label       = submit.querySelector(".wa__submit-label");
     var statusEl    = document.getElementById("waStatus");
     var resultEl    = document.getElementById("waResult");
-    var historyBtn  = document.getElementById("waHistoryBtn");
-    var historyList = document.getElementById("waHistoryList");
 
     function escapeHtml(s) {
       return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -336,37 +318,6 @@
       resultEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
-    function renderHistory(items) {
-      historyList.innerHTML = "";
-      if (!items || !items.length) {
-        historyList.innerHTML = '<div style="padding:14px;text-align:center;font-size:12.5px;color:var(--muted);">Belum ada riwayat build.</div>';
-        return;
-      }
-      var html = "";
-      for (var i = 0; i < items.length; i++) {
-        var h = items[i];
-        var meta = [];
-        if (h.packageName) meta.push(h.packageName);
-        if (h.fileSize) meta.push(fmtSize(h.fileSize));
-        if (h.createdAt) {
-          try { meta.push(new Date(h.createdAt).toLocaleString("id-ID")); } catch (e) {}
-        }
-
-        html += '<div class="wa__history-item">';
-        html += '<div class="wa__history-item-info">';
-        html += '<div class="wa__history-item-name">' + escapeHtml(h.appName || "Untitled") + '</div>';
-        html += '<div class="wa__history-item-meta">' + escapeHtml(meta.join(" · ")) + '</div>';
-        html += '</div>';
-        if (h.downloadUrl) {
-          html += '<a class="wa__history-item-link" href="' + escapeHtml(h.downloadUrl) + '" target="_blank" rel="noopener noreferrer" aria-label="Download">';
-          html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>';
-          html += '</a>';
-        }
-        html += '</div>';
-      }
-      historyList.innerHTML = html;
-    }
-
     [nameInput, pkgInput, urlInput].forEach(function (el) {
       if (!el) return;
       el.addEventListener("input", function () {
@@ -429,11 +380,10 @@
 
       var timers = [];
       var msgs = [
-        [10000, "Menyiapkan akun & verifikasi…"],
-        [30000, "Mengompresi aset aplikasi…"],
-        [60000, "Membangun APK, masih berjalan…"],
-        [90000, "Hampir selesai, sabar ya…"],
-        [120000, "Build butuh waktu ekstra. Kalau timeout, cek riwayat."]
+        [10000, "Mengompresi aset aplikasi…"],
+        [30000, "Membangun APK, masih berjalan…"],
+        [60000, "Hampir selesai, sabar ya…"],
+        [90000, "Server API sedang sibuk, tetap menunggu…"]
       ];
       for (var i = 0; i < msgs.length; i++) {
         (function (delay, text) {
@@ -443,13 +393,12 @@
 
       try {
         var controller = new AbortController();
-        var timeoutId = setTimeout(function () { controller.abort(); }, 300000);
+        var timeoutId = setTimeout(function () { controller.abort(); }, 300000); // 5 menit timeout client
 
         var res = await fetch("/api/webtoapk", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            action: "build",
             appName: appName,
             packageName: pkg,
             url: url,
@@ -465,14 +414,19 @@
         try { json = await res.json(); }
         catch (e) { throw new Error("Server mengembalikan respons tidak valid."); }
 
-        if (!json.ok) throw new Error(json.error || "Gagal membuat APK.");
+        if (!json.ok) {
+          if (json.limitReached) {
+            throw new Error("Limit API harian tercapai. Silakan coba lagi besok.");
+          }
+          throw new Error(json.error || "Gagal membuat APK.");
+        }
 
         hideStatus();
         showStatus("APK berhasil dibuat!", "success");
         renderResult(json.data);
       } catch (err) {
         if (err.name === "AbortError") {
-          showStatus("Waktu habis. Build mungkin masih berjalan — coba cek riwayat.", "error");
+          showStatus("Waktu habis. Server API tidak merespons.", "error");
         } else {
           showStatus(err.message || "Terjadi kesalahan.", "error");
         }
@@ -481,31 +435,6 @@
         submit.disabled = false;
         spinner.hidden = true;
         label.textContent = "Build APK";
-      }
-    });
-
-    historyBtn.addEventListener("click", async function () {
-      historyBtn.disabled = true;
-      var origHtml = historyBtn.innerHTML;
-      historyBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg> Memuat…';
-
-      try {
-        var res = await fetch("/api/webtoapk", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "history" })
-        });
-        var json = await res.json();
-
-        if (!json.ok) throw new Error(json.error || "Gagal memuat riwayat.");
-
-        var list = (json.data && json.data.history) || [];
-        renderHistory(list);
-      } catch (err) {
-        historyList.innerHTML = '<div style="padding:14px;text-align:center;font-size:12.5px;color:var(--err);">' + escapeHtml(err.message || "Gagal memuat riwayat.") + '</div>';
-      } finally {
-        historyBtn.disabled = false;
-        historyBtn.innerHTML = origHtml;
       }
     });
   }
