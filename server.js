@@ -14,6 +14,7 @@ const vtsearchHandler     = require("./api/vtsearch");
 const pinterestHandler    = require("./api/pinterest");
 const texttoimageHandler  = require("./api/texttoimage");
 const playstoreHandler    = require("./api/playstore");
+const googlesearchHandler = require("./api/googlesearch");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -53,6 +54,7 @@ app.post("/api/vtsearch",     vtsearchHandler);
 app.post("/api/pinterest",    pinterestHandler);
 app.post("/api/texttoimage",  texttoimageHandler);
 app.post("/api/playstore",    playstoreHandler);
+app.post("/api/googlesearch", googlesearchHandler);
 
 /* =========================================================
    STATIC FILES
