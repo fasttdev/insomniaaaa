@@ -66,7 +66,6 @@
       </div>
     </div>
 
-    <!-- Tabs -->
     <div class="pin__tabs">
       <div class="pin__tab is-active" id="tabSearch">Cari Inspirasi</div>
       <div class="pin__tab" id="tabDownload">Unduh dari Link</div>
@@ -202,7 +201,7 @@
         
         html += '<div class="pcard__thumb">';
         if (thumb) {
-          html += '<img src="' + escapeHtml(thumb) + '" alt="" loading="lazy" referrerpolicy="no-referrer">';
+          html += '<img src="' + escapeHtml(thumb) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'https://placehold.co/400x600/f1f5f9/64748b?text=No+Image\';">';
         }
         if (isVideo) {
           html += '<div class="pcard__badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Video</div>';
@@ -231,7 +230,7 @@
         if (isVideo) {
           html += '<video src="' + escapeHtml(mediaUrl) + '" controls playsinline autoplay loop muted></video>';
         } else {
-          html += '<img src="' + escapeHtml(mediaUrl) + '" alt="Preview">';
+          html += '<img src="' + escapeHtml(mediaUrl) + '" alt="Preview" onerror="this.onerror=null;this.src=\'https://placehold.co/600x400/f1f5f9/64748b?text=No+Image\';">';
         }
         html += '</div>';
       }
