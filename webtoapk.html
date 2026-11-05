@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web to APK — Insomnia Dev</title>
+<link rel="icon" href="logo.png" type="image/png">
+<link rel="stylesheet" href="beranda.css">
+<link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="webtoapk.css">
+</head>
+<body class="is-loading">
+
+<div class="xfer" aria-hidden="true">
+  <div class="xfer__half xfer__half--top"></div>
+  <div class="xfer__half xfer__half--bot"></div>
+  <div class="xfer__seam"></div>
+  <div class="xfer__brand">
+    <img src="logo.png" alt="">
+    <span>Insomnia<em>Dev</em></span>
+  </div>
+</div>
+
+<div class="bg" aria-hidden="true">
+  <div class="bg__grid"></div>
+</div>
+
+<header class="nav reveal" style="--d:80ms">
+  <a class="nav__brand" href="beranda.html" data-nav>
+    <img src="logo.png" alt="Logo Insomnia Dev">
+    <b>Insomnia<em>Dev</em></b>
+  </a>
+  <nav class="nav__links" id="navViewport" aria-label="Navigasi utama">
+    <div class="nav__track" id="navTrack">
+      <a href="beranda.html" class="nav__link" data-nav>Beranda</a>
+      <a href="tools.html" class="nav__link is-active" data-nav>Tools</a>
+      <a href="req.html" class="nav__link" data-nav>Req</a>
+      <a href="info.html" class="nav__link" data-nav>Information</a>
+    </div>
+  </nav>
+</header>
+
+<main class="page">
+
+  <section class="hero reveal" style="--d:160ms">
+    <div class="hero__badge"><i></i> Tools · Web to APK</div>
+    <h1 class="hero__title">
+      Website jadi<br><em>aplikasi Android.</em>
+    </h1>
+    <p class="hero__desc">
+      Ubah situs web apa pun menjadi file APK siap pasang.
+      Cukup isi nama aplikasi, package name, dan URL website-nya.
+    </p>
+  </section>
+
+  <section class="wa reveal" style="--d:240ms" aria-labelledby="waTitle">
+    <div class="wa__head">
+      <div class="wa__mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.4"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3v12"/>
+          <path d="M7 10l5 5 5-5"/>
+          <path d="M5 21h14"/>
+        </svg>
+      </div>
+      <div>
+        <div class="wa__kicker">Web to APK</div>
+        <h2 class="wa__title" id="waTitle">Buat <em>APK</em> baru</h2>
+      </div>
+    </div>
+
+    <form class="wa__form" id="waForm" novalidate>
+
+      <div class="wa__field">
+        <label class="wa__label" for="waAppName">Nama Aplikasi</label>
+        <div class="wa__control" id="waNameWrap">
+          <svg class="wa__control-icon" width="16" height="16" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="3"/>
+            <path d="M9 8h6M9 12h6M9 16h4"/>
+          </svg>
+          <input type="text" class="wa__input" id="waAppName"
+                 maxlength="60" placeholder="Contoh: Toko Online Saya"
+                 autocomplete="off" spellcheck="false"
+                 aria-label="Nama aplikasi">
+        </div>
+      </div>
+
+      <div class="wa__field">
+        <label class="wa__label" for="waPkg">
+          Package Name
+          <span class="wa__label-hint">— unik per aplikasi</span>
+        </label>
+        <div class="wa__control" id="waPkgWrap">
+          <svg class="wa__control-icon" width="16" height="16" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M16 18l6-6-6-6"/>
+            <path d="M8 6l-6 6 6 6"/>
+          </svg>
+          <input type="text" class="wa__input" id="waPkg"
+                 placeholder="com.example.myapp"
+                 autocomplete="off" spellcheck="false"
+                 autocapitalize="off" inputmode="text"
+                 aria-label="Package name">
+        </div>
+      </div>
+
+      <div class="wa__field">
+        <label class="wa__label" for="waUrl">URL Website</label>
+        <div class="wa__control" id="waUrlWrap">
+          <svg class="wa__control-icon" width="16" height="16" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+          <input type="url" class="wa__input" id="waUrl"
+                 placeholder="https://example.com"
+                 autocomplete="off" spellcheck="false"
+                 inputmode="url"
+                 aria-label="URL website">
+        </div>
+      </div>
+
+      <details class="wa__advanced">
+        <summary>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.6"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+          Opsi Lanjutan
+        </summary>
+        <div class="wa__advanced-body">
+
+          <div class="wa__row">
+            <div class="wa__field">
+              <label class="wa__label" for="waVersion">Versi</label>
+              <div class="wa__control">
+                <svg class="wa__control-icon" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.2"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M4 7h16M4 12h16M4 17h10"/>
+                </svg>
+                <input type="text" class="wa__input" id="waVersion"
+                       value="1.0" placeholder="1.0"
+                       autocomplete="off" spellcheck="false"
+                       aria-label="Versi aplikasi">
+              </div>
+            </div>
+            <div class="wa__field">
+              <label class="wa__label" for="waVersionCode">Version Code</label>
+              <div class="wa__control">
+                <svg class="wa__control-icon" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.2"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M4 7h16M4 12h16M4 17h10"/>
+                </svg>
+                <input type="number" class="wa__input" id="waVersionCode"
+                       value="1" min="1" max="99999" placeholder="1"
+                       aria-label="Version code">
+              </div>
+            </div>
+          </div>
+
+          <div class="wa__field">
+            <label class="wa__label" for="waOrientation">Orientasi Layar</label>
+            <div class="wa__control">
+              <svg class="wa__control-icon" width="16" height="16" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="2.2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="4" y="2" width="16" height="20" rx="2"/>
+                <path d="M12 18h.01"/>
+              </svg>
+              <select class="wa__select" id="waOrientation">
+                <option value="auto">Auto (ikut perangkat)</option>
+                <option value="portrait">Portrait (tegak)</option>
+                <option value="landscape">Landscape (mendatar)</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+      </details>
+
+      <button type="submit" class="wa__submit" id="waSubmit">
+        <span class="wa__submit-label">Build APK</span>
+        <span class="wa__spinner" id="waSpinner" hidden></span>
+      </button>
+
+    </form>
+
+    <div class="wa__status" id="waStatus" role="status" aria-live="polite" hidden></div>
+
+    <div class="wa__result" id="waResult" hidden></div>
+
+    <div class="wa__history">
+      <div class="wa__history-head">
+        <div class="wa__history-title">Riwayat Build</div>
+        <button type="button" class="wa__history-btn" id="waHistoryBtn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.6"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 1 1-3.1-6.8"/>
+            <path d="M21 3v6h-6"/>
+          </svg>
+          Muat Riwayat
+        </button>
+      </div>
+      <div class="wa__history-list" id="waHistoryList"></div>
+    </div>
+
+    <div class="wa__note">
+      <strong>Catatan:</strong> Proses build biasanya memakan waktu 1–2 menit.
+      Kalau halaman terlihat diam terlalu lama, jangan ditutup — build tetap berjalan di server.
+      Kalau timeout, cek lewat tombol <strong>Muat Riwayat</strong> untuk melihat hasil yang sudah selesai.
+    </div>
+
+  </section>
+
+</main>
+
+<footer class="foot reveal" style="--d:320ms">
+  &copy; <span id="y">2025</span> <span>Insomnia Dev</span>. Semua hak dilindungi.
+</footer>
+
+<script src="app.js" defer></script>
+
+<script>
+(function () {
+  "use strict";
+
+  function initWta() {
+    var form = document.getElementById("waForm");
+    if (!form) return;
+
+    var yearEl = document.getElementById("y");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    var nameInput   = document.getElementById("waAppName");
+    var nameWrap    = document.getElementById("waNameWrap");
+    var pkgInput    = document.getElementById("waPkg");
+    var pkgWrap     = document.getElementById("waPkgWrap");
+    var urlInput    = document.getElementById("waUrl");
+    var urlWrap     = document.getElementById("waUrlWrap");
+    var versionInput= document.getElementById("waVersion");
+    var versionCodeInput = document.getElementById("waVersionCode");
+    var orientInput = document.getElementById("waOrientation");
+    var submit      = document.getElementById("waSubmit");
+    var spinner     = document.getElementById("waSpinner");
+    var label       = submit.querySelector(".wa__submit-label");
+    var statusEl    = document.getElementById("waStatus");
+    var resultEl    = document.getElementById("waResult");
+    var historyBtn  = document.getElementById("waHistoryBtn");
+    var historyList = document.getElementById("waHistoryList");
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    var ICONS = {
+      loading: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg>',
+      error:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>',
+      success: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+      info:    '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>'
+    };
+
+    function showStatus(text, type) {
+      statusEl.className = "wa__status is-" + (type || "info");
+      statusEl.innerHTML = (ICONS[type] || ICONS.info) + "<span>" + escapeHtml(text) + "</span>";
+      statusEl.hidden = false;
+    }
+    function hideStatus() {
+      statusEl.hidden = true;
+      statusEl.innerHTML = "";
+    }
+
+    function fmtSize(bytes) {
+      if (!bytes) return "-";
+      var b = Number(bytes);
+      if (b >= 1024 * 1024) return (b / (1024 * 1024)).toFixed(2) + " MB";
+      if (b >= 1024) return (b / 1024).toFixed(2) + " KB";
+      return b + " B";
+    }
+
+    function renderResult(data) {
+      var html = "";
+
+      html += '<div class="wa__result-head">';
+      html += '<div class="wa__result-icon" aria-hidden="true">';
+      html += '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+      html += '</div>';
+      html += '<div style="flex:1;min-width:0">';
+      html += '<div class="wa__result-title">' + escapeHtml(data.appName || "-") + '</div>';
+      html += '<div class="wa__result-sub">' + escapeHtml(data.packageName || "-") + '</div>';
+      html += '</div>';
+      html += '</div>';
+
+      html += '<div class="wa__result-body">';
+      html += '<div class="wa__row-item">' +
+              '<div class="wa__row-label">File</div>' +
+              '<div class="wa__row-value is-mono">' + escapeHtml(data.fileName || "-") + '</div>' +
+              '</div>';
+      html += '<div class="wa__row-item">' +
+              '<div class="wa__row-label">Ukuran</div>' +
+              '<div class="wa__row-value">' + escapeHtml(data.fileSizeFormatted || fmtSize(data.fileSize)) + '</div>' +
+              '</div>';
+      html += '<div class="wa__row-item" style="grid-column:1 / -1">' +
+              '<div class="wa__row-label">Target</div>' +
+              '<div class="wa__row-value is-mono">' + escapeHtml(data.targetUrl || "-") + '</div>' +
+              '</div>';
+      if (data.buildId) {
+        html += '<div class="wa__row-item" style="grid-column:1 / -1">' +
+                '<div class="wa__row-label">Build ID</div>' +
+                '<div class="wa__row-value is-mono">' + escapeHtml(data.buildId) + '</div>' +
+                '</div>';
+      }
+      html += '</div>';
+
+      if (data.downloadUrl) {
+        html += '<div class="wa__result-foot">';
+        html += '<a class="wa__download" href="' + escapeHtml(data.downloadUrl) + '" target="_blank" rel="noopener noreferrer">';
+        html += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>';
+        html += 'Download APK';
+        html += '</a>';
+        html += '</div>';
+      }
+
+      resultEl.innerHTML = html;
+      resultEl.hidden = false;
+      resultEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function renderHistory(items) {
+      historyList.innerHTML = "";
+      if (!items || !items.length) {
+        historyList.innerHTML = '<div style="padding:14px;text-align:center;font-size:12.5px;color:var(--muted);">Belum ada riwayat build.</div>';
+        return;
+      }
+      var html = "";
+      for (var i = 0; i < items.length; i++) {
+        var h = items[i];
+        var meta = [];
+        if (h.packageName) meta.push(h.packageName);
+        if (h.fileSize) meta.push(fmtSize(h.fileSize));
+        if (h.createdAt) {
+          try { meta.push(new Date(h.createdAt).toLocaleString("id-ID")); } catch (e) {}
+        }
+
+        html += '<div class="wa__history-item">';
+        html += '<div class="wa__history-item-info">';
+        html += '<div class="wa__history-item-name">' + escapeHtml(h.appName || "Untitled") + '</div>';
+        html += '<div class="wa__history-item-meta">' + escapeHtml(meta.join(" · ")) + '</div>';
+        html += '</div>';
+        if (h.downloadUrl) {
+          html += '<a class="wa__history-item-link" href="' + escapeHtml(h.downloadUrl) + '" target="_blank" rel="noopener noreferrer" aria-label="Download">';
+          html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>';
+          html += '</a>';
+        }
+        html += '</div>';
+      }
+      historyList.innerHTML = html;
+    }
+
+    [nameInput, pkgInput, urlInput].forEach(function (el) {
+      if (!el) return;
+      el.addEventListener("input", function () {
+        if (nameWrap) nameWrap.classList.remove("is-invalid");
+        if (pkgWrap) pkgWrap.classList.remove("is-invalid");
+        if (urlWrap) urlWrap.classList.remove("is-invalid");
+      });
+    });
+
+    form.addEventListener("submit", async function (ev) {
+      ev.preventDefault();
+
+      var appName = nameInput.value.trim();
+      var pkg = pkgInput.value.trim();
+      var url = urlInput.value.trim();
+      var versionName = versionInput.value.trim() || "1.0";
+      var versionCode = parseInt(versionCodeInput.value, 10) || 1;
+      var orientation = orientInput.value;
+
+      /* Validate */
+      if (!appName) {
+        nameWrap.classList.add("is-invalid");
+        showStatus("Nama aplikasi wajib diisi.", "error");
+        nameInput.focus();
+        return;
+      }
+      if (!pkg) {
+        pkgWrap.classList.add("is-invalid");
+        showStatus("Package name wajib diisi.", "error");
+        pkgInput.focus();
+        return;
+      }
+      if (!/^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$/i.test(pkg)) {
+        pkgWrap.classList.add("is-invalid");
+        showStatus("Format package name tidak valid. Contoh: com.example.app", "error");
+        pkgInput.focus();
+        return;
+      }
+      if (!url) {
+        urlWrap.classList.add("is-invalid");
+        showStatus("URL wajib diisi.", "error");
+        urlInput.focus();
+        return;
+      }
+      if (!/^https?:\/\//i.test(url)) {
+        urlWrap.classList.add("is-invalid");
+        showStatus("URL harus dimulai dengan http:// atau https://", "error");
+        urlInput.focus();
+        return;
+      }
+
+      /* UI state */
+      resultEl.hidden = true;
+      resultEl.innerHTML = "";
+      submit.disabled = true;
+      spinner.hidden = false;
+      label.textContent = "Membangun…";
+
+      showStatus("Memulai proses build, mohon tunggu 1–2 menit…", "loading");
+
+      var timers = [];
+      var msgs = [
+        [10000, "Menyiapkan akun & verifikasi…"],
+        [30000, "Mengompresi aset aplikasi…"],
+        [60000, "Membangun APK, masih berjalan…"],
+        [90000, "Hampir selesai, sabar ya…"],
+        [120000, "Build butuh waktu ekstra. Kalau timeout, cek riwayat."]
+      ];
+      for (var i = 0; i < msgs.length; i++) {
+        (function (delay, text) {
+          timers.push(setTimeout(function () { showStatus(text, "loading"); }, delay));
+        })(msgs[i][0], msgs[i][1]);
+      }
+
+      try {
+        var controller = new AbortController();
+        var timeoutId = setTimeout(function () { controller.abort(); }, 300000);
+
+        var res = await fetch("/api/webtoapk", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "build",
+            appName: appName,
+            packageName: pkg,
+            url: url,
+            versionName: versionName,
+            versionCode: versionCode,
+            orientation: orientation
+          }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        var json;
+        try { json = await res.json(); }
+        catch (e) { throw new Error("Server mengembalikan respons tidak valid."); }
+
+        if (!json.ok) throw new Error(json.error || "Gagal membuat APK.");
+
+        hideStatus();
+        showStatus("APK berhasil dibuat!", "success");
+        renderResult(json.data);
+      } catch (err) {
+        if (err.name === "AbortError") {
+          showStatus("Waktu habis. Build mungkin masih berjalan — coba cek riwayat.", "error");
+        } else {
+          showStatus(err.message || "Terjadi kesalahan.", "error");
+        }
+      } finally {
+        for (var t = 0; t < timers.length; t++) clearTimeout(timers[t]);
+        submit.disabled = false;
+        spinner.hidden = true;
+        label.textContent = "Build APK";
+      }
+    });
+
+    historyBtn.addEventListener("click", async function () {
+      historyBtn.disabled = true;
+      var origHtml = historyBtn.innerHTML;
+      historyBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg> Memuat…';
+
+      try {
+        var res = await fetch("/api/webtoapk", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "history" })
+        });
+        var json = await res.json();
+
+        if (!json.ok) throw new Error(json.error || "Gagal memuat riwayat.");
+
+        var list = (json.data && json.data.history) || [];
+        renderHistory(list);
+      } catch (err) {
+        historyList.innerHTML = '<div style="padding:14px;text-align:center;font-size:12.5px;color:var(--err);">' + escapeHtml(err.message || "Gagal memuat riwayat.") + '</div>';
+      } finally {
+        historyBtn.disabled = false;
+        historyBtn.innerHTML = origHtml;
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initWta);
+  } else {
+    initWta();
+  }
+})();
+</script>
+
+</body>
+</html>
