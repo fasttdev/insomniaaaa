@@ -97,6 +97,54 @@
   cursor:pointer;
 }
 
+/* === NEW: Upload Icon === */
+.wa__upload-wrap{
+  position:relative;
+  display:flex;align-items:center;gap:14px;
+  padding:12px;
+  background:#fafcff;
+  border:1.5px dashed var(--line);
+  border-radius:14px;
+  transition:border-color .18s,background .18s;
+  cursor:pointer;
+}
+.wa__upload-wrap:hover{
+  border-color:var(--blue-400);
+  background:#fff;
+}
+.wa__file-input{
+  position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;
+}
+.wa__upload-preview{
+  width:52px;height:52px;
+  border-radius:10px;
+  background:#fff;
+  border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;flex-shrink:0;
+  color:var(--muted);
+}
+.wa__upload-preview img{
+  width:100%;height:100%;object-fit:cover;
+}
+.wa__upload-info{flex:1;min-width:0}
+.wa__upload-title{
+  font-size:13.5px;font-weight:700;color:var(--ink);
+  margin-bottom:2px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.wa__upload-desc{
+  font-size:11.5px;color:var(--muted);
+}
+.wa__upload-clear{
+  background:none;border:none;
+  color:var(--err);font-size:11.5px;font-weight:800;
+  cursor:pointer;padding:6px 10px;
+  border-radius:6px;
+  transition:background .15s;
+}
+.wa__upload-clear:hover{background:var(--err-bg)}
+
 /* Advanced toggle */
 .wa__advanced{
   border:1px dashed var(--line);
@@ -268,75 +316,6 @@
   box-shadow:0 14px 28px -12px rgba(34,197,94,.8);
 }
 
-/* History */
-.wa__history{
-  margin-top:16px;
-  padding-top:16px;
-  border-top:1px solid var(--line);
-}
-.wa__history-head{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:10px;
-  margin-bottom:12px;
-}
-.wa__history-title{
-  font-size:12.5px;font-weight:800;
-  color:var(--ink-2);
-  letter-spacing:-.1px;
-}
-.wa__history-btn{
-  display:inline-flex;align-items:center;gap:6px;
-  font-size:11.5px;font-weight:800;
-  letter-spacing:.04em;
-  padding:7px 13px;
-  border-radius:9px;
-  color:var(--blue-600);
-  background:var(--blue-50);
-  border:1px solid var(--blue-100);
-  cursor:pointer;
-  transition:background .15s,border-color .15s;
-}
-.wa__history-btn:hover{
-  background:var(--blue-100);border-color:var(--blue-200);
-}
-.wa__history-btn:disabled{opacity:.6;cursor:not-allowed}
-.wa__history-list{
-  display:flex;flex-direction:column;gap:8px;
-}
-.wa__history-item{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:12px;
-  padding:12px 14px;
-  background:#fafcff;
-  border:1px solid var(--line);
-  border-radius:10px;
-}
-.wa__history-item-info{flex:1;min-width:0}
-.wa__history-item-name{
-  font-size:13px;font-weight:800;
-  color:var(--ink);
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  margin-bottom:2px;
-}
-.wa__history-item-meta{
-  font-size:11px;font-weight:600;
-  color:var(--muted);
-}
-.wa__history-item-link{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:32px;height:32px;
-  border-radius:9px;
-  color:#fff;
-  background:linear-gradient(135deg,#22c55e,#16a34a);
-  text-decoration:none;
-  flex-shrink:0;
-  transition:transform .15s,box-shadow .15s;
-}
-.wa__history-item-link:hover{
-  transform:translateY(-1px);
-  box-shadow:0 6px 14px -6px rgba(34,197,94,.7);
-}
-
 /* Note */
 .wa__note{
   margin-top:16px;
@@ -359,6 +338,4 @@
   .wa__row{grid-template-columns:1fr}
   .wa__result-body{grid-template-columns:1fr}
   .wa__submit{padding:13px 20px;font-size:14.5px}
-  .wa__history-head{flex-direction:column;align-items:stretch}
-  .wa__history-btn{justify-content:center}
 }
