@@ -1,0 +1,261 @@
+/*
+  Insomnia Dev — Instagram Stalker styles
+*/
+
+.ig{
+  position:relative;
+  background:#ffffff;
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:32px;
+  box-shadow:var(--shadow-card);
+  overflow:hidden;
+  max-width:760px;
+  width:100%;
+  margin:0 auto;
+}
+.ig::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:5px;
+  background:linear-gradient(90deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);
+}
+
+.ig__head{
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:24px;
+}
+.ig__mark{
+  display:flex;align-items:center;justify-content:center;
+  width:48px;height:48px;border-radius:14px;
+  background:linear-gradient(135deg,#f09433,#dc2743,#bc1888);
+  color:#fff;flex-shrink:0;
+  box-shadow:0 10px 22px -10px rgba(220,39,67,.6);
+}
+.ig__kicker{
+  font-size:11px;font-weight:800;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--blue-600);margin-bottom:2px;
+}
+.ig__title{
+  font-size:22px;font-weight:800;
+  letter-spacing:-.5px;color:var(--ink);
+}
+.ig__title em{font-style:normal;color:var(--blue-600)}
+
+/* Form */
+.ig__form{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.ig__control{
+  position:relative;
+  flex:1 1 320px;
+  display:flex;align-items:center;
+  background:#fff;
+  border:1.5px solid var(--line);
+  border-radius:14px;
+  transition:border-color .18s,box-shadow .18s;
+}
+.ig__control:focus-within{
+  border-color:#dc2743;
+  box-shadow:0 0 0 4px rgba(220,39,67,.1);
+}
+.ig__control.is-invalid{
+  border-color:var(--err);
+  box-shadow:0 0 0 4px rgba(185,28,28,.08);
+}
+.ig__control-icon{
+  position:absolute;left:14px;
+  color:var(--muted);pointer-events:none;
+  transition:color .18s;
+}
+.ig__control:focus-within .ig__control-icon{color:#dc2743}
+.ig__input{
+  flex:1;min-width:0;
+  padding:14px 18px 14px 42px;
+  font-size:14.5px;color:var(--ink);
+  background:transparent;border:none;outline:none;
+  border-radius:14px;
+}
+.ig__input::placeholder{color:var(--muted);opacity:.85}
+.ig__input:disabled{opacity:.6;cursor:not-allowed}
+
+.ig__submit{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  flex-shrink:0;
+  font-size:15px;font-weight:800;
+  color:#fff;
+  background:linear-gradient(135deg,#f09433,#dc2743,#bc1888);
+  padding:14px 32px;border:none;border-radius:14px;
+  box-shadow:0 10px 24px -10px rgba(220,39,67,.6);
+  cursor:pointer;
+  transition:transform .15s,box-shadow .18s,opacity .15s;
+}
+.ig__submit:hover:not(:disabled){
+  transform:translateY(-1px);
+  box-shadow:0 16px 30px -12px rgba(220,39,67,.7);
+}
+.ig__submit:active:not(:disabled){transform:translateY(0) scale(.98)}
+.ig__submit:disabled{opacity:.7;cursor:not-allowed}
+
+.ig__spinner{
+  width:16px;height:16px;
+  border:2px solid rgba(255,255,255,.35);
+  border-top-color:#fff;
+  border-radius:50%;
+  animation:spin .75s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.ig__hint{
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.55;
+  margin-top:2px;
+}
+
+/* Status */
+.ig__status{
+  display:flex;align-items:flex-start;gap:9px;
+  margin-top:20px;
+  padding:13px 16px;
+  font-size:13.5px;line-height:1.55;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:var(--blue-50);
+  color:var(--ink-2);
+  word-break:break-word;
+}
+.ig__status svg{flex-shrink:0;margin-top:1px}
+.ig__status.is-loading{color:#dc2743;background:#fdf2f8;border-color:#fbcfe8}
+.ig__status.is-loading svg{animation:spin .9s linear infinite}
+.ig__status.is-error{color:var(--err);background:var(--err-bg);border-color:var(--err-line)}
+.ig__status.is-success{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)}
+
+/* Profile Card */
+.igprof{
+  margin-top:20px;
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  background:#ffffff;
+  box-shadow:var(--shadow-soft);
+}
+
+.igprof__top{
+  display:flex;gap:16px;align-items:flex-start;
+  padding:20px;
+  background:linear-gradient(180deg,#ffffff,var(--blue-50));
+  border-bottom:1px solid var(--line);
+}
+
+.igprof__avatar{
+  width:88px;height:88px;flex-shrink:0;
+  border-radius:50%;
+  overflow:hidden;
+  background:var(--blue-100);
+  border:3px solid #ffffff;
+  box-shadow:0 8px 22px -8px rgba(220,39,67,.4);
+  position:relative;
+}
+.igprof__avatar img{
+  width:100%;height:100%;
+  object-fit:cover;display:block;
+}
+
+.igprof__info{flex:1;min-width:0;padding-top:2px}
+.igprof__name{
+  font-size:17px;font-weight:800;
+  color:var(--ink);letter-spacing:-.3px;
+  line-height:1.3;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  margin-bottom:2px;
+}
+.igprof__verified{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:16px;height:16px;flex-shrink:0;
+  border-radius:50%;
+  background:#0ea5e9;
+  color:#fff;
+}
+.igprof__username{
+  font-size:13px;font-weight:700;
+  color:#dc2743;
+  margin-bottom:8px;
+}
+.igprof__bio{
+  font-size:12.5px;line-height:1.55;
+  color:var(--ink-2);
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
+  overflow:hidden;
+  word-break:break-word;
+  white-space:pre-line;
+}
+.igprof__bio.is-empty{
+  color:var(--muted);
+  font-style:italic;
+}
+
+/* Stats */
+.igprof__stats{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:1px;
+  background:var(--line);
+}
+.igprof__stat{
+  background:#ffffff;
+  padding:14px 10px;
+  text-align:center;
+}
+.igprof__stat b{
+  display:block;
+  font-size:16px;
+  font-weight:800;
+  color:var(--ink);
+  letter-spacing:-.3px;
+  font-variant-numeric:tabular-nums;
+  line-height:1.1;
+  margin-bottom:4px;
+}
+.igprof__stat span{
+  display:block;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+/* Meta */
+.igprof__meta{
+  padding:14px 20px;
+  display:flex;flex-wrap:wrap;gap:8px;
+  border-top:1px solid var(--line);
+  background:#ffffff;
+}
+.igprof__tag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11.5px;font-weight:700;
+  padding:5px 11px;border-radius:99px;
+  border:1px solid var(--line);
+  color:var(--ink-2);
+  background:#fafcff;
+  text-decoration:none;
+  transition:background .15s,border-color .15s,color .15s;
+}
+.igprof__tag--ok{color:#047857;background:#ecfdf5;border-color:#d1fae5}
+.igprof__tag--off{color:var(--muted);background:#f1f5f9;border-color:#e2e8f0}
+a.igprof__tag:hover{color:#dc2743;border-color:#fbcfe8;background:#fdf2f8}
+
+/* Responsive */
+@media (max-width:640px){
+  .ig{padding:20px;border-radius:18px}
+  .ig__head{gap:12px;margin-bottom:20px}
+  .ig__mark{width:42px;height:42px}
+  .ig__title{font-size:19px}
+  .ig__form{gap:8px}
+  .ig__control{flex:1 1 100%}
+  .ig__submit{width:100%;padding:13px 20px;font-size:14.5px}
+
+  .igprof__top{padding:16px;gap:14px}
+  .igprof__avatar{width:72px;height:72px}
+  .igprof__name{font-size:15.5px}
+  .igprof__meta{padding:12px 16px}
+}
