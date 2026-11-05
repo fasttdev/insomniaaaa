@@ -39,7 +39,8 @@ async function search(query, limit = 20) {
 
     const results = rawList.slice(0, limit).map(item => {
         const rawImg = item.image_url || item.image || item.images?.orig?.url || '';
-        const cleanImg = rawImg.replace(/\/\d+x\d*([_\/])/, '/originals$1').replace(/\/\d+x\//, '/originals/');
+        // Ubah resolusi ke 736x agar bisa di-embed (originals di-block hotlink)
+        const cleanImg = rawImg.replace(/\/\d+x\d*([_\/])/, '/736x$1').replace(/\/\d+x\//, '/736x/');
 
         return {
             id: item.id || null,
@@ -97,7 +98,8 @@ async function download(targetUrl) {
         .filter(h => !h.includes('d53b014d86a6b6761bf649a0ed813c2b'));
 
     const uniqueHashes = [...new Set(hashMatches)];
-    const image = uniqueHashes[0] ? `https://i.pinimg.com/originals/${uniqueHashes[0]}` : null;
+    // Pakai 736x agar tidak 403 saat didownload / dirender
+    const image = uniqueHashes[0] ? `https://i.pinimg.com/736x/${uniqueHashes[0]}` : null;
 
     return {
         title: title || 'Pinterest Media',
