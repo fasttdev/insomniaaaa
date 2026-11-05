@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LCD ST7735 Converter — Insomnia Dev</title>
+<link rel="icon" href="logo.png" type="image/png">
+<link rel="stylesheet" href="beranda.css">
+<link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="lcdconverter.css">
+</head>
+<body class="is-loading">
+
+<div class="xfer" aria-hidden="true">
+  <div class="xfer__half xfer__half--top"></div>
+  <div class="xfer__half xfer__half--bot"></div>
+  <div class="xfer__seam"></div>
+  <div class="xfer__brand">
+    <img src="logo.png" alt="">
+    <span>Insomnia<em>Dev</em></span>
+  </div>
+</div>
+
+<div class="bg" aria-hidden="true">
+  <div class="bg__grid"></div>
+</div>
+
+<header class="nav reveal" style="--d:80ms">
+  <a class="nav__brand" href="beranda.html" data-nav>
+    <img src="logo.png" alt="Logo Insomnia Dev">
+    <b>Insomnia<em>Dev</em></b>
+  </a>
+  <nav class="nav__links" id="navViewport" aria-label="Navigasi utama">
+    <div class="nav__track" id="navTrack">
+      <a href="beranda.html" class="nav__link" data-nav>Beranda</a>
+      <a href="tools.html" class="nav__link is-active" data-nav>Tools</a>
+      <a href="req.html" class="nav__link" data-nav>Req</a>
+      <a href="info.html" class="nav__link" data-nav>Information</a>
+    </div>
+  </nav>
+</header>
+
+<main class="page">
+
+  <section class="hero reveal" style="--d:160ms">
+    <div class="hero__badge"><i></i> Tools · ST7735 Converter</div>
+    <h1 class="hero__title">
+      Gambar ke<br><em>Format LCD.</em>
+    </h1>
+    <p class="hero__desc">
+      Konversi foto atau video menjadi C++ array (RGB565) siap pakai
+      untuk layar TFT ST7735 di Arduino/ESP32.
+    </p>
+  </section>
+
+  <section class="lcd reveal" style="--d:240ms">
+    <div class="lcd__head">
+      <div class="lcd__mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+      </div>
+      <div>
+        <div class="lcd__kicker">ST7735 Converter</div>
+        <h2 class="lcd__title">Preview & <em>Konversi</em></h2>
+      </div>
+    </div>
+
+    <!-- Preview Grid -->
+    <div class="lcd__grid">
+      
+      <!-- Original File -->
+      <div class="lcd__panel">
+        <div class="lcd__panel-title">File Asli</div>
+        <div class="lcd__upload" id="lcdUpload">
+          <input type="file" id="lcdFile" accept="image/*,video/*">
+          <div class="lcd__upload-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div class="lcd__upload-text">Pilih Foto / Video</div>
+          <div class="lcd__upload-sub">Maks 10MB</div>
+        </div>
+        
+        <div class="lcd__canvas-wrap" id="lcdOriginalWrap" hidden>
+          <canvas id="lcdOriginalCanvas"></canvas>
+        </div>
+        
+        <div class="lcd__video-ctrl" id="lcdVideoCtrl" hidden>
+          <button class="lcd__btn-play" id="lcdPlayBtn">
+            <svg id="lcdPlayIcon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <div class="lcd__video-time" id="lcdVideoTime">00:00 / 00:00</div>
+        </div>
+      </div>
+
+      <!-- LCD Preview -->
+      <div class="lcd__panel">
+        <div class="lcd__panel-title">
+          Preview LCD
+          <span id="lcdDimLabel" style="color:var(--blue-600);">128 x 160</span>
+        </div>
+        <div class="lcd__canvas-wrap lcd__canvas-wrap--lcd" id="lcdPreviewWrap">
+          <canvas id="lcdPreviewCanvas" width="128" height="160"></canvas>
+        </div>
+        <div style="font-size:11.5px; color:var(--muted); text-align:center;">
+          Gambar di atas adalah simulasi tampilan pixel pada ST7735.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Controls -->
+    <div class="lcd__controls">
+      <div class="lcd__field">
+        <label class="lcd__label">Resolusi TFT</label>
+        <select class="lcd__select" id="lcdRes">
+          <option value="128x160">128 x 160 (Portrait)</option>
+          <option value="160x128">160 x 128 (Landscape)</option>
+          <option value="128x128">128 x 128 (Square)</option>
+        </select>
+      </div>
+
+      <div class="lcd__field">
+        <label class="lcd__label">Rotation</label>
+        <select class="lcd__select" id="lcdRotate">
+          <option value="0">0° (Normal)</option>
+          <option value="90">90° (Kanan)</option>
+          <option value="180">180° (Terbalik)</option>
+          <option value="270">270° (Kiri)</option>
+        </select>
+      </div>
+
+      <div class="lcd__field">
+        <label class="lcd__label">Scale / Zoom</label>
+        <input type="range" class="lcd__range" id="lcdScale" min="0.1" max="3" step="0.05" value="1">
+        <div class="lcd__range-val" id="lcdScaleVal">1.00x</div>
+      </div>
+
+      <div class="lcd__field">
+        <label class="lcd__label">Offset X (Geser Kiri/Kanan)</label>
+        <input type="range" class="lcd__range" id="lcdOffsetX" min="-100" max="100" step="1" value="0">
+        <div class="lcd__range-val" id="lcdOffsetXVal">0px</div>
+      </div>
+
+      <div class="lcd__field">
+        <label class="lcd__label">Offset Y (Geser Atas/Bawah)</label>
+        <input type="range" class="lcd__range" id="lcdOffsetY" min="-100" max="100" step="1" value="0">
+        <div class="lcd__range-val" id="lcdOffsetYVal">0px</div>
+      </div>
+
+      <div class="lcd__field" id="lcdFpsField" hidden>
+        <label class="lcd__label">Video FPS (Frame Rate)</label>
+        <select class="lcd__select" id="lcdFps">
+          <option value="10">10 FPS (Disarankan)</option>
+          <option value="15">15 FPS</option>
+          <option value="24">24 FPS</option>
+          <option value="30">30 FPS (Berat)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Action -->
+    <div class="lcd__action">
+      <button class="lcd__submit" id="lcdSubmit" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+        <span id="lcdSubmitLabel">Convert & Download .h</span>
+      </button>
+      <div class="lcd__status" id="lcdStatus"></div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer class="foot reveal" style="--d:320ms">
+  &copy; <span id="y">2025</span> <span>Insomnia Dev</span>. Semua hak dilindungi.
+</footer>
+
+<script src="app.js" defer></script>
+
+<script>
+(function () {
+  "use strict";
+
+  function initLcd() {
+    var fileInput = document.getElementById("lcdFile");
+    if (!fileInput) return;
+
+    var yearEl = document.getElementById("y");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    // DOM Elements
+    var uploadBox = document.getElementById("lcdUpload");
+    var originalWrap = document.getElementById("lcdOriginalWrap");
+    var originalCanvas = document.getElementById("lcdOriginalCanvas");
+    var previewWrap = document.getElementById("lcdPreviewWrap");
+    var previewCanvas = document.getElementById("lcdPreviewCanvas");
+    var ctxOrig = originalCanvas.getContext("2d", { willReadFrequently: true });
+    var ctxPrev = previewCanvas.getContext("2d", { willReadFrequently: true });
+
+    var videoCtrl = document.getElementById("lcdVideoCtrl");
+    var playBtn = document.getElementById("lcdPlayBtn");
+    var playIcon = document.getElementById("lcdPlayIcon");
+    var videoTimeLabel = document.getElementById("lcdVideoTime");
+    
+    var resSelect = document.getElementById("lcdRes");
+    var rotateSelect = document.getElementById("lcdRotate");
+    var scaleInput = document.getElementById("lcdScale");
+    var scaleVal = document.getElementById("lcdScaleVal");
+    var oxInput = document.getElementById("lcdOffsetX");
+    var oxVal = document.getElementById("lcdOffsetXVal");
+    var oyInput = document.getElementById("lcdOffsetY");
+    var oyVal = document.getElementById("lcdOffsetYVal");
+    var fpsField = document.getElementById("lcdFpsField");
+    var fpsSelect = document.getElementById("lcdFps");
+
+    var submitBtn = document.getElementById("lcdSubmit");
+    var submitLabel = document.getElementById("lcdSubmitLabel");
+    var statusEl = document.getElementById("lcdStatus");
+
+    // State
+    var mediaType = null; // 'image' | 'video'
+    var mediaObj = null; // Image or Video element
+    var isPlaying = false;
+    var animId = null;
+
+    // Default resolution
+    var tW = 128, tH = 160;
+
+    // --- Helper Functions ---
+    function showStatus(msg, type) {
+      statusEl.textContent = msg;
+      statusEl.className = "lcd__status is-" + type;
+    }
+    function clearStatus() {
+      statusEl.className = "lcd__status";
+      statusEl.textContent = "";
+    }
+
+    function formatTime(sec) {
+      var m = Math.floor(sec / 60);
+      var s = Math.floor(sec % 60);
+      return (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+    }
+
+    // --- Core Drawing Logic ---
+    function drawFrames() {
+      if (!mediaObj) return;
+
+      // 1. Dapatkan dimensi sumber
+      var sw = mediaType === "video" ? mediaObj.videoWidth : mediaObj.naturalWidth;
+      var sh = mediaType === "video" ? mediaObj.videoHeight : mediaObj.naturalHeight;
+      if (!sw || !sh) return;
+
+      // 2. Set ukuran canvas original
+      originalCanvas.width = sw;
+      originalCanvas.height = sh;
+
+      // 3. Hitung transformasi
+      var rot = parseInt(rotateSelect.value, 10);
+      var scale = parseFloat(scaleInput.value);
+      var ox = parseInt(oxInput.value, 10);
+      var oy = parseInt(oyInput.value, 10);
+      
+      var scaleW = (tW / sw) * scale;
+      var scaleH = (tH / sh) * scale;
+      
+      // Karena ST7735 punya rotasi, kita sesuaikan scaling
+      if (rot === 90 || rot === 270) {
+         scaleW = (tH / sw) * scale;
+         scaleH = (tW / sh) * scale;
+      }
+
+      // Gambar Original
+      ctxOrig.clearRect(0, 0, sw, sh);
+      ctxOrig.drawImage(mediaObj, 0, 0, sw, sh);
+
+      // Gambar ke Preview LCD
+      ctxPrev.clearRect(0, 0, tW, tH);
+      ctxPrev.save();
+      
+      // Pindah ke tengah
+      ctxPrev.translate(tW / 2, tH / 2);
+      
+      // Rotate
+      ctxPrev.rotate((rot * Math.PI) / 180);
+      
+      // Geser (Offset X/Y)
+      // Karena canvas diputar, X/Y sedikit berbeda pengaruhnya, tapi kita simpelkan
+      ctxPrev.translate(ox, oy);
+
+      // Skala
+      ctxPrev.scale(scaleW, scaleH);
+      
+      // Posisi tengah
+      ctxPrev.drawImage(mediaObj, -sw / 2, -sh / 2, sw, sh);
+      ctxPrev.restore();
+    }
+
+    function updateLoop() {
+      if (mediaType === "video" && isPlaying) {
+        drawFrames();
+        var cur = mediaObj.currentTime;
+        var dur = mediaObj.duration || 0;
+        videoTimeLabel.textContent = formatTime(cur) + " / " + formatTime(dur);
+        animId = requestAnimationFrame(updateLoop);
+      }
+    }
+
+    // --- Event Listeners ---
+    
+    // File Upload
+    fileInput.addEventListener("change", function(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+
+      clearStatus();
+      if (file.size > 10 * 1024 * 1024) {
+        showStatus("File maksimal 10MB", "error");
+        return;
+      }
+
+      var url = URL.createObjectURL(file);
+      submitBtn.disabled = true;
+      uploadBox.hidden = true;
+      originalWrap.hidden = false;
+
+      // Cek Tipe
+      if (file.type.startsWith("video/")) {
+        mediaType = "video";
+        fpsField.hidden = false;
+        videoCtrl.hidden = false;
+
+        var video = document.createElement("video");
+        video.src = url;
+        video.muted = true;
+        video.playsInline = true;
+        video.loop = true;
+        
+        video.onloadedmetadata = function() {
+          mediaObj = video;
+          submitBtn.disabled = false;
+          submitLabel.textContent = "Convert Video & Download .h";
+          drawFrames();
+          
+          videoTimeLabel.textContent = "00:00 / " + formatTime(video.duration);
+          
+          // Auto play for preview
+          video.play();
+          isPlaying = true;
+          playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; // Pause icon
+          if(animId) cancelAnimationFrame(animId);
+          updateLoop();
+        };
+        
+        video.onerror = function() {
+          showStatus("Gagal memuat video. Format tidak didukung browser.", "error");
+        };
+      } 
+      else if (file.type.startsWith("image/")) {
+        mediaType = "image";
+        fpsField.hidden = true;
+        videoCtrl.hidden = true;
+
+        var img = new Image();
+        img.src = url;
+        img.onload = function() {
+          mediaObj = img;
+          submitBtn.disabled = false;
+          submitLabel.textContent = "Convert Foto & Download .h";
+          drawFrames();
+        };
+        img.onerror = function() {
+          showStatus("Gagal memuat gambar.", "error");
+        };
+      } 
+      else {
+        showStatus("Format file tidak didukung. Gunakan foto atau video.", "error");
+      }
+    });
+
+    // Controls change
+    function onControlChange() {
+      scaleVal.textContent = parseFloat(scaleInput.value).toFixed(2) + "x";
+      oxVal.textContent = oxInput.value + "px";
+      oyVal.textContent = oyInput.value + "px";
+      
+      var dims = resSelect.value.split("x");
+      tW = parseInt(dims[0], 10);
+      tH = parseInt(dims[1], 10);
+      previewCanvas.width = tW;
+      previewCanvas.height = tH;
+      document.getElementById("lcdDimLabel").textContent = tW + " x " + tH;
+
+      // Atur class landscape untuk CSS
+      if (tW > tH) {
+        previewWrap.classList.add("landscape");
+      } else {
+        previewWrap.classList.remove("landscape");
+      }
+      
+      drawFrames();
+    }
+
+    scaleInput.addEventListener("input", onControlChange);
+    oxInput.addEventListener("input", onControlChange);
+    oyInput.addEventListener("input", onControlChange);
+    resSelect.addEventListener("change", onControlChange);
+    rotateSelect.addEventListener("change", onControlChange);
+
+    // Video Controls
+    playBtn.addEventListener("click", function() {
+      if (!mediaObj || mediaType !== "video") return;
+      if (isPlaying) {
+        mediaObj.pause();
+        isPlaying = false;
+        playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+        if(animId) cancelAnimationFrame(animId);
+      } else {
+        mediaObj.play();
+        isPlaying = true;
+        playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+        updateLoop();
+      }
+    });
+
+    // --- Export Logic ---
+    submitBtn.addEventListener("click", async function() {
+      if (!mediaObj) return;
+
+      submitBtn.disabled = true;
+      showStatus("Memproses data...", "info");
+
+      // Beri waktu UI untuk render status
+      await new Promise(r => setTimeout(r, 50));
+
+      try {
+        if (mediaType === "image") {
+          generateImageHeader();
+        } else {
+          await generateVideoHeader();
+        }
+      } catch (err) {
+        console.error(err);
+        showStatus("Gagal memproses: " + err.message, "error");
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    function rgbTo565(r, g, b) {
+      // 5-bit Red (shift 11), 6-bit Green (shift 5), 5-bit Blue
+      return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
+    }
+
+    function downloadFile(content, filename) {
+      var blob = new Blob([content], { type: "text/plain" });
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+      showStatus("Berhasil! File " + filename + " telah diunduh.", "success");
+    }
+
+    function generateImageHeader() {
+      // Pastikan canvas dalam posisi yang benar
+      drawFrames();
+      
+      var imgData = ctxPrev.getImageData(0, 0, tW, tH).data;
+      var pixels = [];
+      
+      for (var i = 0; i < imgData.length; i += 4) {
+        var r = imgData[i];
+        var g = imgData[i+1];
+        var b = imgData[i+2];
+        var rgb565 = rgbTo565(r, g, b);
+        // Format ke hex 4 digit
+        pixels.push("0x" + rgb565.toString(16).padStart(4, "0"));
+      }
+
+      var header = "";
+      header += "// Generated by Insomnia Dev LCD Converter\n";
+      header += "// Resolution: " + tW + "x" + tH + "\n\n";
+      header += "#include <pgmspace.h>\n\n";
+      header += "const uint16_t PROGMEM image_data[] = {\n  ";
+      
+      // Chunking per 16 pixel biar rapi
+      for (var i = 0; i < pixels.length; i++) {
+        header += pixels[i];
+        if (i < pixels.length - 1) header += ", ";
+        if ((i + 1) % 16 === 0) header += "\n  ";
+      }
+      
+      header += "\n};\n\n";
+      header += "// Size: " + (tW * tH * 2) + " bytes\n";
+
+      downloadFile(header, "image_" + tW + "x" + tH + ".h");
+    }
+
+    async function generateVideoHeader() {
+      var fps = parseInt(fpsSelect.value, 10);
+      var duration = mediaObj.duration;
+      
+      if (!duration || duration === Infinity) {
+        throw new Error("Durasi video tidak valid.");
+      }
+
+      // Hitung total frame
+      var totalFrames = Math.floor(duration * fps);
+      
+      // Batasi maksimal frame agar browser tidak crash (misal max 300 frame)
+      if (totalFrames > 300) {
+        totalFrames = 300;
+        showStatus("Video dipotong maksimal 300 frame agar tidak crash.", "info");
+      }
+
+      showStatus("Mengekstrak " + totalFrames + " frame...", "info");
+
+      // Pause video
+      mediaObj.pause();
+      isPlaying = false;
+      playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+      if(animId) cancelAnimationFrame(animId);
+
+      var header = "";
+      header += "// Generated by Insomnia Dev LCD Converter\n";
+      header += "// Resolution: " + tW + "x" + tH + "\n";
+      header += "// FPS: " + fps + " (Total " + totalFrames + " frames)\n\n";
+      header += "#include <pgmspace.h>\n\n";
+
+      var frameSize = tW * tH;
+      var dataArray = [];
+
+      for (var f = 0; f < totalFrames; f++) {
+        var time = f / fps;
+        mediaObj.currentTime = time;
+
+        // Tunggu sampai video di-seek
+        await new Promise(resolve => {
+          var onSeeked = function() {
+            mediaObj.removeEventListener("seeked", onSeeked);
+            resolve();
+          };
+          mediaObj.addEventListener("seeked", onSeeked);
+        });
+
+        // Gambar frame ke canvas
+        drawFrames();
+        
+        // Ambil data pixel
+        var imgData = ctxPrev.getImageData(0, 0, tW, tH).data;
+        var pixels = [];
+        for (var i = 0; i < imgData.length; i += 4) {
+          var rgb565 = rgbTo565(imgData[i], imgData[i+1], imgData[i+2]);
+          pixels.push("0x" + rgb565.toString(16).padStart(4, "0"));
+        }
+        
+        dataArray.push(pixels);
+        
+        // Update progress
+        if (f % 10 === 0) {
+          showStatus("Mengekstrak frame " + (f+1) + " / " + totalFrames + "...", "info");
+        }
+      }
+
+      // Tulis ke string C++
+      for (var f = 0; f < dataArray.length; f++) {
+        header += "const uint16_t PROGMEM video_frame_" + f + "[] = {\n  ";
+        var pixels = dataArray[f];
+        for (var i = 0; i < pixels.length; i++) {
+          header += pixels[i];
+          if (i < pixels.length - 1) header += ", ";
+          if ((i + 1) % 16 === 0) header += "\n  ";
+        }
+        header += "\n};\n\n";
+      }
+
+      // Array of pointers (opsional)
+      header += "// Array of frame pointers\n";
+      header += "const uint16_t* const PROGMEM video_frames[] = {\n  ";
+      for (var f = 0; f < dataArray.length; f++) {
+        header += "video_frame_" + f;
+        if (f < dataArray.length - 1) header += ", ";
+        if ((f + 1) % 8 === 0) header += "\n  ";
+      }
+      header += "\n};\n\n";
+      header += "const int video_frame_count = " + dataArray.length + ";\n";
+
+      // Restore state
+      mediaObj.currentTime = 0;
+      drawFrames();
+
+      downloadFile(header, "video_" + tW + "x" + tH + "_" + fps + "fps.h");
+    }
+
+    // Init
+    onControlChange();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initLcd);
+  } else {
+    initLcd();
+  }
+})();
+</script>
+
+</body>
+</html>
