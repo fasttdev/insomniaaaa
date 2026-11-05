@@ -8,6 +8,7 @@ const downloadHandler     = require("./api/download");
 const stalkttHandler      = require("./api/stalktt");
 const reqHandler          = require("./api/req");
 const wainspectorHandler  = require("./api/wainspector");
+const webtoapkHandler     = require("./api/webtoapk");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,7 +19,7 @@ app.use(express.json({ limit: "100kb" }));
 /* =========================================================
    BLOCK DIRECT ACCESS
    ========================================================= */
-const BLOCKED = ["server.js", "package.json", "package-lock.json", ".env"];
+const BLOCKED = ["server.js", "package.json", "package-lock.json", ".env", ".rfweb2apk_token.json"];
 
 app.use((req, res, next) => {
   const p = req.path.toLowerCase();
@@ -41,6 +42,7 @@ app.post("/api/download",     downloadHandler);
 app.post("/api/stalktt",      stalkttHandler);
 app.post("/api/req",          reqHandler);
 app.post("/api/wainspector",  wainspectorHandler);
+app.post("/api/webtoapk",     webtoapkHandler);
 
 /* =========================================================
    STATIC FILES
