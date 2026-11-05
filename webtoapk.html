@@ -125,6 +125,22 @@
         </div>
       </div>
 
+      <!-- Upload Icon -->
+      <div class="wa__field">
+        <label class="wa__label">Icon Aplikasi <span class="wa__label-hint">— Opsional</span></label>
+        <div class="wa__upload-wrap" id="waUploadWrap">
+          <input type="file" id="waIcon" class="wa__file-input" accept="image/png, image/jpeg">
+          <div class="wa__upload-preview" id="waUploadPreview">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <div class="wa__upload-info">
+            <div class="wa__upload-title" id="waUploadTitle">Pilih Gambar</div>
+            <div class="wa__upload-desc">PNG atau JPG, maks 2MB (kotak 512x512 disarankan)</div>
+          </div>
+          <button type="button" class="wa__upload-clear" id="waUploadClear" hidden>Hapus</button>
+        </div>
+      </div>
+
       <details class="wa__advanced">
         <summary>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
@@ -239,6 +255,13 @@
     var statusEl    = document.getElementById("waStatus");
     var resultEl    = document.getElementById("waResult");
 
+    // Upload Icon Elements
+    var iconInput    = document.getElementById("waIcon");
+    var uploadPreview= document.getElementById("waUploadPreview");
+    var uploadTitle  = document.getElementById("waUploadTitle");
+    var uploadClear  = document.getElementById("waUploadClear");
+    var selectedIcon = null;
+
     function escapeHtml(s) {
       return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
         return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
@@ -327,6 +350,42 @@
       });
     });
 
+    // Logic Upload Icon
+    iconInput.addEventListener("change", function () {
+      var file = iconInput.files[0];
+      if (!file) return;
+
+      if (file.size > 2 * 1024 * 1024) {
+        showStatus("Ukuran icon maksimal 2MB.", "error");
+        iconInput.value = "";
+        return;
+      }
+
+      if (file.type !== "image/png" && file.type !== "image/jpeg") {
+        showStatus("Format icon harus PNG atau JPG.", "error");
+        iconInput.value = "";
+        return;
+      }
+
+      selectedIcon = file;
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        uploadPreview.innerHTML = '<img src="' + e.target.result + '" alt="Preview">';
+        uploadTitle.textContent = file.name;
+        uploadClear.hidden = false;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    uploadClear.addEventListener("click", function (e) {
+      e.preventDefault();
+      iconInput.value = "";
+      selectedIcon = null;
+      uploadPreview.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+      uploadTitle.textContent = "Pilih Gambar";
+      uploadClear.hidden = true;
+    });
+
     form.addEventListener("submit", async function (ev) {
       ev.preventDefault();
 
@@ -393,19 +452,23 @@
 
       try {
         var controller = new AbortController();
-        var timeoutId = setTimeout(function () { controller.abort(); }, 300000); // 5 menit timeout client
+        var timeoutId = setTimeout(function () { controller.abort(); }, 300000); // 5 menit
+
+        var fd = new FormData();
+        fd.append("appName", appName);
+        fd.append("packageName", pkg);
+        fd.append("url", url);
+        fd.append("versionName", versionName);
+        fd.append("versionCode", versionCode);
+        fd.append("orientation", orientation);
+        
+        if (selectedIcon) {
+          fd.append("icon", selectedIcon);
+        }
 
         var res = await fetch("/api/webtoapk", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            appName: appName,
-            packageName: pkg,
-            url: url,
-            versionName: versionName,
-            versionCode: versionCode,
-            orientation: orientation
-          }),
+          body: fd, // Kirim sebagai multipart/form-data
           signal: controller.signal
         });
         clearTimeout(timeoutId);
