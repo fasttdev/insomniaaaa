@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Search — Insomnia Dev</title>
+<link rel="icon" href="logo.png" type="image/png">
+<link rel="stylesheet" href="beranda.css">
+<link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="googlesearch.css">
+</head>
+<body class="is-loading">
+
+<div class="xfer" aria-hidden="true">
+  <div class="xfer__half xfer__half--top"></div>
+  <div class="xfer__half xfer__half--bot"></div>
+  <div class="xfer__seam"></div>
+  <div class="xfer__brand">
+    <img src="logo.png" alt="">
+    <span>Insomnia<em>Dev</em></span>
+  </div>
+</div>
+
+<div class="bg" aria-hidden="true">
+  <div class="bg__grid"></div>
+</div>
+
+<header class="nav reveal" style="--d:80ms">
+  <a class="nav__brand" href="beranda.html" data-nav>
+    <img src="logo.png" alt="Logo Insomnia Dev">
+    <b>Insomnia<em>Dev</em></b>
+  </a>
+  <nav class="nav__links" id="navViewport" aria-label="Navigasi utama">
+    <div class="nav__track" id="navTrack">
+      <a href="beranda.html" class="nav__link" data-nav>Beranda</a>
+      <a href="tools.html" class="nav__link is-active" data-nav>Tools</a>
+      <a href="req.html" class="nav__link" data-nav>Req</a>
+      <a href="info.html" class="nav__link" data-nav>Information</a>
+    </div>
+  </nav>
+</header>
+
+<main class="page">
+
+  <section class="hero reveal" style="--d:160ms">
+    <div class="hero__badge"><i></i> Tools · Google Search</div>
+    <h1 class="hero__title">
+      Cari apapun<br><em>di internet.</em>
+    </h1>
+    <p class="hero__desc">
+      Cari halaman web atau gambar langsung dari mesin pencari.
+      Cepat, ringan, dan tanpa iklan.
+    </p>
+  </section>
+
+  <section class="gs reveal" style="--d:240ms">
+    <div class="gs__head">
+      <div class="gs__mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.4"
+             stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="M21 21l-4.35-4.35"/>
+        </svg>
+      </div>
+      <div>
+        <div class="gs__kicker">Google Search</div>
+        <h2 class="gs__title">Search & <em>Image</em></h2>
+      </div>
+    </div>
+
+    <div class="gs__tabs">
+      <div class="gs__tab is-active" id="tabWeb">Web Search</div>
+      <div class="gs__tab" id="tabImage">Image Search</div>
+    </div>
+
+    <form class="gs__form" id="gsForm" novalidate>
+      <div class="gs__control" id="gsControl">
+        <svg class="gs__control-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <input type="text" class="gs__input" id="gsInput"
+               placeholder="Masukkan kata kunci pencarian..."
+               autocomplete="off" spellcheck="false">
+      </div>
+      <button type="submit" class="gs__submit" id="gsSubmit">
+        <span class="gs__submit-label">Cari</span>
+        <span class="gs__spinner" id="gsSpinner" hidden></span>
+      </button>
+    </form>
+
+    <div class="gs__status" id="gsStatus" role="status" aria-live="polite" hidden></div>
+
+    <!-- Web Results -->
+    <div class="gs__web" id="gsWeb" hidden></div>
+
+    <!-- Image Results -->
+    <div class="gs__img" id="gsImg" hidden></div>
+
+  </section>
+
+</main>
+
+<footer class="foot reveal" style="--d:320ms">
+  &copy; <span id="y">2025</span> <span>Insomnia Dev</span>. Semua hak dilindungi.
+</footer>
+
+<script src="app.js" defer></script>
+
+<script>
+(function () {
+  "use strict";
+
+  function initGs() {
+    var form = document.getElementById("gsForm");
+    if (!form) return;
+
+    var yearEl = document.getElementById("y");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    var tabWeb = document.getElementById("tabWeb");
+    var tabImage = document.getElementById("tabImage");
+    var input = document.getElementById("gsInput");
+    var control = document.getElementById("gsControl");
+    var submit = document.getElementById("gsSubmit");
+    var spinner = document.getElementById("gsSpinner");
+    var label = submit.querySelector(".gs__submit-label");
+    var statusEl = document.getElementById("gsStatus");
+    var webEl = document.getElementById("gsWeb");
+    var imgEl = document.getElementById("gsImg");
+
+    var mode = "web"; // 'web' | 'image'
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    var ICONS = {
+      loading: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg>',
+      error:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>',
+      success: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+      info:    '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>'
+    };
+
+    function showStatus(text, type) {
+      statusEl.className = "gs__status is-" + (type || "info");
+      statusEl.innerHTML = (ICONS[type] || ICONS.info) + "<span>" + escapeHtml(text) + "</span>";
+      statusEl.hidden = false;
+    }
+    function hideStatus() {
+      statusEl.hidden = true;
+      statusEl.innerHTML = "";
+    }
+
+    // --- Tabs Logic ---
+    tabWeb.addEventListener("click", function() {
+      mode = "web";
+      tabWeb.classList.add("is-active");
+      tabImage.classList.remove("is-active");
+      input.placeholder = "Cari halaman web (contoh: berita hari ini)";
+      webEl.hidden = true;
+      imgEl.hidden = true;
+      hideStatus();
+    });
+
+    tabImage.addEventListener("click", function() {
+      mode = "image";
+      tabImage.classList.add("is-active");
+      tabWeb.classList.remove("is-active");
+      input.placeholder = "Cari gambar (contoh: aesthetic wallpaper)";
+      webEl.hidden = true;
+      imgEl.hidden = true;
+      hideStatus();
+    });
+
+    input.addEventListener("input", function () {
+      control.classList.remove("is-invalid");
+    });
+
+    // --- Render Functions ---
+    function renderWebResults(results) {
+      webEl.innerHTML = "";
+      if (!results || results.length === 0) {
+        webEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13.5px;">Tidak ada hasil web ditemukan.</div>';
+        webEl.hidden = false;
+        return;
+      }
+
+      var html = "";
+      for (var i = 0; i < results.length; i++) {
+        var v = results[i];
+        html += '<a href="' + escapeHtml(v.url) + '" target="_blank" rel="noopener noreferrer" class="gsw">';
+        html += '<div class="gsw__url">' + escapeHtml(v.url) + '</div>';
+        html += '<div class="gsw__title">' + escapeHtml(v.title) + '</div>';
+        html += '</a>';
+      }
+      webEl.innerHTML = html;
+      webEl.hidden = false;
+    }
+
+    function renderImageResults(results) {
+      imgEl.innerHTML = "";
+      if (!results || results.length === 0) {
+        imgEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted);font-size:13.5px;">Tidak ada gambar ditemukan.</div>';
+        imgEl.hidden = false;
+        return;
+      }
+
+      var html = "";
+      for (var i = 0; i < results.length; i++) {
+        var v = results[i];
+        html += '<a href="' + escapeHtml(v) + '" target="_blank" rel="noopener noreferrer" class="gsi">';
+        html += '<img src="' + escapeHtml(v) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display=\'none\'">';
+        html += '<div class="gsi__overlay">';
+        html += '<div class="gsi__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></div>';
+        html += '</div>';
+        html += '</a>';
+      }
+      imgEl.innerHTML = html;
+      imgEl.hidden = false;
+    }
+
+    // --- Submit ---
+    form.addEventListener("submit", async function (ev) {
+      ev.preventDefault();
+
+      var q = input.value.trim();
+      if (!q) {
+        control.classList.add("is-invalid");
+        showStatus("Masukkan kata kunci pencarian.", "error");
+        input.focus();
+        return;
+      }
+
+      webEl.hidden = true;
+      imgEl.hidden = true;
+      submit.disabled = true;
+      input.disabled = true;
+      spinner.hidden = false;
+      label.textContent = "Mencari";
+
+      showStatus("Mencari di internet...", "loading");
+
+      try {
+        var controller = new AbortController();
+        var timeoutId = setTimeout(function () { controller.abort(); }, 30000);
+
+        var res = await fetch("/api/googlesearch", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: mode, query: q }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        var json;
+        try { json = await res.json(); }
+        catch (e) { throw new Error("Server mengembalikan respons tidak valid."); }
+
+        if (!json.ok) throw new Error(json.error || "Gagal memproses pencarian.");
+
+        hideStatus();
+        
+        if (json.type === "web") {
+          if (json.data.length === 0) {
+            showStatus("Pencarian tidak menemukan hasil.", "info");
+          } else {
+            showStatus("Ditemukan " + json.data.length + " halaman web.", "success");
+          }
+          renderWebResults(json.data);
+        } else {
+          if (json.data.length === 0) {
+            showStatus("Pencarian tidak menemukan gambar.", "info");
+          } else {
+            showStatus("Ditemukan " + json.data.length + " gambar.", "success");
+          }
+          renderImageResults(json.data);
+        }
+
+      } catch (err) {
+        if (err.name === "AbortError") {
+          showStatus("Waktu habis. Server tidak merespons.", "error");
+        } else {
+          showStatus(err.message || "Terjadi kesalahan.", "error");
+        }
+      } finally {
+        submit.disabled = false;
+        input.disabled = false;
+        spinner.hidden = true;
+        label.textContent = "Cari";
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initGs);
+  } else {
+    initGs();
+  }
+})();
+</script>
+
+</body>
+</html>
