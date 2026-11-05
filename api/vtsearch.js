@@ -1,14 +1,15 @@
 /*
   Insomnia Dev — VT Search (TikTok Video Search)
-  Base: https://getdl.space
-  Creator: t.me/AwasPhpJir
+  Base: https://getdl.space (Primary)
+  Fallback: https://api.ikyyxd.my.id (Secondary)
 */
 
 const axios = require('axios');
 const { wrapper } = require('axios-cookiejar-support');
 const { CookieJar } = require('tough-cookie');
 
-const BASE_URL = 'https://getdl.space';
+const PRIMARY_URL = 'https://getdl.space';
+const FALLBACK_URL = 'https://api.ikyyxd.my.id';
 
 const HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Mobile Safari/537.36',
@@ -35,43 +36,32 @@ function checkRate(ip) {
 }
 
 /* =========================================================
-   CORE
+   CORE — PRIMARY (GetDL)
    ========================================================= */
-async function searchTikTok(query, count = 10, region = 'ID') {
+async function searchPrimary(query, count = 10, region = 'ID') {
     const jar = new CookieJar();
-    const client = wrapper(axios.create({
-        jar,
-        withCredentials: true,
-        timeout: 15000
-    }));
+    const client = wrapper(axios.create({ jar, withCredentials: true, timeout: 15000 }));
 
-    const sessionRes = await client.get(`${BASE_URL}/api/session`, { headers: HEADERS });
-    
+    const sessionRes = await client.get(`${PRIMARY_URL}/api/session`, { headers: HEADERS });
     if (!sessionRes.data?.success || !sessionRes.data.sessionId) {
-        throw new Error('Gagal inisialisasi session.');
+        throw new Error('Primary gagal inisialisasi session.');
     }
     
-    const sessionId = sessionRes.data.sessionId;
-
     const payload = {
         query: query,
         count: count,
         cursor: 0,
         region: region,
-        sessionId: sessionId,
+        sessionId: sessionRes.data.sessionId,
         sortType: 0
     };
 
-    const searchRes = await client.post(`${BASE_URL}/api/search/tiktok`, payload, { 
+    const searchRes = await client.post(`${PRIMARY_URL}/api/search/tiktok`, payload, { 
         headers: { ...HEADERS, 'Content-Type': 'application/json' }
     });
 
-    if (searchRes.status !== 200) {
-        throw new Error(`Server menolak request (Status: ${searchRes.status})`);
-    }
-
     if (!searchRes.data?.success) {
-        throw new Error(`API Error: ${searchRes.data.message || 'Unknown error'}`);
+        throw new Error(searchRes.data.message || 'API Error');
     }
 
     const { totalResults, videos } = searchRes.data.data;
@@ -89,6 +79,35 @@ async function searchTikTok(query, count = 10, region = 'ID') {
     return {
         query: query,
         total_results: totalResults,
+        data: results
+    };
+}
+
+/* =========================================================
+   CORE — FALLBACK (IkyyXD)
+   ========================================================= */
+async function searchFallback(query) {
+    const res = await axios.get(`${FALLBACK_URL}/search/tiktok?query=${encodeURIComponent(query)}`, { timeout: 15000 });
+    
+    if (!res.data || res.data.status !== true || !res.data.result) {
+        throw new Error(res.data?.message || 'Fallback API Error');
+    }
+    
+    // Mapping hasil dari API IkyyXD ke format yang sama
+    const videos = res.data.result.videos || res.data.result || [];
+    const results = videos.map((v, i) => ({
+        index: i + 1,
+        id: v.id || '',
+        title: v.title || 'Tanpa judul',
+        duration: v.duration ? `${v.duration}s` : '-',
+        play_url: v.play || v.play_url || v.video_url || '',
+        cover_url: v.cover || v.cover_url || '',
+        created_at: new Date().toLocaleString('id-ID') // fallback date
+    })).filter(v => v.play_url);
+
+    return {
+        query: query,
+        total_results: results.length,
         data: results
     };
 }
@@ -131,11 +150,26 @@ async function handler(req, res) {
     }
 
     try {
-        const result = await searchTikTok(query);
+        // Coba Primary
+        let result;
+        try {
+            result = await searchPrimary(query);
+        } catch (err) {
+            console.warn("[VT SEARCH] Primary gagal, beralih ke Fallback:", err.message);
+            // Jika primary gagal (404/timeout), coba Fallback
+            result = await searchFallback(query);
+        }
+
         return sendJson(res, 200, { ok: true, data: result });
     } catch (err) {
         console.error("[VT SEARCH ERR]", err.message);
-        return sendJson(res, 500, { ok: false, error: err.message || "Gagal mencari video." });
+        
+        let errMsg = err.message;
+        if (err.response && err.response.status === 404) {
+            errMsg = "Layanan pencarian sedang gangguan (404). Coba lagi nanti.";
+        }
+        
+        return sendJson(res, 500, { ok: false, error: errMsg });
     }
 }
 
