@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WA Inspector — Insomnia Dev</title>
+<link rel="icon" href="logo.png" type="image/png">
+<link rel="stylesheet" href="beranda.css">
+<link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="wainspector.css">
+</head>
+<body class="is-loading">
+
+<div class="xfer" aria-hidden="true">
+  <div class="xfer__half xfer__half--top"></div>
+  <div class="xfer__half xfer__half--bot"></div>
+  <div class="xfer__seam"></div>
+  <div class="xfer__brand">
+    <img src="logo.png" alt="">
+    <span>Insomnia<em>Dev</em></span>
+  </div>
+</div>
+
+<div class="bg" aria-hidden="true">
+  <div class="bg__grid"></div>
+</div>
+
+<header class="nav reveal" style="--d:80ms">
+  <a class="nav__brand" href="beranda.html" data-nav>
+    <img src="logo.png" alt="Logo Insomnia Dev">
+    <b>Insomnia<em>Dev</em></b>
+  </a>
+  <nav class="nav__links" id="navViewport" aria-label="Navigasi utama">
+    <div class="nav__track" id="navTrack">
+      <a href="beranda.html" class="nav__link" data-nav>Beranda</a>
+      <a href="tools.html" class="nav__link is-active" data-nav>Tools</a>
+      <a href="req.html" class="nav__link" data-nav>Req</a>
+      <a href="info.html" class="nav__link" data-nav>Information</a>
+    </div>
+  </nav>
+</header>
+
+<main class="page">
+
+  <section class="hero reveal" style="--d:160ms">
+    <div class="hero__badge"><i></i> Tools · WA Inspector</div>
+    <h1 class="hero__title">
+      Cek nomor<br><em>WhatsApp.</em>
+    </h1>
+    <p class="hero__desc">
+      Analisa status, umur, bio, dan kategori nomor WhatsApp.
+      Bisa juga cek status OTP SMS untuk nomor tertentu.
+    </p>
+  </section>
+
+  <section class="wai reveal" style="--d:240ms" aria-labelledby="waiTitle">
+    <div class="wai__head">
+      <div class="wai__mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.4"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.9-.9L3 20l1.1-3.9A8.4 8.4 0 0 1 3 12a8.4 8.4 0 0 1 9-8.4 8.4 8.4 0 0 1 9 7.9z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="wai__kicker">WA Inspector</div>
+        <h2 class="wai__title" id="waiTitle">Inspeksi <em>nomor WA</em></h2>
+      </div>
+    </div>
+
+    <div class="wai__modes" role="radiogroup" aria-label="Mode inspeksi">
+      <label class="wai__mode">
+        <input type="radio" name="waiMode" value="wa" checked>
+        <span class="wai__mode-inner">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.4"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <span>Cek Nomor WA</span>
+        </span>
+      </label>
+      <label class="wai__mode">
+        <input type="radio" name="waiMode" value="otp_sms">
+        <span class="wai__mode-inner">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.4"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 4h16v12H8l-4 4z"/>
+          </svg>
+          <span>Cek OTP SMS</span>
+        </span>
+      </label>
+    </div>
+
+    <form id="waiForm" novalidate>
+      <div class="wai__field">
+        <label class="wai__label" for="waiNumber">Nomor Telepon</label>
+        <div class="wai__control" id="waiControl">
+          <textarea class="wai__textarea" id="waiNumber"
+                    rows="3"
+                    placeholder="081234567890&#10;081298765432&#10;(boleh lebih dari satu, pisah dengan enter atau koma)"
+                    spellcheck="false"
+                    inputmode="tel"
+                    aria-label="Nomor telepon"></textarea>
+        </div>
+        <div class="wai__hint">
+          Format bebas: <strong>08xx</strong>, <strong>+62xx</strong>, atau <strong>62xx</strong>.
+          Multiple nomor dipisah enter, koma, atau titik koma.
+        </div>
+      </div>
+
+      <button type="submit" class="wai__submit" id="waiSubmit">
+        <span class="wai__submit-label">Inspeksi</span>
+        <span class="wai__spinner" id="waiSpinner" hidden></span>
+      </button>
+    </form>
+
+    <div class="wai__status" id="waiStatus" role="status" aria-live="polite" hidden></div>
+    <div class="wai__results" id="waiResults"></div>
+  </section>
+
+</main>
+
+<footer class="foot reveal" style="--d:320ms">
+  &copy; <span id="y">2025</span> <span>Insomnia Dev</span>. Semua hak dilindungi.
+</footer>
+
+<script src="app.js" defer></script>
+
+<script>
+(function () {
+  "use strict";
+
+  function initWai() {
+    var form = document.getElementById("waiForm");
+    if (!form) return;
+
+    var yearEl = document.getElementById("y");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    var input    = document.getElementById("waiNumber");
+    var control  = document.getElementById("waiControl");
+    var submit   = document.getElementById("waiSubmit");
+    var spinner  = document.getElementById("waiSpinner");
+    var label    = submit.querySelector(".wai__submit-label");
+    var statusEl = document.getElementById("waiStatus");
+    var resultsEl = document.getElementById("waiResults");
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    var ICONS = {
+      loading: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg>',
+      error:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>',
+      success: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+      info:    '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>'
+    };
+
+    function showStatus(text, type) {
+      statusEl.className = "wai__status is-" + (type || "info");
+      statusEl.innerHTML = (ICONS[type] || ICONS.info) + "<span>" + escapeHtml(text) + "</span>";
+      statusEl.hidden = false;
+    }
+    function hideStatus() {
+      statusEl.hidden = true;
+      statusEl.innerHTML = "";
+    }
+
+    function renderTag(t) {
+      var cls = "wcard__tag";
+      if (t === "Mewah") cls += " is-gold";
+      else if (t === "Old") cls += " is-old";
+      else if (t === "Regular") cls += " is-regular";
+      return '<span class="' + cls + '">' + escapeHtml(t) + '</span>';
+    }
+
+    function renderCard(item) {
+      var isWa = item.status === "registered" || item.status === "unregistered";
+      var badgeClass = "wcard__badge";
+      var badgeText = "";
+
+      if (item.status === "invalid") {
+        badgeClass += " is-invalid";
+        badgeText = "Invalid";
+      } else if (item.status === "registered") {
+        badgeClass += " is-reg";
+        badgeText = "Terdaftar";
+      } else if (item.status === "unregistered") {
+        badgeClass += " is-unreg";
+        badgeText = "Tidak Terdaftar";
+      } else if (item.status === "ready") {
+        badgeClass += " is-reg";
+        badgeText = "Ready SMS";
+      } else if (item.status === "cooldown") {
+        badgeClass += " is-unreg";
+        badgeText = "Cooldown";
+      }
+
+      var html = '<div class="wcard">';
+
+      html += '<div class="wcard__head">';
+      html += '<div class="wcard__avatar" aria-hidden="true">';
+      html += '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.9-.9L3 20l1.1-3.9A8.4 8.4 0 0 1 3 12a8.4 8.4 0 0 1 9-8.4 8.4 8.4 0 0 1 9 7.9z"/></svg>';
+      html += '</div>';
+      html += '<div class="wcard__info">';
+      html += '<div class="wcard__number">' + escapeHtml(item.formatted) + '</div>';
+      html += '<div class="wcard__raw">input: ' + escapeHtml(item.raw) + '</div>';
+      html += '</div>';
+      html += '<span class="' + badgeClass + '">' + escapeHtml(badgeText) + '</span>';
+      html += '</div>';
+
+      html += '<div class="wcard__body">';
+
+      if (isWa) {
+        html += '<div class="wcard__row">' +
+                '<div class="wcard__row-label">Bio</div>' +
+                '<div class="wcard__row-value' +
+                (item.status === "unregistered" ? ' is-muted' : '') + '">' +
+                escapeHtml(item.bio || "-") + '</div></div>';
+
+        html += '<div class="wcard__row">' +
+                '<div class="wcard__row-label">Umur</div>' +
+                '<div class="wcard__row-value">' + escapeHtml(item.umur || "-") + '</div></div>';
+
+        html += '<div class="wcard__row">' +
+                '<div class="wcard__row-label">Status OTP</div>' +
+                '<div class="wcard__row-value' +
+                (item.otp === "Bisa Masuk" ? ' is-green' :
+                 item.otp === "Tidak Masuk" || item.otp === "Tidak (Blocked)" ? ' is-red' : '') + '">' +
+                escapeHtml(item.otp || "-") + '</div></div>';
+
+        html += '<div class="wcard__row">' +
+                '<div class="wcard__row-label">Kategori</div>' +
+                '<div class="wcard__tags">' +
+                (item.kategori || []).map(renderTag).join("") +
+                '</div></div>';
+      } else {
+        html += '<div class="wcard__row" style="grid-column:1 / -1">' +
+                '<div class="wcard__row-label">Status OTP SMS</div>' +
+                '<div class="wcard__row-value' +
+                (item.status === "ready" ? ' is-green' : ' is-red') + '">' +
+                escapeHtml(item.otp || "-") + '</div></div>';
+
+        html += '<div class="wcard__row" style="grid-column:1 / -1">' +
+                '<div class="wcard__row-label">Keterangan</div>' +
+                '<div class="wcard__tags">' +
+                (item.kategori || []).map(renderTag).join("") +
+                '</div></div>';
+      }
+
+      html += '</div>';
+
+      if (item.waLink) {
+        html += '<div class="wcard__footer">';
+        html += '<a class="wcard__link" href="' + escapeHtml(item.waLink) + '" target="_blank" rel="noopener noreferrer">';
+        html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.9-.9L3 20l1.1-3.9A8.4 8.4 0 0 1 3 12a8.4 8.4 0 0 1 9-8.4 8.4 8.4 0 0 1 9 7.9z"/></svg>';
+        html += 'Buka di WhatsApp';
+        html += '</a>';
+        html += '</div>';
+      }
+
+      html += '</div>';
+      return html;
+    }
+
+    function renderResults(data) {
+      resultsEl.innerHTML = "";
+      if (!data || !data.data) return;
+      var list = Array.isArray(data.data) ? data.data : [data.data];
+      var html = "";
+      for (var i = 0; i < list.length; i++) {
+        html += renderCard(list[i]);
+      }
+      resultsEl.innerHTML = html;
+    }
+
+    input.addEventListener("input", function () {
+      control.classList.remove("is-invalid");
+    });
+
+    form.addEventListener("submit", async function (ev) {
+      ev.preventDefault();
+
+      var number = input.value.trim();
+      if (!number) {
+        control.classList.add("is-invalid");
+        showStatus("Masukkan nomor terlebih dahulu.", "error");
+        input.focus();
+        return;
+      }
+
+      var modeEl = form.querySelector('input[name="waiMode"]:checked');
+      var mode = modeEl ? modeEl.value : "wa";
+
+      resultsEl.innerHTML = "";
+      submit.disabled = true;
+      input.disabled = true;
+      spinner.hidden = false;
+      label.textContent = "Memproses";
+
+      showStatus("Menginspeksi nomor, mohon tunggu…", "loading");
+
+      try {
+        var res = await fetch("/api/wainspector", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ number: number, mode: mode })
+        });
+
+        var json;
+        try { json = await res.json(); }
+        catch (e) { throw new Error("Server mengembalikan respons tidak valid."); }
+
+        if (!json.ok) throw new Error(json.error || "Gagal memproses nomor.");
+
+        hideStatus();
+        renderResults(json.data);
+      } catch (err) {
+        showStatus(err.message || "Terjadi kesalahan.", "error");
+      } finally {
+        submit.disabled = false;
+        input.disabled = false;
+        spinner.hidden = true;
+        label.textContent = "Inspeksi";
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initWai);
+  } else {
+    initWai();
+  }
+})();
+</script>
+
+</body>
+</html>
