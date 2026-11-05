@@ -1,0 +1,292 @@
+/*
+  Insomnia Dev — Request page styles
+  Reuse beranda.css untuk base, nav, hero, footer
+*/
+
+/* =========================================================
+   FORM CONTAINER
+   ========================================================= */
+.req{
+  position:relative;
+  background:#ffffff;
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:32px;
+  box-shadow:var(--shadow-card);
+  overflow:hidden;
+  max-width:720px;
+  width:100%;
+  margin:0 auto;
+}
+.req::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:5px;
+  background:linear-gradient(90deg,var(--blue-400),var(--blue-600),var(--blue-400));
+}
+
+.req__head{
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:24px;
+}
+.req__mark{
+  display:flex;align-items:center;justify-content:center;
+  width:48px;height:48px;border-radius:14px;
+  background:linear-gradient(135deg,var(--blue-400),var(--blue-600));
+  color:#fff;flex-shrink:0;
+  box-shadow:0 10px 22px -10px rgba(2,132,199,.7);
+}
+.req__kicker{
+  font-size:11px;font-weight:800;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--blue-600);margin-bottom:2px;
+}
+.req__title{
+  font-size:22px;font-weight:800;
+  letter-spacing:-.5px;color:var(--ink);
+}
+.req__title em{font-style:normal;color:var(--blue-600)}
+
+/* =========================================================
+   FORM
+   ========================================================= */
+.req__form{
+  display:flex;flex-direction:column;gap:20px;
+}
+
+.req__field{
+  display:flex;flex-direction:column;gap:8px;
+}
+
+.req__label{
+  font-size:11.5px;font-weight:800;
+  letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);
+}
+
+.req__label-hint{
+  font-weight:600;
+  text-transform:none;
+  letter-spacing:0;
+  color:var(--muted);
+  margin-left:4px;
+}
+
+/* ----- Input control ----- */
+.req__control{
+  position:relative;
+  display:flex;align-items:center;
+  background:#fff;
+  border:1.5px solid var(--line);
+  border-radius:14px;
+  transition:border-color .18s,box-shadow .18s;
+}
+.req__control:focus-within{
+  border-color:var(--blue-400);
+  box-shadow:0 0 0 4px rgba(56,189,248,.15);
+}
+.req__control.is-invalid{
+  border-color:var(--err);
+  box-shadow:0 0 0 4px rgba(185,28,28,.08);
+}
+
+.req__control-icon{
+  position:absolute;left:14px;
+  color:var(--muted);pointer-events:none;
+  transition:color .18s;
+}
+.req__control:focus-within .req__control-icon{color:var(--blue-500)}
+
+.req__input{
+  flex:1;min-width:0;
+  padding:14px 18px 14px 42px;
+  font-size:14.5px;color:var(--ink);
+  background:transparent;border:none;outline:none;
+  border-radius:14px;
+}
+.req__input::placeholder{color:var(--muted);opacity:.85}
+.req__input:disabled{opacity:.6;cursor:not-allowed}
+
+/* ----- Textarea ----- */
+.req__control--area{
+  align-items:stretch;
+  padding:0;
+}
+.req__textarea{
+  flex:1;min-width:0;
+  padding:14px 16px;
+  font-family:inherit;
+  font-size:14.5px;
+  line-height:1.6;
+  color:var(--ink);
+  background:transparent;
+  border:none;
+  outline:none;
+  border-radius:14px;
+  resize:vertical;
+  min-height:130px;
+  max-height:300px;
+}
+.req__textarea::placeholder{color:var(--muted);opacity:.85}
+.req__textarea:disabled{opacity:.6;cursor:not-allowed}
+
+.req__counter{
+  align-self:flex-end;
+  font-size:11px;
+  font-weight:700;
+  color:var(--muted);
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.02em;
+}
+.req__counter.is-warn{color:#b45309}
+.req__counter.is-limit{color:var(--err)}
+
+/* =========================================================
+   TYPE RADIO
+   ========================================================= */
+.req__types{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.req__type{
+  position:relative;
+  cursor:pointer;
+  display:block;
+}
+.req__type input{
+  position:absolute;
+  opacity:0;
+  width:0;height:0;
+  pointer-events:none;
+}
+
+.req__type-inner{
+  display:flex;align-items:center;justify-content:center;
+  gap:8px;
+  padding:14px 16px;
+  background:#fff;
+  border:1.5px solid var(--line);
+  border-radius:14px;
+  font-size:13.5px;
+  font-weight:700;
+  color:var(--ink-2);
+  transition:
+    border-color .18s,
+    background .18s,
+    color .18s,
+    box-shadow .18s,
+    transform .15s;
+}
+.req__type-inner svg{
+  color:var(--muted);
+  flex-shrink:0;
+  transition:color .18s;
+}
+
+.req__type:hover .req__type-inner{
+  border-color:var(--blue-200);
+}
+
+.req__type input:checked + .req__type-inner{
+  border-color:var(--blue-400);
+  background:var(--blue-50);
+  color:var(--blue-700);
+  box-shadow:0 0 0 4px rgba(56,189,248,.12);
+}
+.req__type input:checked + .req__type-inner svg{
+  color:var(--blue-500);
+}
+
+.req__type input:focus-visible + .req__type-inner{
+  outline:2px solid var(--blue-500);
+  outline-offset:2px;
+}
+
+/* =========================================================
+   SUBMIT
+   ========================================================= */
+.req__submit{
+  display:inline-flex;align-items:center;justify-content:center;
+  gap:10px;
+  width:100%;
+  font-size:15px;
+  font-weight:800;
+  color:#fff;
+  background:linear-gradient(135deg,var(--blue-400),var(--blue-600));
+  padding:15px 32px;
+  border:none;
+  border-radius:14px;
+  box-shadow:0 12px 26px -12px rgba(2,132,199,.7);
+  cursor:pointer;
+  transition:
+    background .18s,
+    transform .15s,
+    box-shadow .18s,
+    opacity .15s;
+}
+.req__submit:hover:not(:disabled){
+  transform:translateY(-1px);
+  box-shadow:0 18px 32px -14px rgba(2,132,199,.8);
+}
+.req__submit:active:not(:disabled){transform:translateY(0) scale(.99)}
+.req__submit:disabled{opacity:.7;cursor:not-allowed}
+
+.req__spinner{
+  width:16px;height:16px;
+  border:2px solid rgba(255,255,255,.35);
+  border-top-color:#fff;
+  border-radius:50%;
+  animation:spin .75s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+.req__status{
+  display:flex;align-items:flex-start;gap:9px;
+  margin-top:20px;
+  padding:13px 16px;
+  font-size:13.5px;line-height:1.55;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:var(--blue-50);
+  color:var(--ink-2);
+  word-break:break-word;
+}
+.req__status svg{flex-shrink:0;margin-top:1px}
+.req__status.is-loading{color:var(--blue-700);background:var(--blue-50);border-color:var(--blue-100)}
+.req__status.is-loading svg{animation:spin .9s linear infinite}
+.req__status.is-error{color:var(--err);background:var(--err-bg);border-color:var(--err-line)}
+.req__status.is-success{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)}
+
+/* =========================================================
+   NOTE / TIP
+   ========================================================= */
+.req__note{
+  margin-top:18px;
+  padding:14px 16px;
+  background:#fafcff;
+  border:1px dashed var(--line);
+  border-radius:12px;
+  font-size:12.5px;
+  line-height:1.6;
+  color:var(--muted);
+  text-align:left;
+}
+.req__note strong{
+  color:var(--ink-2);
+  font-weight:800;
+}
+
+/* =========================================================
+   RESPONSIF
+   ========================================================= */
+@media (max-width:640px){
+  .req{padding:20px;border-radius:18px}
+  .req__head{gap:12px;margin-bottom:20px}
+  .req__mark{width:42px;height:42px}
+  .req__title{font-size:19px}
+  .req__form{gap:18px}
+  .req__submit{padding:14px 20px;font-size:14.5px}
+}
