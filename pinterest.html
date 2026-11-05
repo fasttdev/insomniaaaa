@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pinterest Downloader — Insomnia Dev</title>
+<link rel="icon" href="logo.png" type="image/png">
+<link rel="stylesheet" href="beranda.css">
+<link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="pinterest.css">
+</head>
+<body class="is-loading">
+
+<div class="xfer" aria-hidden="true">
+  <div class="xfer__half xfer__half--top"></div>
+  <div class="xfer__half xfer__half--bot"></div>
+  <div class="xfer__seam"></div>
+  <div class="xfer__brand">
+    <img src="logo.png" alt="">
+    <span>Insomnia<em>Dev</em></span>
+  </div>
+</div>
+
+<div class="bg" aria-hidden="true">
+  <div class="bg__grid"></div>
+</div>
+
+<header class="nav reveal" style="--d:80ms">
+  <a class="nav__brand" href="beranda.html" data-nav>
+    <img src="logo.png" alt="Logo Insomnia Dev">
+    <b>Insomnia<em>Dev</em></b>
+  </a>
+  <nav class="nav__links" id="navViewport" aria-label="Navigasi utama">
+    <div class="nav__track" id="navTrack">
+      <a href="beranda.html" class="nav__link" data-nav>Beranda</a>
+      <a href="tools.html" class="nav__link is-active" data-nav>Tools</a>
+      <a href="req.html" class="nav__link" data-nav>Req</a>
+      <a href="info.html" class="nav__link" data-nav>Information</a>
+    </div>
+  </nav>
+</header>
+
+<main class="page">
+
+  <section class="hero reveal" style="--d:160ms">
+    <div class="hero__badge"><i></i> Tools · Pinterest</div>
+    <h1 class="hero__title">
+      Cari & Unduh<br><em>Pinterest.</em>
+    </h1>
+    <p class="hero__desc">
+      Cari inspirasi atau unduh foto dan video Pinterest tanpa watermark.
+      Cukup masukkan kata kunci atau tempel link Pinterest.
+    </p>
+  </section>
+
+  <section class="pin reveal" style="--d:240ms">
+    <div class="pin__head">
+      <div class="pin__mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0a12 12 0 0 0-4.373 23.178c-.105-.949-.2-2.405.042-3.441.219-.937 1.41-5.965 1.41-5.965s-.36-.719-.36-1.782c0-1.668.968-2.914 2.173-2.914 1.025 0 1.52.769 1.52 1.69 0 1.03-.656 2.569-.995 3.995-.283 1.198.6 2.174 1.78 2.174 2.136 0 3.776-2.252 3.776-5.503 0-2.876-2.067-4.886-5.018-4.886-3.418 0-5.424 2.564-5.424 5.213 0 1.033.397 2.14.893 2.742.098.118.112.221.083.341-.09.378-.292 1.192-.331 1.358-.053.218-.174.265-.4.159-1.495-.696-2.43-2.88-2.43-4.634 0-3.774 2.742-7.241 7.905-7.241 4.15 0 7.376 2.957 7.376 6.91 0 4.123-2.6 7.442-6.208 7.442-1.212 0-2.352-.63-2.743-1.375 0 0-.6 2.29-.746 2.85-.27 1.04-1 2.34-1.49 3.134A12 12 0 1 0 12 0z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="pin__kicker">Pinterest Tools</div>
+        <h2 class="pin__title">Search & <em>Download</em></h2>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="pin__tabs">
+      <div class="pin__tab is-active" id="tabSearch">Cari Inspirasi</div>
+      <div class="pin__tab" id="tabDownload">Unduh dari Link</div>
+    </div>
+
+    <form class="pin__form" id="pinForm" novalidate>
+      <div class="pin__control" id="pinControl">
+        <svg class="pin__control-icon" id="pinInputIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <input type="text" class="pin__input" id="pinInput"
+               placeholder="Kata kunci pencarian (contoh: aesthetic room)"
+               autocomplete="off" spellcheck="false">
+      </div>
+      <button type="submit" class="pin__submit" id="pinSubmit">
+        <span class="pin__submit-label">Cari</span>
+        <span class="pin__spinner" id="pinSpinner" hidden></span>
+      </button>
+    </form>
+
+    <div class="pin__status" id="pinStatus" role="status" aria-live="polite" hidden></div>
+
+    <!-- Search Results -->
+    <div class="pin__grid" id="pinGrid"></div>
+    
+    <!-- Download Result -->
+    <div class="pin__res" id="pinRes" hidden></div>
+
+  </section>
+
+</main>
+
+<footer class="foot reveal" style="--d:320ms">
+  &copy; <span id="y">2025</span> <span>Insomnia Dev</span>. Semua hak dilindungi.
+</footer>
+
+<script src="app.js" defer></script>
+
+<script>
+(function () {
+  "use strict";
+
+  function initPin() {
+    var form = document.getElementById("pinForm");
+    if (!form) return;
+
+    var yearEl = document.getElementById("y");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    var tabSearch = document.getElementById("tabSearch");
+    var tabDownload = document.getElementById("tabDownload");
+    var input = document.getElementById("pinInput");
+    var control = document.getElementById("pinControl");
+    var submit = document.getElementById("pinSubmit");
+    var spinner = document.getElementById("pinSpinner");
+    var label = submit.querySelector(".pin__submit-label");
+    var statusEl = document.getElementById("pinStatus");
+    var gridEl = document.getElementById("pinGrid");
+    var resEl = document.getElementById("pinRes");
+    var inputIcon = document.getElementById("pinInputIcon");
+
+    var mode = "search"; // 'search' | 'download'
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    var ICONS = {
+      loading: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg>',
+      error:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>',
+      success: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+      info:    '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>'
+    };
+
+    function showStatus(text, type) {
+      statusEl.className = "pin__status is-" + (type || "info");
+      statusEl.innerHTML = (ICONS[type] || ICONS.info) + "<span>" + escapeHtml(text) + "</span>";
+      statusEl.hidden = false;
+    }
+    function hideStatus() {
+      statusEl.hidden = true;
+      statusEl.innerHTML = "";
+    }
+
+    // --- Tabs Logic ---
+    tabSearch.addEventListener("click", function() {
+      mode = "search";
+      tabSearch.classList.add("is-active");
+      tabDownload.classList.remove("is-active");
+      input.placeholder = "Kata kunci pencarian (contoh: aesthetic room)";
+      inputIcon.innerHTML = '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/>';
+      label.textContent = "Cari";
+      input.value = "";
+      gridEl.innerHTML = "";
+      resEl.hidden = true;
+      hideStatus();
+    });
+
+    tabDownload.addEventListener("click", function() {
+      mode = "download";
+      tabDownload.classList.add("is-active");
+      tabSearch.classList.remove("is-active");
+      input.placeholder = "https://pinterest.com/pin/...";
+      inputIcon.innerHTML = '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>';
+      label.textContent = "Unduh";
+      input.value = "";
+      gridEl.innerHTML = "";
+      resEl.hidden = true;
+      hideStatus();
+    });
+
+    input.addEventListener("input", function () {
+      control.classList.remove("is-invalid");
+    });
+
+    // --- Render Functions ---
+    function renderSearchResults(results) {
+      gridEl.innerHTML = "";
+      if (!results || results.length === 0) {
+        gridEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted);font-size:13.5px;">Tidak ada hasil ditemukan.</div>';
+        return;
+      }
+
+      var html = "";
+      for (var i = 0; i < results.length; i++) {
+        var v = results[i];
+        var isVideo = v.type === "video";
+        var thumb = v.image || "";
+
+        html += '<a href="' + escapeHtml(v.pin || "#") + '" target="_blank" rel="noopener noreferrer" class="pcard">';
+        
+        html += '<div class="pcard__thumb">';
+        if (thumb) {
+          html += '<img src="' + escapeHtml(thumb) + '" alt="" loading="lazy" referrerpolicy="no-referrer">';
+        }
+        if (isVideo) {
+          html += '<div class="pcard__badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Video</div>';
+        }
+        html += '</div>';
+
+        html += '<div class="pcard__info">';
+        html += '<div class="pcard__title">' + escapeHtml(v.title || 'Pinterest Pin') + '</div>';
+        if (v.pinner && v.pinner.name) {
+          html += '<div class="pcard__user">By: ' + escapeHtml(v.pinner.name) + '</div>';
+        }
+        html += '</div>';
+
+        html += '</a>';
+      }
+      gridEl.innerHTML = html;
+    }
+
+    function renderDownloadResult(data) {
+      var isVideo = data.type === "video";
+      var mediaUrl = isVideo ? data.video : data.image;
+
+      var html = "";
+      if (mediaUrl) {
+        html += '<div class="pin__res-media">';
+        if (isVideo) {
+          html += '<video src="' + escapeHtml(mediaUrl) + '" controls playsinline autoplay loop muted></video>';
+        } else {
+          html += '<img src="' + escapeHtml(mediaUrl) + '" alt="Preview">';
+        }
+        html += '</div>';
+      }
+
+      html += '<div class="pin__res-body">';
+      html += '<div class="pin__res-title">' + escapeHtml(data.title || 'Pinterest Media') + '</div>';
+      if (data.description) {
+        html += '<div class="pin__res-desc">' + escapeHtml(data.description) + '</div>';
+      }
+
+      html += '<div class="pin__res-actions">';
+      
+      if (mediaUrl) {
+        html += '<a href="' + escapeHtml(mediaUrl) + '" class="pin__res-btn pin__res-btn--dl" target="_blank" rel="noopener noreferrer">';
+        html += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>';
+        html += ' Download ' + (isVideo ? 'Video' : 'Gambar');
+        html += '</a>';
+      }
+
+      html += '<a href="' + escapeHtml(data.url) + '" class="pin__res-btn pin__res-btn--link" target="_blank" rel="noopener noreferrer">';
+      html += 'Buka di Pinterest';
+      html += '</a>';
+
+      html += '</div>'; // actions
+      html += '</div>'; // body
+
+      resEl.innerHTML = html;
+      resEl.hidden = false;
+    }
+
+    // --- Submit ---
+    form.addEventListener("submit", async function (ev) {
+      ev.preventDefault();
+
+      var val = input.value.trim();
+      if (!val) {
+        control.classList.add("is-invalid");
+        showStatus(mode === "search" ? "Masukkan kata kunci." : "Masukkan URL Pinterest.", "error");
+        input.focus();
+        return;
+      }
+
+      gridEl.innerHTML = "";
+      resEl.hidden = true;
+      submit.disabled = true;
+      input.disabled = true;
+      spinner.hidden = false;
+      label.textContent = mode === "search" ? "Mencari" : "Mengunduh";
+
+      showStatus(mode === "search" ? "Mencari di Pinterest..." : "Mengekstrak media...", "loading");
+
+      try {
+        var controller = new AbortController();
+        var timeoutId = setTimeout(function () { controller.abort(); }, 30000);
+
+        var payload = mode === "search" ? { action: "search", query: val } : { action: "download", url: val };
+
+        var res = await fetch("/api/pinterest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        var json;
+        try { json = await res.json(); }
+        catch (e) { throw new Error("Server mengembalikan respons tidak valid."); }
+
+        if (!json.ok) throw new Error(json.error || "Gagal memproses permintaan.");
+
+        hideStatus();
+        
+        if (json.type === "search") {
+          if (json.data.length === 0) {
+            showStatus("Pencarian tidak menemukan hasil.", "info");
+          } else {
+            showStatus("Ditemukan " + json.data.length + " hasil.", "success");
+            renderSearchResults(json.data);
+          }
+        } else {
+          showStatus("Media berhasil diekstrak!", "success");
+          renderDownloadResult(json.data);
+        }
+
+      } catch (err) {
+        if (err.name === "AbortError") {
+          showStatus("Waktu habis. Server tidak merespons.", "error");
+        } else {
+          showStatus(err.message || "Terjadi kesalahan.", "error");
+        }
+      } finally {
+        submit.disabled = false;
+        input.disabled = false;
+        spinner.hidden = true;
+        label.textContent = mode === "search" ? "Cari" : "Unduh";
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initPin);
+  } else {
+    initPin();
+  }
+})();
+</script>
+
+</body>
+</html>
