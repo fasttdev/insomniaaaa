@@ -11,6 +11,7 @@ const wainspectorHandler  = require("./api/wainspector");
 const webtoapkHandler     = require("./api/webtoapk");
 const bypassHandler       = require("./api/bypass");
 const vtsearchHandler     = require("./api/vtsearch");
+const pinterestHandler    = require("./api/pinterest");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -47,6 +48,7 @@ app.post("/api/wainspector",  wainspectorHandler);
 app.post("/api/webtoapk",     webtoapkHandler);
 app.post("/api/bypass",       bypassHandler);
 app.post("/api/vtsearch",     vtsearchHandler);
+app.post("/api/pinterest",    pinterestHandler);
 
 /* =========================================================
    STATIC FILES
