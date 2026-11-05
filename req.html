@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Request — Insomnia Dev</title>
+<link rel="icon" href="logo.jpg" type="image/jpeg">
+<link rel="stylesheet" href="beranda.css">
+<link rel="stylesheet" href="req.css">
+</head>
+<body class="is-loading">
+
+<!-- TRANSITION OVERLAY -->
+<div class="xfer" aria-hidden="true">
+  <div class="xfer__half xfer__half--top"></div>
+  <div class="xfer__half xfer__half--bot"></div>
+  <div class="xfer__seam"></div>
+  <div class="xfer__brand">
+    <img src="logo.jpg" alt="">
+    <span>Insomnia<em>Dev</em></span>
+  </div>
+</div>
+
+<!-- LATAR -->
+<div class="bg" aria-hidden="true">
+  <div class="bg__grid"></div>
+</div>
+
+<!-- NAV -->
+<header class="nav reveal" style="--d:80ms">
+  <a class="nav__brand" href="beranda.html" data-nav>
+    <img src="logo.jpg" alt="Logo Insomnia Dev">
+    <b>Insomnia<em>Dev</em></b>
+  </a>
+  <nav class="nav__links" id="navViewport" aria-label="Navigasi utama">
+    <div class="nav__track" id="navTrack">
+      <a href="beranda.html" class="nav__link" data-nav>Beranda</a>
+      <a href="tools.html" class="nav__link" data-nav>Tools</a>
+      <a href="req.html" class="nav__link is-active" data-nav>Req</a>
+      <a href="info.html" class="nav__link" data-nav>Information</a>
+    </div>
+  </nav>
+</header>
+
+<!-- MAIN -->
+<main class="page">
+
+  <section class="hero reveal" style="--d:160ms">
+    <div class="hero__badge"><i></i> Request</div>
+    <h1 class="hero__title">
+      Mau tools apa<br><em>selanjutnya?</em>
+    </h1>
+    <p class="hero__desc">
+      Punya ide tools atau menu yang belum ada di situs ini?
+      Kirim request kamu lewat form di bawah. Kami baca semuanya.
+    </p>
+  </section>
+
+  <section class="req reveal" style="--d:240ms" aria-labelledby="reqTitle">
+    <div class="req__head">
+      <div class="req__mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.4"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 2 11 13"/>
+          <path d="M22 2 15 22l-4-9-9-4z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="req__kicker">Form Request</div>
+        <h2 class="req__title" id="reqTitle">Kirim <em>ide kamu</em></h2>
+      </div>
+    </div>
+
+    <form class="req__form" id="reqForm" novalidate>
+
+      <!-- NAMA -->
+      <div class="req__field">
+        <label class="req__label" for="reqName">Nama Kamu</label>
+        <div class="req__control" id="reqNameWrap">
+          <svg class="req__control-icon" width="16" height="16" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 21c0-4 4-7 8-7s8 3 8 7"/>
+          </svg>
+          <input type="text" class="req__input" id="reqName"
+                 maxlength="50" placeholder="Nama atau panggilan"
+                 autocomplete="name" spellcheck="false"
+                 aria-label="Nama">
+        </div>
+      </div>
+
+      <!-- JENIS -->
+      <div class="req__field">
+        <label class="req__label">Jenis Request</label>
+        <div class="req__types" role="radiogroup" aria-label="Jenis request">
+
+          <label class="req__type">
+            <input type="radio" name="reqType" value="Tools" checked>
+            <span class="req__type-inner">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2.4"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M14.7 6.3a4 4 0 1 1-5.4 5.4"/>
+                <path d="M14.7 6.3 21 12.6"/>
+                <path d="M3 21l7-7"/>
+              </svg>
+              <span>Tools</span>
+            </span>
+          </label>
+
+          <label class="req__type">
+            <input type="radio" name="reqType" value="Menu">
+            <span class="req__type-inner">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2.4"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 6h16"/>
+                <path d="M4 12h16"/>
+                <path d="M4 18h10"/>
+              </svg>
+              <span>Menu</span>
+            </span>
+          </label>
+
+        </div>
+      </div>
+
+      <!-- REQUEST -->
+      <div class="req__field">
+        <label class="req__label" for="reqText">
+          Detail Request
+          <span class="req__label-hint">— jelaskan sedetail mungkin</span>
+        </label>
+        <div class="req__control req__control--area" id="reqTextWrap">
+          <textarea class="req__textarea" id="reqText"
+                    maxlength="1000" rows="5"
+                    placeholder="Contoh: Tools untuk download story Instagram, atau menu downloader untuk Pinterest…"
+                    spellcheck="true"
+                    aria-label="Detail request"></textarea>
+        </div>
+        <div class="req__counter" id="reqCounter">
+          <span id="reqCount">0</span> / 1000
+        </div>
+      </div>
+
+      <!-- SUBMIT -->
+      <button type="submit" class="req__submit" id="reqSubmit">
+        <span class="req__submit-label">Kirim Request</span>
+        <span class="req__spinner" id="reqSpinner" hidden></span>
+      </button>
+
+    </form>
+
+    <div class="req__status" id="reqStatus" role="status" aria-live="polite" hidden></div>
+
+    <div class="req__note">
+      <strong>Tips:</strong> request yang jelas dan spesifik lebih cepat diproses.
+      Kami tidak menjamin semua request langsung dikerjakan, tapi semuanya dibaca dan dipertimbangkan.
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot reveal" style="--d:320ms">
+  &copy; <span id="y">2025</span> <span>Insomnia Dev</span>. Semua hak dilindungi.
+</footer>
+
+<script src="app.js" defer></script>
+
+<script>
+(function () {
+  "use strict";
+
+  function initReq() {
+    var form = document.getElementById("reqForm");
+    if (!form) return;
+
+    var yearEl = document.getElementById("y");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    var nameInput = document.getElementById("reqName");
+    var nameWrap  = document.getElementById("reqNameWrap");
+    var textInput = document.getElementById("reqText");
+    var textWrap  = document.getElementById("reqTextWrap");
+    var counter   = document.getElementById("reqCounter");
+    var countEl   = document.getElementById("reqCount");
+    var submit    = document.getElementById("reqSubmit");
+    var spinner   = document.getElementById("reqSpinner");
+    var label     = submit.querySelector(".req__submit-label");
+    var statusEl  = document.getElementById("reqStatus");
+
+    var MAX = 1000;
+
+    /* Counter */
+    function updateCounter() {
+      var len = textInput.value.length;
+      countEl.textContent = len;
+      counter.classList.toggle("is-warn", len > MAX * 0.85 && len <= MAX);
+      counter.classList.toggle("is-limit", len >= MAX);
+    }
+    textInput.addEventListener("input", updateCounter);
+    updateCounter();
+
+    /* Clear invalid state */
+    function clearInvalid(wrap) {
+      if (wrap) wrap.classList.remove("is-invalid");
+    }
+    nameInput.addEventListener("input", function () { clearInvalid(nameWrap); });
+    textInput.addEventListener("input", function () { clearInvalid(textWrap); });
+
+    /* Status */
+    var ICONS = {
+      loading: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg>',
+      error:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>',
+      success: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+      info:    '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>'
+    };
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    function showStatus(text, type) {
+      if (!statusEl) return;
+      statusEl.className = "req__status is-" + (type || "info");
+      statusEl.innerHTML = (ICONS[type] || ICONS.info) + "<span>" + escapeHtml(text) + "</span>";
+      statusEl.hidden = false;
+    }
+    function hideStatus() {
+      if (!statusEl) return;
+      statusEl.hidden = true;
+      statusEl.innerHTML = "";
+    }
+
+    /* Submit */
+    form.addEventListener("submit", async function (ev) {
+      ev.preventDefault();
+
+      var name = nameInput.value.trim();
+      var text = textInput.value.trim();
+      var typeEl = form.querySelector('input[name="reqType"]:checked');
+      var type = typeEl ? typeEl.value : "";
+
+      /* Client validation */
+      if (name.length < 2) {
+        clearInvalid(nameWrap);
+        nameWrap.classList.add("is-invalid");
+        showStatus("Nama minimal 2 karakter.", "error");
+        nameInput.focus();
+        return;
+      }
+      if (name.length > 50) {
+        clearInvalid(nameWrap);
+        nameWrap.classList.add("is-invalid");
+        showStatus("Nama maksimal 50 karakter.", "error");
+        nameInput.focus();
+        return;
+      }
+      if (text.length < 10) {
+        clearInvalid(textWrap);
+        textWrap.classList.add("is-invalid");
+        showStatus("Request minimal 10 karakter — jelaskan lebih detail.", "error");
+        textInput.focus();
+        return;
+      }
+      if (text.length > MAX) {
+        clearInvalid(textWrap);
+        textWrap.classList.add("is-invalid");
+        showStatus("Request terlalu panjang (maks " + MAX + " karakter).", "error");
+        textInput.focus();
+        return;
+      }
+
+      /* UI state */
+      submit.disabled = true;
+      nameInput.disabled = true;
+      textInput.disabled = true;
+      spinner.hidden = false;
+      label.textContent = "Mengirim";
+
+      showStatus("Mengirim request, mohon tunggu…", "loading");
+
+      try {
+        var controller = new AbortController();
+        var timeoutId = setTimeout(function () { controller.abort(); }, 30000);
+
+        var res = await fetch("/api/req", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: name, type: type, text: text }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        var json;
+        try { json = await res.json(); }
+        catch (e) { throw new Error("Server mengembalikan respons tidak valid."); }
+
+        if (!json.ok) throw new Error(json.error || "Gagal mengirim request.");
+
+        /* Success */
+        showStatus(json.message || "Request kamu sudah terkirim. Terima kasih!", "success");
+
+        /* Reset form */
+        nameInput.value = "";
+        textInput.value = "";
+        form.querySelector('input[name="reqType"][value="Tools"]').checked = true;
+        updateCounter();
+        clearInvalid(nameWrap);
+        clearInvalid(textWrap);
+      } catch (err) {
+        if (err.name === "AbortError") {
+          showStatus("Waktu habis. Server tidak merespons.", "error");
+        } else {
+          showStatus(err.message || "Terjadi kesalahan.", "error");
+        }
+      } finally {
+        submit.disabled = false;
+        nameInput.disabled = false;
+        textInput.disabled = false;
+        spinner.hidden = true;
+        label.textContent = "Kirim Request";
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initReq);
+  } else {
+    initReq();
+  }
+})();
+</script>
+
+</body>
+</html>
