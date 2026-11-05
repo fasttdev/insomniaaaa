@@ -4,32 +4,29 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Request — Insomnia Dev</title>
-<link rel="icon" href="logo.jpg" type="image/jpeg">
+<link rel="icon" href="logo.png" type="image/png">
 <link rel="stylesheet" href="beranda.css">
 <link rel="stylesheet" href="req.css">
 </head>
 <body class="is-loading">
 
-<!-- TRANSITION OVERLAY -->
 <div class="xfer" aria-hidden="true">
   <div class="xfer__half xfer__half--top"></div>
   <div class="xfer__half xfer__half--bot"></div>
   <div class="xfer__seam"></div>
   <div class="xfer__brand">
-    <img src="logo.jpg" alt="">
+    <img src="logo.png" alt="">
     <span>Insomnia<em>Dev</em></span>
   </div>
 </div>
 
-<!-- LATAR -->
 <div class="bg" aria-hidden="true">
   <div class="bg__grid"></div>
 </div>
 
-<!-- NAV -->
 <header class="nav reveal" style="--d:80ms">
   <a class="nav__brand" href="beranda.html" data-nav>
-    <img src="logo.jpg" alt="Logo Insomnia Dev">
+    <img src="logo.png" alt="Logo Insomnia Dev">
     <b>Insomnia<em>Dev</em></b>
   </a>
   <nav class="nav__links" id="navViewport" aria-label="Navigasi utama">
@@ -42,7 +39,6 @@
   </nav>
 </header>
 
-<!-- MAIN -->
 <main class="page">
 
   <section class="hero reveal" style="--d:160ms">
@@ -74,7 +70,6 @@
 
     <form class="req__form" id="reqForm" novalidate>
 
-      <!-- NAMA -->
       <div class="req__field">
         <label class="req__label" for="reqName">Nama Kamu</label>
         <div class="req__control" id="reqNameWrap">
@@ -91,7 +86,6 @@
         </div>
       </div>
 
-      <!-- JENIS -->
       <div class="req__field">
         <label class="req__label">Jenis Request</label>
         <div class="req__types" role="radiogroup" aria-label="Jenis request">
@@ -127,7 +121,6 @@
         </div>
       </div>
 
-      <!-- REQUEST -->
       <div class="req__field">
         <label class="req__label" for="reqText">
           Detail Request
@@ -145,7 +138,6 @@
         </div>
       </div>
 
-      <!-- SUBMIT -->
       <button type="submit" class="req__submit" id="reqSubmit">
         <span class="req__submit-label">Kirim Request</span>
         <span class="req__spinner" id="reqSpinner" hidden></span>
@@ -193,7 +185,6 @@
 
     var MAX = 1000;
 
-    /* Counter */
     function updateCounter() {
       var len = textInput.value.length;
       countEl.textContent = len;
@@ -203,14 +194,12 @@
     textInput.addEventListener("input", updateCounter);
     updateCounter();
 
-    /* Clear invalid state */
     function clearInvalid(wrap) {
       if (wrap) wrap.classList.remove("is-invalid");
     }
     nameInput.addEventListener("input", function () { clearInvalid(nameWrap); });
     textInput.addEventListener("input", function () { clearInvalid(textWrap); });
 
-    /* Status */
     var ICONS = {
       loading: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg>',
       error:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>',
@@ -236,7 +225,6 @@
       statusEl.innerHTML = "";
     }
 
-    /* Submit */
     form.addEventListener("submit", async function (ev) {
       ev.preventDefault();
 
@@ -245,7 +233,6 @@
       var typeEl = form.querySelector('input[name="reqType"]:checked');
       var type = typeEl ? typeEl.value : "";
 
-      /* Client validation */
       if (name.length < 2) {
         clearInvalid(nameWrap);
         nameWrap.classList.add("is-invalid");
@@ -275,7 +262,6 @@
         return;
       }
 
-      /* UI state */
       submit.disabled = true;
       nameInput.disabled = true;
       textInput.disabled = true;
@@ -302,10 +288,8 @@
 
         if (!json.ok) throw new Error(json.error || "Gagal mengirim request.");
 
-        /* Success */
         showStatus(json.message || "Request kamu sudah terkirim. Terima kasih!", "success");
 
-        /* Reset form */
         nameInput.value = "";
         textInput.value = "";
         form.querySelector('input[name="reqType"][value="Tools"]').checked = true;
