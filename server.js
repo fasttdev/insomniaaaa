@@ -9,6 +9,7 @@ const stalkttHandler      = require("./api/stalktt");
 const reqHandler          = require("./api/req");
 const wainspectorHandler  = require("./api/wainspector");
 const webtoapkHandler     = require("./api/webtoapk");
+const bypassHandler       = require("./api/bypass");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -43,6 +44,7 @@ app.post("/api/stalktt",      stalkttHandler);
 app.post("/api/req",          reqHandler);
 app.post("/api/wainspector",  wainspectorHandler);
 app.post("/api/webtoapk",     webtoapkHandler);
+app.post("/api/bypass",       bypassHandler);
 
 /* =========================================================
    STATIC FILES
