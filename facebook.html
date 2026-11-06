@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Facebook Downloader — Insomnia Dev</title>
+<link rel="icon" href="logo.png" type="image/png">
+<link rel="stylesheet" href="beranda.css">
+<link rel="stylesheet" href="tools.css">
+<link rel="stylesheet" href="facebook.css">
+</head>
+<body class="is-loading">
+
+<div class="xfer" aria-hidden="true">
+  <div class="xfer__half xfer__half--top"></div>
+  <div class="xfer__half xfer__half--bot"></div>
+  <div class="xfer__seam"></div>
+  <div class="xfer__brand">
+    <img src="logo.png" alt="">
+    <span>Insomnia<em>Dev</em></span>
+  </div>
+</div>
+
+<div class="bg" aria-hidden="true">
+  <div class="bg__grid"></div>
+</div>
+
+<header class="nav reveal" style="--d:80ms">
+  <a class="nav__brand" href="beranda.html" data-nav>
+    <img src="logo.png" alt="Logo Insomnia Dev">
+    <b>Insomnia<em>Dev</em></b>
+  </a>
+  <nav class="nav__links" id="navViewport" aria-label="Navigasi utama">
+    <div class="nav__track" id="navTrack">
+      <a href="beranda.html" class="nav__link" data-nav>Beranda</a>
+      <a href="tools.html" class="nav__link is-active" data-nav>Tools</a>
+      <a href="req.html" class="nav__link" data-nav>Req</a>
+      <a href="info.html" class="nav__link" data-nav>Information</a>
+    </div>
+  </nav>
+</header>
+
+<main class="page">
+
+  <section class="hero reveal" style="--d:160ms">
+    <div class="hero__badge"><i></i> Tools · Facebook Downloader</div>
+    <h1 class="hero__title">
+      Unduh video<br><em>Facebook.</em>
+    </h1>
+    <p class="hero__desc">
+      Simpan video dari Facebook tanpa watermark dan dengan kualitas terbaik.
+      Cukup tempel link video atau reel Facebook di bawah.
+    </p>
+  </section>
+
+  <section class="fb reveal" style="--d:240ms">
+    <div class="fb__head">
+      <div class="fb__mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="fb__kicker">Facebook Tools</div>
+        <h2 class="fb__title">Video <em>Downloader</em></h2>
+      </div>
+    </div>
+
+    <form class="fb__form" id="fbForm" novalidate>
+      <div class="fb__control" id="fbControl">
+        <svg class="fb__control-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+        </svg>
+        <input type="url" class="fb__input" id="fbUrl"
+               placeholder="https://www.facebook.com/reel/..."
+               autocomplete="off" spellcheck="false">
+      </div>
+      <button type="submit" class="fb__submit" id="fbSubmit">
+        <span class="fb__submit-label">Unduh</span>
+        <span class="fb__spinner" id="fbSpinner" hidden></span>
+      </button>
+    </form>
+
+    <p class="fb__hint">
+      Mendukung link video/reel Facebook publik. Pastikan video tidak di-private.
+    </p>
+
+    <div class="fb__status" id="fbStatus" role="status" aria-live="polite" hidden></div>
+
+    <div class="fbres" id="fbResult" hidden></div>
+
+  </section>
+
+</main>
+
+<footer class="foot reveal" style="--d:320ms">
+  &copy; <span id="y">2025</span> <span>Insomnia Dev</span>. Semua hak dilindungi.
+</footer>
+
+<script src="app.js" defer></script>
+
+<script>
+(function () {
+  "use strict";
+
+  function initFb() {
+    var form = document.getElementById("fbForm");
+    if (!form) return;
+
+    var yearEl = document.getElementById("y");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    var input = document.getElementById("fbUrl");
+    var control = document.getElementById("fbControl");
+    var submit = document.getElementById("fbSubmit");
+    var spinner = document.getElementById("fbSpinner");
+    var label = submit.querySelector(".fb__submit-label");
+    var statusEl = document.getElementById("fbStatus");
+    var resultEl = document.getElementById("fbResult");
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    var ICONS = {
+      loading: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg>',
+      error:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>',
+      success: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+      info:    '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>'
+    };
+
+    function showStatus(text, type) {
+      statusEl.className = "fb__status is-" + (type || "info");
+      statusEl.innerHTML = (ICONS[type] || ICONS.info) + "<span>" + escapeHtml(text) + "</span>";
+      statusEl.hidden = false;
+    }
+    function hideStatus() {
+      statusEl.hidden = true;
+      statusEl.innerHTML = "";
+    }
+
+    function renderResult(data) {
+      var html = "";
+
+      html += '<div class="fbres__head">';
+      if (data.thumbnail) {
+        html += '<div class="fbres__thumb">';
+        html += '<img src="' + escapeHtml(data.thumbnail) + '" alt="" onerror="this.style.display=\'none\'">';
+        html += '</div>';
+      }
+      
+      html += '<div class="fbres__info">';
+      html += '<div class="fbres__title">' + escapeHtml(data.title || 'Facebook Video') + '</div>';
+      if (data.author) {
+        html += '<div class="fbres__author">Oleh: ' + escapeHtml(data.author) + '</div>';
+      }
+      
+      var statsHtml = "";
+      if (data.stats && data.stats.views) statsHtml += '<span>👁️ ' + escapeHtml(data.stats.views) + '</span>';
+      if (data.stats && data.stats.reactions) statsHtml += '<span>👍 ' + escapeHtml(data.stats.reactions) + '</span>';
+      if (data.duration) statsHtml += '<span>⏱️ ' + escapeHtml(data.duration) + '</span>';
+      
+      if (statsHtml) {
+        html += '<div class="fbres__stats">' + statsHtml + '</div>';
+      }
+      
+      html += '</div>';
+      html += '</div>';
+
+      html += '<div class="fbres__actions">';
+      
+      if (data.downloads && data.downloads.hd) {
+        html += '<a class="fbres__btn fbres__btn--hd" href="' + escapeHtml(data.downloads.hd) + '" target="_blank" rel="noopener noreferrer">';
+        html += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>';
+        html += ' Download HD (Video)';
+        html += '</a>';
+      } else {
+        html += '<button class="fbres__btn fbres__btn--hd is-disabled" disabled>HD Tidak Tersedia</button>';
+      }
+
+      if (data.downloads && data.downloads.sd) {
+        html += '<a class="fbres__btn fbres__btn--sd" href="' + escapeHtml(data.downloads.sd) + '" target="_blank" rel="noopener noreferrer">';
+        html += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>';
+        html += ' Download SD (Video)';
+        html += '</a>';
+      } else {
+        html += '<button class="fbres__btn fbres__btn--sd is-disabled" disabled>SD Tidak Tersedia</button>';
+      }
+
+      html += '</div>';
+
+      resultEl.innerHTML = html;
+      resultEl.hidden = false;
+      resultEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    input.addEventListener("input", function () {
+      control.classList.remove("is-invalid");
+    });
+
+    form.addEventListener("submit", async function (ev) {
+      ev.preventDefault();
+
+      var url = input.value.trim();
+      if (!url) {
+        control.classList.add("is-invalid");
+        showStatus("Masukkan URL Facebook.", "error");
+        input.focus();
+        return;
+      }
+      if (!/^https?:\/\//i.test(url)) {
+        control.classList.add("is-invalid");
+        showStatus("URL harus dimulai dengan http:// atau https://", "error");
+        input.focus();
+        return;
+      }
+
+      resultEl.hidden = true;
+      resultEl.innerHTML = "";
+      submit.disabled = true;
+      input.disabled = true;
+      spinner.hidden = false;
+      label.textContent = "Mengunduh";
+
+      showStatus("Mengekstrak video, mohon tunggu…", "loading");
+
+      var timers = [];
+      var msgs = [
+        [5000,  "Memb
