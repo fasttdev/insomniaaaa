@@ -16,6 +16,7 @@ const texttoimageHandler  = require("./api/texttoimage");
 const playstoreHandler    = require("./api/playstore");
 const googlesearchHandler = require("./api/googlesearch");
 const igstalkerHandler    = require("./api/igstalker");
+const facebookHandler     = require("./api/facebook");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -57,6 +58,7 @@ app.post("/api/texttoimage",  texttoimageHandler);
 app.post("/api/playstore",    playstoreHandler);
 app.post("/api/googlesearch", googlesearchHandler);
 app.post("/api/igstalker",    igstalkerHandler);
+app.post("/api/facebook",     facebookHandler);
 
 /* =========================================================
    STATIC FILES
