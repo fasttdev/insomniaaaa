@@ -229,4 +229,61 @@
 
       var timers = [];
       var msgs = [
-        [5000,  "Memb
+        [5000,  "Membaca metadata video…"],
+        [10000, "Menyiapkan link download…"],
+        [20000, "Hampir selesai…"]
+      ];
+      for (var i = 0; i < msgs.length; i++) {
+        (function (delay, text) {
+          timers.push(setTimeout(function () { showStatus(text, "loading"); }, delay));
+        })(msgs[i][0], msgs[i][1]);
+      }
+
+      try {
+        var controller = new AbortController();
+        var timeoutId = setTimeout(function () { controller.abort(); }, 30000);
+
+        var res = await fetch("/api/facebook", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: url }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        var json;
+        try { json = await res.json(); }
+        catch (e) { throw new Error("Server mengembalikan respons tidak valid."); }
+
+        if (!json.ok) throw new Error(json.error || "Gagal memproses video.");
+
+        hideStatus();
+        showStatus("Video berhasil diekstrak!", "success");
+        renderResult(json.data);
+
+      } catch (err) {
+        if (err.name === "AbortError") {
+          showStatus("Waktu habis. Server tidak merespons.", "error");
+        } else {
+          showStatus(err.message || "Terjadi kesalahan.", "error");
+        }
+      } finally {
+        for (var t = 0; t < timers.length; t++) clearTimeout(timers[t]);
+        submit.disabled = false;
+        input.disabled = false;
+        spinner.hidden = true;
+        label.textContent = "Unduh";
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFb);
+  } else {
+    initFb();
+  }
+})();
+</script>
+
+</body>
+</html>
